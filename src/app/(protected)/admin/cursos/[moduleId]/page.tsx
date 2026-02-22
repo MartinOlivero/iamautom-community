@@ -35,6 +35,7 @@ export default function AdminLessonsPage() {
         if (moduleId) {
             fetchData();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [moduleId]);
 
     async function fetchData() {

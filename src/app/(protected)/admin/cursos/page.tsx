@@ -28,6 +28,7 @@ export default function AdminCursosPage() {
 
     useEffect(() => {
         fetchModules();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     async function fetchModules() {

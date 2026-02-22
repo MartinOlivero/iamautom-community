@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { Badge, UserBadge } from "@/types/database";
+import type { Badge } from "@/types/database";
 
 export interface BadgeWithStatus extends Badge {
     earned: boolean;
@@ -32,7 +32,7 @@ export function useBadges(userId?: string) {
         }
 
         // Fetch user's earned badges
-        let earnedMap: Record<string, string> = {};
+        const earnedMap: Record<string, string> = {};
 
         if (userId) {
             const { data: userBadges } = await supabase
