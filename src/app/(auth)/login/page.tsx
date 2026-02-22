@@ -1,17 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Link from "next/link";
 
-/**
- * Login/Register page with tab toggle.
- * Uses Supabase email/password authentication.
- */
-export default function LoginPage() {
+function LoginForm() {
     const [mode, setMode] = useState<"login" | "register">("login");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,7 +16,6 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
 
-    const router = useRouter();
     const searchParams = useSearchParams();
     const redirectTo = searchParams.get("redirect") || "/app/feed";
     const supabase = createClient();
@@ -84,6 +79,7 @@ export default function LoginPage() {
                     {/* Tabs */}
                     <div className="flex bg-brand-hover-bg rounded-input p-1 mb-6">
                         <button
+                            type="button"
                             onClick={() => { setMode("login"); setError(""); setSuccessMessage(""); }}
                             className={`flex-1 py-2 text-sm font-medium rounded-[6px] transition-all ${mode === "login"
                                 ? "bg-brand-card text-brand-text shadow-sm"
@@ -93,6 +89,7 @@ export default function LoginPage() {
                             Iniciar sesión
                         </button>
                         <button
+                            type="button"
                             onClick={() => { setMode("register"); setError(""); setSuccessMessage(""); }}
                             className={`flex-1 py-2 text-sm font-medium rounded-[6px] transition-all ${mode === "register"
                                 ? "bg-brand-card text-brand-text shadow-sm"
@@ -167,5 +164,18 @@ export default function LoginPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+/**
+ * Login/Register page with tab toggle.
+ * Uses Supabase email/password authentication.
+ * Wrapped in Suspense to prevent useSearchParams hydration errors in Next.js build.
+ */
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-brand-dark flex items-center justify-center text-brand-muted">Cargando plataforma...</div>}>
+            <LoginForm />
+        </Suspense>
     );
 }
