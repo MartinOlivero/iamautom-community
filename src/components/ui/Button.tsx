@@ -11,15 +11,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
     primary:
-        "bg-gradient-to-r from-brand-accent to-brand-accent-hover text-white hover:shadow-lg hover:shadow-brand-accent/25 active:scale-[0.98]",
+        "relative overflow-hidden group bg-gradient-to-r from-brand-accent to-brand-accent-hover text-white hover:text-white border-0 shadow-lg shadow-brand-accent/30 hover:shadow-brand-accent/50 hover:scale-105 active:scale-95 transition-all duration-300 before:absolute before:inset-0 before:bg-white/20 before:translate-x-[-100%] hover:before:translate-x-0 before:transition-transform before:duration-300",
     secondary:
-        "bg-brand-card text-brand-text border border-brand-border hover:bg-brand-hover-bg active:scale-[0.98]",
+        "bg-brand-card/50 backdrop-blur-md text-brand-text border border-white/10 hover:border-white/30 hover:bg-white/5 active:scale-[0.98] transition-all duration-300",
     ghost:
-        "bg-transparent text-brand-text-secondary hover:bg-brand-hover-bg hover:text-brand-text",
+        "bg-transparent text-brand-text-secondary hover:bg-white/5 hover:text-brand-text transition-all duration-300",
     danger:
-        "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 active:scale-[0.98]",
+        "bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 active:scale-[0.98] transition-all duration-300",
     gold:
-        "bg-gradient-to-r from-brand-gold to-yellow-300 text-brand-dark font-semibold hover:shadow-lg hover:shadow-brand-gold/25 active:scale-[0.98]",
+        "relative overflow-hidden group bg-gradient-to-r from-brand-gold to-yellow-400 text-black font-bold shadow-lg shadow-brand-gold/30 hover:shadow-brand-gold/50 hover:scale-105 active:scale-95 transition-all duration-300 before:absolute before:inset-0 before:bg-white/30 before:translate-x-[-100%] hover:before:translate-x-0 before:transition-transform before:duration-300",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

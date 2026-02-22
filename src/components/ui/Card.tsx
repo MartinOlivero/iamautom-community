@@ -25,13 +25,18 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
             <div
                 ref={ref}
                 className={`
-          bg-brand-card rounded-card border border-brand-border
-          ${hover ? "transition-shadow duration-200 hover:shadow-md hover:shadow-black/5 cursor-pointer" : ""}
+          relative overflow-hidden bg-brand-card/30 backdrop-blur-xl rounded-card border border-brand-border
           ${paddingStyles[padding]}
           ${className}
+          ${hover
+                        ? "transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-2xl hover:shadow-brand-accent/20 hover:border-brand-accent/40 hover:bg-brand-card/50 cursor-pointer group"
+                        : "transition-all duration-500"}
         `}
                 {...props}
             >
+                {hover && (
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-accent/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                )}
                 {children}
             </div>
         );

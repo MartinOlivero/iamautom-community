@@ -12,7 +12,7 @@ export default function Topbar() {
     const { profile, signOut } = useAuth();
 
     return (
-        <header className="sticky top-0 z-30 bg-brand-bg/80 backdrop-blur-md border-b border-brand-border">
+        <header className="sticky top-0 z-30 bg-brand-bg/60 backdrop-blur-2xl border-b border-white/5 transition-all duration-500">
             <div className="flex items-center justify-between h-14 px-4 lg:px-6">
                 {/* Mobile logo */}
                 <div className="lg:hidden flex items-center gap-2">

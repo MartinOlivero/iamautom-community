@@ -9,6 +9,8 @@ import PlanBadge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Button from "@/components/ui/Button";
 import { LEVEL_THRESHOLDS } from "@/lib/constants";
+import { useBadges } from "@/hooks/useBadges";
+import BadgeGrid from "@/components/gamification/BadgeGrid";
 
 /**
  * User profile page with stats and edit form.
@@ -177,6 +179,27 @@ export default function PerfilPage() {
                     {profile.xp_points.toLocaleString()} / {nextMin.toLocaleString()} XP
                 </p>
             </div>
+
+            {/* Badges */}
+            <div className="bg-brand-card rounded-card border border-brand-border p-5">
+                <h3 className="text-sm font-semibold text-brand-text mb-4">🏅 Mis Badges</h3>
+                <BadgeGridSection userId={user.id} />
+            </div>
+        </div>
+    );
+}
+
+/** Extracted so useBadges hook is only called when userId is available. */
+function BadgeGridSection({ userId }: { userId: string }) {
+    const { badges, isLoading } = useBadges(userId);
+    const earned = badges.filter((b) => b.earned).length;
+
+    return (
+        <div>
+            <p className="text-[10px] text-brand-muted mb-3">
+                {earned}/{badges.length} desbloqueados
+            </p>
+            <BadgeGrid badges={badges} isLoading={isLoading} />
         </div>
     );
 }

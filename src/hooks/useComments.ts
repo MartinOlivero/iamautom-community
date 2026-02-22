@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Comment, Profile } from "@/types/database";
+import { triggerXPAward } from "@/lib/xpClient";
 
 export type CommentWithAuthor = Omit<Comment, "author"> & {
     author: Pick<Profile, "id" | "full_name" | "avatar_url" | "plan_type">;
@@ -53,6 +54,10 @@ export function useComments(postId: string) {
             if (!error && data) {
                 const newComment = data as unknown as CommentWithAuthor;
                 setComments((prev) => [...prev, newComment]);
+
+                // Award XP for creating a comment
+                triggerXPAward("create_comment");
+
                 return newComment;
             }
             return null;

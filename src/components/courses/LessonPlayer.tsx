@@ -8,7 +8,7 @@ interface LessonPlayerProps {
         id: string;
         title: string;
         description: string;
-        video_url: string;
+        youtube_url: string;
         duration_minutes: number;
         attachments: string[];
     };
@@ -33,7 +33,7 @@ export default function LessonPlayer({ lesson, isCompleted, onComplete }: Lesson
     const [completing, setCompleting] = useState(false);
     const [completed, setCompleted] = useState(isCompleted);
 
-    const videoId = getYouTubeId(lesson.video_url);
+    const videoId = getYouTubeId(lesson.youtube_url);
 
     async function handleComplete() {
         setCompleting(true);

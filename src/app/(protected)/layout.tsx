@@ -1,6 +1,7 @@
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 import MobileNav from "@/components/layout/MobileNav";
+import XPToast from "@/components/gamification/XPToast";
 
 /**
  * Protected app layout — shown for all /app/* and /admin/* routes.
@@ -30,6 +31,9 @@ export default function ProtectedLayout({
 
             {/* Mobile bottom navigation */}
             <MobileNav />
+
+            {/* Gamification toast notifications */}
+            <XPToast />
         </div>
     );
 }

@@ -9,20 +9,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand colors
+        // Brand colors driven by CSS variables in globals.css for full dark mode support
         brand: {
-          bg: "#FAFAF9",
-          card: "#FFFFFF",
-          dark: "#0A0A0A",
-          text: "#0A0A0A",
-          "text-secondary": "#6B6B6B",
-          muted: "#A3A3A3",
-          accent: "#FF4D00",
-          "accent-hover": "#FF6D33",
-          gold: "#FFB800",
-          success: "#00C853",
-          border: "#E8E8E6",
-          "hover-bg": "#F0EFED",
+          bg: "var(--color-bg)",
+          card: "var(--color-card)",
+          dark: "var(--color-dark)",
+          text: "var(--color-text)",
+          "text-secondary": "var(--color-text-secondary)",
+          muted: "var(--color-muted)",
+          accent: "var(--color-accent)",
+          "accent-hover": "var(--color-accent-hover)",
+          gold: "var(--color-gold)",
+          success: "var(--color-success)",
+          border: "var(--color-border)",
+          "hover-bg": "var(--color-hover-bg)",
         },
       },
       fontFamily: {

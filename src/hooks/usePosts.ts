@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Post, Profile, PostReaction } from "@/types/database";
+import { triggerXPAward } from "@/lib/xpClient";
 
 /** Post with joined author, reactions, and comment count */
 export type PostWithDetails = Omit<Post, "author" | "reactions"> & {
@@ -124,6 +125,10 @@ export function usePosts(options: UsePostsOptions = {}) {
             } as PostWithDetails;
 
             setPosts((prev) => [newPost, ...prev]);
+
+            // Award XP for creating a post
+            triggerXPAward("create_post");
+
             return newPost;
         },
         [supabase, channel]

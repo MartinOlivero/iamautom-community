@@ -8,7 +8,7 @@ type XPAction = keyof typeof XP_REWARDS;
  * Uses admin client to bypass RLS.
  * Call from server actions or API routes only.
  */
-export async function awardXP(userId: string, action: XPAction): Promise<{ newXP: number; leveledUp: boolean; newLevel: string }> {
+export async function awardXP(userId: string, action: XPAction): Promise<{ newXP: number; leveledUp: boolean; newLevel: string; xpAmount: number }> {
     const supabase = createAdminClient();
     const xpAmount = XP_REWARDS[action];
 
@@ -45,5 +45,5 @@ export async function awardXP(userId: string, action: XPAction): Promise<{ newXP
         })
         .eq("id", userId);
 
-    return { newXP, leveledUp, newLevel };
+    return { newXP, leveledUp, newLevel, xpAmount };
 }

@@ -7,12 +7,13 @@ import { createClient } from "@/lib/supabase/client";
 import LessonPlayer from "@/components/courses/LessonPlayer";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Spinner from "@/components/ui/Spinner";
+import { triggerXPAward } from "@/lib/xpClient";
 
 interface Lesson {
     id: string;
     title: string;
     description: string;
-    video_url: string;
+    youtube_url: string;
     duration_minutes: number;
     order_index: number;
     attachments: string[];
@@ -107,6 +108,9 @@ export default function ModuleDetailPage() {
         );
 
         setCompletedLessonIds((prev) => new Set([...Array.from(prev), lessonId]));
+
+        // Award XP for completing a lesson
+        triggerXPAward("complete_lesson");
     }
 
     const activeLesson = lessons.find((l) => l.id === activeLessonId);

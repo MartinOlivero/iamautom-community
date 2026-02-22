@@ -16,7 +16,7 @@ export default function Sidebar() {
     const { profile } = useAuth();
 
     return (
-        <aside className="hidden lg:flex flex-col w-[260px] h-screen bg-brand-dark text-white fixed left-0 top-0 z-40">
+        <aside className="hidden lg:flex flex-col w-[260px] h-screen bg-[#0a0a0a]/70 backdrop-blur-2xl border-r border-white/5 text-white fixed left-0 top-0 z-40 transition-all duration-500 ease-in-out">
             {/* ── Logo ────────────────────────────────── */}
             <div className="px-6 py-6 border-b border-white/10">
                 <Link href="/app/feed" className="flex items-center gap-3">
