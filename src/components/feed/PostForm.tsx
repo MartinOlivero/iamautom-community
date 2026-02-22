@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import Button from "@/components/ui/Button";
 import Avatar from "@/components/ui/Avatar";
 import { useAuth } from "@/components/auth/AuthProvider";
 
@@ -10,9 +9,6 @@ interface PostFormProps {
     channel: string;
 }
 
-/**
- * Post creation form with auto-expanding textarea.
- */
 export default function PostForm({ onSubmit, channel }: PostFormProps) {
     const [content, setContent] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,7 +16,6 @@ export default function PostForm({ onSubmit, channel }: PostFormProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const { profile } = useAuth();
 
-    // Auto-expand textarea
     function handleInput() {
         const textarea = textareaRef.current;
         if (textarea) {
@@ -32,16 +27,11 @@ export default function PostForm({ onSubmit, channel }: PostFormProps) {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (!content.trim()) return;
-
         setIsSubmitting(true);
         await onSubmit(content.trim());
         setContent("");
         setIsFocused(false);
-
-        // Reset textarea height
-        if (textareaRef.current) {
-            textareaRef.current.style.height = "auto";
-        }
+        if (textareaRef.current) textareaRef.current.style.height = "auto";
         setIsSubmitting(false);
     }
 
@@ -50,19 +40,19 @@ export default function PostForm({ onSubmit, channel }: PostFormProps) {
         proyectos: "Proyectos",
         soporte: "Soporte",
         off_topic: "Off Topic",
-        inner_circle_vip: "Inner Circle VIP",
+        inner_circle_vip: "Inner Circle",
     };
 
     return (
-        <div className="bg-brand-card rounded-card border border-brand-border p-4">
+        <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${isFocused ? 'border-[#38bdf8]/40 bg-[rgba(10,16,30,0.9)] shadow-[0_0_30px_rgba(56,189,248,0.08)]' : 'border-white/[0.07] bg-[rgba(10,16,30,0.6)]'}`}>
             <form onSubmit={handleSubmit}>
-                <div className="flex gap-3">
+                <div className="flex gap-3 p-4">
                     <Avatar
                         name={profile?.full_name || ""}
                         imageUrl={profile?.avatar_url || undefined}
-                        size="sm"
+                        size="md"
                     />
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                         <textarea
                             ref={textareaRef}
                             value={content}
@@ -70,28 +60,30 @@ export default function PostForm({ onSubmit, channel }: PostFormProps) {
                             onInput={handleInput}
                             onFocus={() => setIsFocused(true)}
                             placeholder={`¿Qué querés compartir en #${channelLabels[channel] || channel}?`}
-                            className="w-full bg-transparent text-brand-text placeholder:text-brand-muted
-                         text-sm resize-none outline-none min-h-[40px] max-h-[200px]
-                         transition-all"
+                            className="w-full bg-transparent text-white/80 placeholder:text-white/25
+                                text-sm resize-none outline-none min-h-[40px] max-h-[200px]
+                                leading-relaxed transition-all"
                             rows={1}
                         />
 
-                        {/* Action bar — shown when focused */}
                         {(isFocused || content.trim()) && (
-                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-brand-border animate-fade-in">
-                                <div className="flex items-center gap-2 text-brand-muted text-xs">
-                                    <span>📸</span>
-                                    <span>📎</span>
+                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5 animate-fade-in">
+                                <div className="flex items-center gap-3 text-white/25 text-sm">
+                                    <button type="button" className="hover:text-white/50 transition-colors" title="Imagen">📸</button>
+                                    <button type="button" className="hover:text-white/50 transition-colors" title="Adjunto">📎</button>
                                 </div>
-                                <Button
+                                <button
                                     type="submit"
-                                    variant="primary"
-                                    size="sm"
-                                    isLoading={isSubmitting}
-                                    disabled={!content.trim()}
+                                    disabled={!content.trim() || isSubmitting}
+                                    className="relative overflow-hidden px-5 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-accent disabled:opacity-40 hover:scale-[1.03] transition-all duration-200 shadow-glow-accent disabled:shadow-none"
                                 >
-                                    Publicar
-                                </Button>
+                                    {isSubmitting ? (
+                                        <span className="flex items-center gap-2">
+                                            <span className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />
+                                            Publicando...
+                                        </span>
+                                    ) : "Publicar →"}
+                                </button>
                             </div>
                         )}
                     </div>

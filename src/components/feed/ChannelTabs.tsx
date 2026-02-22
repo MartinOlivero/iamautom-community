@@ -8,10 +8,6 @@ interface ChannelTabsProps {
     onChannelChange: (channel: string) => void;
 }
 
-/**
- * Horizontal channel tabs for the feed.
- * VIP channel only visible to Inner Circle / admin users.
- */
 export default function ChannelTabs({ activeChannel, onChannelChange }: ChannelTabsProps) {
     const { profile } = useAuth();
     const isInnerCircle =
@@ -22,28 +18,33 @@ export default function ChannelTabs({ activeChannel, onChannelChange }: ChannelT
     const channelEntries = Object.entries(CHANNELS) as [string, { label: string; emoji: string; requiresInnerCircle: boolean }][];
 
     return (
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-hide">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
             {channelEntries.map(([id, channel]) => {
-                // Hide VIP channel from non-Inner Circle users
                 if (id === "inner_circle_vip" && !isInnerCircle) return null;
-
                 const isActive = activeChannel === id;
+                const isVIP = id === "inner_circle_vip";
 
                 return (
                     <button
                         key={id}
                         onClick={() => onChannelChange(id)}
-                        className={`flex items-center gap-1.5 px-4 py-2 rounded-pill text-sm font-medium
-                       whitespace-nowrap transition-all
-                       ${isActive
-                                ? id === "inner_circle_vip"
-                                    ? "bg-gradient-gold text-brand-dark"
-                                    : "bg-brand-dark text-white"
-                                : "text-brand-muted hover:text-brand-text hover:bg-brand-hover-bg"
-                            }`}
+                        className={`
+                            relative flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold
+                            whitespace-nowrap transition-all duration-300 border
+                            ${isActive
+                                ? isVIP
+                                    ? "bg-gradient-to-r from-[#f59e0b] to-[#f97316] text-white border-transparent shadow-glow-accent"
+                                    : "bg-[#38bdf8]/15 text-[#38bdf8] border-[#38bdf8]/30"
+                                : "text-white/40 hover:text-white/70 hover:bg-white/5 border-transparent"
+                            }
+                        `}
                     >
-                        <span>{channel.emoji}</span>
-                        <span>{channel.label}</span>
+                        {isActive && !isVIP && (
+                            <span className="absolute inset-0 rounded-xl bg-[#38bdf8]/5" />
+                        )}
+                        <span className="relative z-10">{channel.emoji}</span>
+                        <span className="relative z-10">{channel.label}</span>
+                        {isVIP && <span className="relative z-10 text-[9px] bg-white/20 px-1 rounded-sm font-bold">VIP</span>}
                     </button>
                 );
             })}
