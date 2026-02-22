@@ -29,8 +29,10 @@ export function usePosts(options: UsePostsOptions = {}) {
             setIsLoading(true);
 
             try {
+                console.log("[usePosts] Starting fetchPosts, creating client...");
                 const supabase = createClient();
-                
+
+                console.log("[usePosts] Constructing query...");
                 let query = supabase
                     .from("posts")
                     .select(
@@ -45,7 +47,9 @@ export function usePosts(options: UsePostsOptions = {}) {
                     query = query.lt("created_at", cursor);
                 }
 
+                console.log("[usePosts] Awaiting query...");
                 const { data, error } = await query;
+                console.log("[usePosts] Query complete:", { dataLength: data?.length, error });
 
                 if (error) {
                     console.error("Error fetching posts:", error);

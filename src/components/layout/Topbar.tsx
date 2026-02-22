@@ -10,6 +10,7 @@ const PAGE_TITLES: Record<string, { title: string; emoji: string }> = {
     "/app/cursos": { title: "Cursos", emoji: "📚" },
     "/app/leaderboard": { title: "Leaderboard", emoji: "🏆" },
     "/app/miembros": { title: "Miembros", emoji: "👥" },
+    "/app/calendario": { title: "Calendario", emoji: "📅" },
     "/app/perfil": { title: "Mi Perfil", emoji: "👤" },
     "/admin": { title: "Admin", emoji: "⚙️" },
 };

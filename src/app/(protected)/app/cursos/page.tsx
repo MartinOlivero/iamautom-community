@@ -24,18 +24,7 @@ export default function CursosPage() {
             </div>
 
             {/* Module grid */}
-            {isLoading ? (
-                <div className="flex justify-center py-12">
-                    <Spinner size="lg" />
-                </div>
-            ) : modules.length === 0 ? (
-                <div className="text-center py-12">
-                    <p className="text-4xl mb-3">📚</p>
-                    <p className="text-brand-muted text-sm">
-                        Los cursos están siendo preparados. ¡Pronto habrá contenido!
-                    </p>
-                </div>
-            ) : (
+            {modules.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {modules.map((mod) => (
                         <ModuleCard
@@ -44,6 +33,17 @@ export default function CursosPage() {
                             onClick={() => router.push(`/app/cursos/${mod.id}`)}
                         />
                     ))}
+                </div>
+            ) : isLoading ? (
+                <div className="flex justify-center py-12">
+                    <Spinner size="lg" />
+                </div>
+            ) : (
+                <div className="text-center py-12">
+                    <p className="text-4xl mb-3">📚</p>
+                    <p className="text-brand-muted text-sm">
+                        Los cursos están siendo preparados. ¡Pronto habrá contenido!
+                    </p>
                 </div>
             )}
         </div>

@@ -73,35 +73,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     useEffect(() => {
-        // Get initial session
-        async function init() {
-            const supabase = createClient();
-            const {
-                data: { session },
-            } = await supabase.auth.getSession();
-
-            if (session?.user) {
-                setUser(session.user);
-                await fetchProfile(session.user.id);
-            }
-            setIsLoading(false);
-        }
-
-        init();
-
-        // Listen for auth state changes
+        console.log("[AuthProvider] Starting init...");
         const supabase = createClient();
+
+        console.log("[AuthProvider] Calling getUser()...");
+        supabase.auth.getUser().then(({ data: { user: currentUser }, error }) => {
+            console.log("[AuthProvider] getUser() complete:", { currentUser, error });
+            if (currentUser) {
+                setUser(currentUser);
+                fetchProfile(currentUser.id).finally(() => setIsLoading(false));
+            } else {
+                setIsLoading(false);
+            }
+        });
+
+        // Listen for auth state changes (login, logout, token refresh)
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (event, session) => {
+        } = supabase.auth.onAuthStateChange((event, session) => {
+            console.log("[AuthProvider] Auth event:", event, session?.user?.id);
             if (session?.user) {
                 setUser(session.user);
-                await fetchProfile(session.user.id);
+                // Fire and forget fetchProfile, DO NOT AWAIT IT!
+                // Awaiting here causes a deadlock with the GoTrue client's internal session lock.
+                fetchProfile(session.user.id).finally(() => setIsLoading(false));
             } else {
                 setUser(null);
                 setProfile(null);
+                setIsLoading(false);
             }
-            setIsLoading(false);
         });
 
         return () => subscription.unsubscribe();

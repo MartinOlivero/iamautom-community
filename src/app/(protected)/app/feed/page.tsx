@@ -38,21 +38,7 @@ export default function FeedPage() {
 
             {/* Post list */}
             <div className="space-y-4">
-                {isLoading && posts.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <div className="relative w-10 h-10">
-                            <div className="absolute inset-0 border-2 border-indigo-100 border-t-indigo-500 rounded-full animate-spin" />
-                            <div className="absolute inset-1 border-2 border-transparent border-b-orange-400 rounded-full animate-spin" style={{ animationDuration: '1.4s', animationDirection: 'reverse' }} />
-                        </div>
-                        <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">Cargando...</span>
-                    </div>
-                ) : posts.length === 0 ? (
-                    <div className="text-center py-16 rounded-2xl border border-slate-200 bg-white shadow-card-sm">
-                        <p className="text-4xl mb-3">✍️</p>
-                        <p className="text-slate-900 font-semibold mb-1">Nadie ha publicado aquí todavía</p>
-                        <p className="text-slate-500 text-sm">¡Sé el primero en publicar en #{channel}!</p>
-                    </div>
-                ) : (
+                {posts.length > 0 ? (
                     <>
                         {posts.map((post) => (
                             <PostCard
@@ -79,6 +65,20 @@ export default function FeedPage() {
                             </div>
                         )}
                     </>
+                ) : isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <div className="relative w-10 h-10">
+                            <div className="absolute inset-0 border-2 border-indigo-100 border-t-indigo-500 rounded-full animate-spin" />
+                            <div className="absolute inset-1 border-2 border-transparent border-b-orange-400 rounded-full animate-spin" style={{ animationDuration: '1.4s', animationDirection: 'reverse' }} />
+                        </div>
+                        <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">Cargando...</span>
+                    </div>
+                ) : (
+                    <div className="text-center py-16 rounded-2xl border border-slate-200 bg-white shadow-card-sm">
+                        <p className="text-4xl mb-3">✍️</p>
+                        <p className="text-slate-900 font-semibold mb-1">Nadie ha publicado aquí todavía</p>
+                        <p className="text-slate-500 text-sm">¡Sé el primero en publicar en #{channel}!</p>
+                    </div>
                 )}
             </div>
         </div>
