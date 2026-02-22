@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/types/database";
 
@@ -12,7 +12,7 @@ export type MemberProfile = Pick<
 export function useMembers() {
     const [members, setMembers] = useState<MemberProfile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
 
     const fetchMembers = useCallback(async () => {
         setIsLoading(true);

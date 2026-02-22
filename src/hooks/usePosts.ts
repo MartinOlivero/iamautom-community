@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Post, Profile, PostReaction } from "@/types/database";
 import { triggerXPAward } from "@/lib/xpClient";
@@ -22,7 +22,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     const [posts, setPosts] = useState<PostWithDetails[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
-    const supabase = createClient();
+    const supabase = useMemo(() => createClient(), []);
 
     /** Fetch posts with author profile, reactions, and comment count */
     const fetchPosts = useCallback(
