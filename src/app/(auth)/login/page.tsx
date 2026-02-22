@@ -38,7 +38,8 @@ export default function LoginPage() {
                     password,
                 });
                 if (error) throw error;
-                router.push(redirectTo);
+                // Previene race-conditions del Soft-Router de Next con cookies
+                window.location.href = redirectTo;
             } else {
                 const { error } = await supabase.auth.signUp({
                     email,
@@ -85,8 +86,8 @@ export default function LoginPage() {
                         <button
                             onClick={() => { setMode("login"); setError(""); setSuccessMessage(""); }}
                             className={`flex-1 py-2 text-sm font-medium rounded-[6px] transition-all ${mode === "login"
-                                    ? "bg-brand-card text-brand-text shadow-sm"
-                                    : "text-brand-muted hover:text-brand-text-secondary"
+                                ? "bg-brand-card text-brand-text shadow-sm"
+                                : "text-brand-muted hover:text-brand-text-secondary"
                                 }`}
                         >
                             Iniciar sesión
@@ -94,8 +95,8 @@ export default function LoginPage() {
                         <button
                             onClick={() => { setMode("register"); setError(""); setSuccessMessage(""); }}
                             className={`flex-1 py-2 text-sm font-medium rounded-[6px] transition-all ${mode === "register"
-                                    ? "bg-brand-card text-brand-text shadow-sm"
-                                    : "text-brand-muted hover:text-brand-text-secondary"
+                                ? "bg-brand-card text-brand-text shadow-sm"
+                                : "text-brand-muted hover:text-brand-text-secondary"
                                 }`}
                         >
                             Registrarse
