@@ -91,9 +91,8 @@ export const CHANNELS = {
 export const NAV_ITEMS = [
     { label: "Feed", emoji: "📣", href: "/app/feed" },
     { label: "Cursos", emoji: "📚", href: "/app/cursos" },
-    { label: "Eventos", emoji: "📅", href: "/app/eventos" },
-    { label: "Chat", emoji: "💬", href: "/app/chat" },
     { label: "Leaderboard", emoji: "🏆", href: "/app/leaderboard" },
+    { label: "Miembros", emoji: "👥", href: "/app/miembros" },
 ] as const;
 
 /**
@@ -102,8 +101,8 @@ export const NAV_ITEMS = [
 export const MOBILE_NAV_ITEMS = [
     { label: "Feed", emoji: "📣", href: "/app/feed" },
     { label: "Cursos", emoji: "📚", href: "/app/cursos" },
-    { label: "Eventos", emoji: "📅", href: "/app/eventos" },
-    { label: "Chat", emoji: "💬", href: "/app/chat" },
+    { label: "Leaderboard", emoji: "🏆", href: "/app/leaderboard" },
+    { label: "Miembros", emoji: "👥", href: "/app/miembros" },
     { label: "Perfil", emoji: "👤", href: "/app/perfil" },
 ] as const;
 
