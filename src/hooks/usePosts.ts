@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Post, Profile, PostReaction } from "@/types/database";
 import { triggerXPAward } from "@/lib/xpClient";
@@ -22,7 +22,6 @@ export function usePosts(options: UsePostsOptions = {}) {
     const [posts, setPosts] = useState<PostWithDetails[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
-    const supabase = useMemo(() => createClient(), []);
 
     /** Fetch posts with author profile, reactions, and comment count */
     const fetchPosts = useCallback(
@@ -30,6 +29,8 @@ export function usePosts(options: UsePostsOptions = {}) {
             setIsLoading(true);
 
             try {
+                const supabase = createClient();
+                
                 let query = supabase
                     .from("posts")
                     .select(
@@ -83,7 +84,7 @@ export function usePosts(options: UsePostsOptions = {}) {
                 setIsLoading(false);
             }
         },
-        [supabase, channel, pageSize]
+        [channel, pageSize]
     );
 
     /** Load more (next page) */
@@ -97,6 +98,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     /** Create a new post */
     const createPost = useCallback(
         async (content: string, mediaUrls?: string[]) => {
+            const supabase = createClient();
             const {
                 data: { user },
             } = await supabase.auth.getUser();
@@ -139,12 +141,13 @@ export function usePosts(options: UsePostsOptions = {}) {
 
             return newPost;
         },
-        [supabase, channel]
+        [channel]
     );
 
     /** Toggle a reaction on a post */
     const toggleReaction = useCallback(
         async (postId: string, emoji: string) => {
+            const supabase = createClient();
             const {
                 data: { user },
             } = await supabase.auth.getUser();
@@ -181,18 +184,19 @@ export function usePosts(options: UsePostsOptions = {}) {
                 }
             }
         },
-        [supabase, posts]
+        [posts]
     );
 
     /** Delete a post */
     const deletePost = useCallback(
         async (postId: string) => {
+            const supabase = createClient();
             const { error } = await supabase.from("posts").delete().eq("id", postId);
             if (!error) {
                 setPosts((prev) => prev.filter((p) => p.id !== postId));
             }
         },
-        [supabase]
+        []
     );
 
     // Initial fetch

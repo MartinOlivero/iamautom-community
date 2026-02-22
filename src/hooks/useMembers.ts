@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/types/database";
 
@@ -12,11 +12,11 @@ export type MemberProfile = Pick<
 export function useMembers() {
     const [members, setMembers] = useState<MemberProfile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const supabase = useMemo(() => createClient(), []);
 
     const fetchMembers = useCallback(async () => {
         setIsLoading(true);
         try {
+            const supabase = createClient();
             const { data, error } = await supabase
                 .from("profiles")
                 .select("id, full_name, avatar_url, plan_type, role, xp_points, level, current_streak, bio")
@@ -35,7 +35,7 @@ export function useMembers() {
         } finally {
             setIsLoading(false);
         }
-    }, [supabase]);
+    }, []);
 
     useEffect(() => {
         fetchMembers();

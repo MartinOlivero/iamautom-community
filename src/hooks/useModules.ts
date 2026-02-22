@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export interface ModuleWithProgress {
@@ -20,12 +20,13 @@ export interface ModuleWithProgress {
 export function useModules() {
     const [modules, setModules] = useState<ModuleWithProgress[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const supabase = useMemo(() => createClient(), []);
 
     const fetchModules = useCallback(async () => {
         setIsLoading(true);
 
         try {
+            const supabase = createClient();
+            
             const {
                 data: { user },
             } = await supabase.auth.getUser();
@@ -99,7 +100,7 @@ export function useModules() {
         } finally {
             setIsLoading(false);
         }
-    }, [supabase]);
+    }, []);
 
     useEffect(() => {
         fetchModules();
