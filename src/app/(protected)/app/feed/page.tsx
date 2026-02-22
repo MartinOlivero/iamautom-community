@@ -13,21 +13,21 @@ export default function FeedPage() {
         usePosts({ channel });
 
     return (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-2xl mx-auto space-y-5">
             {/* Page header */}
-            <div>
-                <div className="flex items-center gap-3 mb-1">
-                    <h1 className="text-2xl font-display font-bold text-white tracking-tight">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-display font-bold text-slate-900 tracking-tight">
                         Comunidad
                     </h1>
-                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#10b981]/10 border border-[#10b981]/20 text-[10px] font-mono text-[#10b981] uppercase tracking-widest">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
-                        Online
-                    </span>
+                    <p className="text-sm text-slate-500 mt-0.5">
+                        Compartí, aprendé y conectá con otros miembros
+                    </p>
                 </div>
-                <p className="text-sm text-white/35">
-                    Compartí, aprendé y conectá con otros miembros
-                </p>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-600">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Online
+                </div>
             </div>
 
             {/* Channel tabs */}
@@ -40,18 +40,17 @@ export default function FeedPage() {
             <div className="space-y-4">
                 {isLoading && posts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <div className="relative">
-                            <div className="w-10 h-10 border-2 border-[#38bdf8]/20 border-t-[#38bdf8] rounded-full animate-spin" />
-                            <div className="absolute inset-0 w-10 h-10 border-2 border-transparent border-b-[#a78bfa]/40 rounded-full animate-spin" style={{ animationDuration: '1.4s', animationDirection: 'reverse' }} />
+                        <div className="relative w-10 h-10">
+                            <div className="absolute inset-0 border-2 border-indigo-100 border-t-indigo-500 rounded-full animate-spin" />
+                            <div className="absolute inset-1 border-2 border-transparent border-b-orange-400 rounded-full animate-spin" style={{ animationDuration: '1.4s', animationDirection: 'reverse' }} />
                         </div>
-                        <span className="text-xs font-mono text-white/30 uppercase tracking-widest">Cargando feed...</span>
+                        <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">Cargando...</span>
                     </div>
                 ) : posts.length === 0 ? (
-                    <div className="text-center py-16 rounded-2xl border border-white/5 bg-[rgba(10,16,30,0.4)]">
+                    <div className="text-center py-16 rounded-2xl border border-slate-200 bg-white shadow-card-sm">
                         <p className="text-4xl mb-3">✍️</p>
-                        <p className="text-white/40 text-sm">
-                            Sé el primero en publicar en #{channel}
-                        </p>
+                        <p className="text-slate-900 font-semibold mb-1">Nadie ha publicado aquí todavía</p>
+                        <p className="text-slate-500 text-sm">¡Sé el primero en publicar en #{channel}!</p>
                     </div>
                 ) : (
                     <>
@@ -65,13 +64,17 @@ export default function FeedPage() {
                         ))}
 
                         {hasMore && (
-                            <div className="flex justify-center pt-4">
+                            <div className="flex justify-center pt-2">
                                 <button
                                     onClick={loadMore}
                                     disabled={isLoading}
-                                    className="px-6 py-2.5 rounded-xl text-sm font-medium text-white/50 border border-white/10 hover:border-[#38bdf8]/30 hover:text-white/80 hover:bg-white/5 transition-all duration-300 disabled:opacity-40"
+                                    className="px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-600
+                                        bg-white border border-slate-200 shadow-card-sm
+                                        hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50
+                                        hover:shadow-[0_4px_12px_rgba(99,102,241,0.15)]
+                                        active:scale-[0.97] transition-all duration-200"
                                 >
-                                    {isLoading ? "Cargando..." : "Cargar más"}
+                                    {isLoading ? "Cargando..." : "Cargar más publicaciones"}
                                 </button>
                             </div>
                         )}
