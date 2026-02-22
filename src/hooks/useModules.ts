@@ -25,72 +25,80 @@ export function useModules() {
     const fetchModules = useCallback(async () => {
         setIsLoading(true);
 
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
+        try {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
 
-        // Fetch modules with lesson count
-        const { data: modulesData, error } = await supabase
-            .from("modules")
-            .select(
-                `
-        *,
-        lessons:lessons(count)
-      `
-            )
-            .eq("is_published", true)
-            .order("order_index", { ascending: true });
+            // Fetch modules with lesson count
+            const { data: modulesData, error } = await supabase
+                .from("modules")
+                .select("*, lessons(count)")
+                .eq("is_published", true)
+                .order("order_index", { ascending: true });
 
-        if (error || !modulesData) {
-            console.error("Error fetching modules:", error);
-            setIsLoading(false);
-            return;
-        }
+            if (error) {
+                console.error("Error fetching modules:", error);
+                setModules([]);
+                setIsLoading(false);
+                return;
+            }
 
-        // If user is logged in, fetch their progress
-        const progressMap: Record<string, number> = {};
-        if (user) {
-            const { data: progressData } = await supabase
-                .from("lesson_progress")
-                .select("lesson_id, completed")
-                .eq("user_id", user.id)
-                .eq("completed", true);
+            if (!modulesData) {
+                setModules([]);
+                setIsLoading(false);
+                return;
+            }
 
-            if (progressData) {
-                // Get progress grouped by module
-                const { data: lessonToModule } = await supabase
-                    .from("lessons")
-                    .select("id, module_id");
+            // If user is logged in, fetch their progress
+            const progressMap: Record<string, number> = {};
+            if (user) {
+                const { data: progressData } = await supabase
+                    .from("lesson_progress")
+                    .select("lesson_id, completed")
+                    .eq("user_id", user.id)
+                    .eq("completed", true);
 
-                if (lessonToModule) {
-                    const moduleMap: Record<string, string> = {};
-                    lessonToModule.forEach((l) => {
-                        moduleMap[l.id] = l.module_id;
-                    });
+                if (progressData) {
+                    // Get progress grouped by module
+                    const { data: lessonToModule } = await supabase
+                        .from("lessons")
+                        .select("id, module_id");
 
-                    progressData.forEach((p) => {
-                        const moduleId = moduleMap[p.lesson_id];
-                        if (moduleId) {
-                            progressMap[moduleId] = (progressMap[moduleId] || 0) + 1;
-                        }
-                    });
+                    if (lessonToModule) {
+                        const moduleMap: Record<string, string> = {};
+                        lessonToModule.forEach((l) => {
+                            moduleMap[l.id] = l.module_id;
+                        });
+
+                        progressData.forEach((p) => {
+                            const moduleId = moduleMap[p.lesson_id];
+                            if (moduleId) {
+                                progressMap[moduleId] = (progressMap[moduleId] || 0) + 1;
+                            }
+                        });
+                    }
                 }
             }
+
+            const formatted: ModuleWithProgress[] = modulesData.map(
+                (m: Record<string, unknown>) => ({
+                    ...m,
+                    lesson_count:
+                        Array.isArray(m.lessons) && m.lessons[0]
+                            ? (m.lessons[0] as { count: number }).count
+                            : 0,
+                    completed_count: progressMap[m.id as string] || 0,
+                })
+            ) as ModuleWithProgress[];
+
+            setModules(formatted);
+        } catch (err) {
+            console.error("Exception fetching modules:", err);
+            setModules([]);
+        } finally {
+            setIsLoading(false);
         }
-
-        const formatted: ModuleWithProgress[] = modulesData.map(
-            (m: Record<string, unknown>) => ({
-                ...m,
-                lesson_count:
-                    Array.isArray(m.lessons) && m.lessons[0]
-                        ? (m.lessons[0] as { count: number }).count
-                        : 0,
-                completed_count: progressMap[m.id as string] || 0,
-            })
-        ) as ModuleWithProgress[];
-
-        setModules(formatted);
-        setIsLoading(false);
     }, [supabase]);
 
     useEffect(() => {

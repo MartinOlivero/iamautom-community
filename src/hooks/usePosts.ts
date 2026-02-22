@@ -29,51 +29,59 @@ export function usePosts(options: UsePostsOptions = {}) {
         async (cursor?: string) => {
             setIsLoading(true);
 
-            let query = supabase
-                .from("posts")
-                .select(
-                    `
-          *,
-          author:profiles!author_id(id, full_name, avatar_url, plan_type, role),
-          reactions:post_reactions(*),
-          comments:comments(count)
-        `
-                )
-                .eq("channel", channel)
-                .order("is_pinned", { ascending: false })
-                .order("created_at", { ascending: false })
-                .limit(pageSize);
+            try {
+                let query = supabase
+                    .from("posts")
+                    .select(
+                        "*, author:profiles!author_id(id, full_name, avatar_url, plan_type, role), reactions:post_reactions(*), comments(count)"
+                    )
+                    .eq("channel", channel)
+                    .order("is_pinned", { ascending: false })
+                    .order("created_at", { ascending: false })
+                    .limit(pageSize);
 
-            if (cursor) {
-                query = query.lt("created_at", cursor);
-            }
+                if (cursor) {
+                    query = query.lt("created_at", cursor);
+                }
 
-            const { data, error } = await query;
+                const { data, error } = await query;
 
-            if (error) {
-                console.error("Error fetching posts:", error);
+                if (error) {
+                    console.error("Error fetching posts:", error);
+                    setPosts([]);
+                    setIsLoading(false);
+                    return;
+                }
+
+                if (!data) {
+                    setPosts([]);
+                    setIsLoading(false);
+                    return;
+                }
+
+                const formatted: PostWithDetails[] = data.map((post: Record<string, unknown>) => ({
+                    ...post,
+                    author: post.author as PostWithDetails["author"],
+                    reactions: (post.reactions ?? []) as PostReaction[],
+                    comment_count:
+                        Array.isArray(post.comments) && post.comments[0]
+                            ? (post.comments[0] as { count: number }).count
+                            : 0,
+                })) as PostWithDetails[];
+
+                if (cursor) {
+                    setPosts((prev) => [...prev, ...formatted]);
+                } else {
+                    setPosts(formatted);
+                }
+
+                setHasMore(formatted.length >= pageSize);
+            } catch (err) {
+                console.error("Exception fetching posts:", err);
+                setPosts([]);
+            } finally {
                 setIsLoading(false);
-                return;
             }
-
-            const formatted: PostWithDetails[] = (data ?? []).map((post: Record<string, unknown>) => ({
-                ...post,
-                author: post.author as PostWithDetails["author"],
-                reactions: (post.reactions ?? []) as PostReaction[],
-                comment_count:
-                    Array.isArray(post.comments) && post.comments[0]
-                        ? (post.comments[0] as { count: number }).count
-                        : 0,
-            })) as PostWithDetails[];
-
-            if (cursor) {
-                setPosts((prev) => [...prev, ...formatted]);
-            } else {
-                setPosts(formatted);
-            }
-
-            setHasMore(formatted.length >= pageSize);
-            setIsLoading(false);
         },
         [supabase, channel, pageSize]
     );

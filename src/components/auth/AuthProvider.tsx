@@ -38,13 +38,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     /** Fetch the user's profile from the profiles table */
     async function fetchProfile(userId: string) {
-        const { data } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", userId)
-            .single();
+        try {
+            const { data, error } = await supabase
+                .from("profiles")
+                .select("*")
+                .eq("id", userId)
+                .single();
 
-        setProfile(data as Profile | null);
+            if (error) {
+                console.error("Error fetching profile:", error);
+                setProfile(null);
+                return;
+            }
+
+            setProfile(data as Profile | null);
+        } catch (err) {
+            console.error("Exception fetching profile:", err);
+            setProfile(null);
+        }
     }
 
     /** Refresh profile data (call after updates) */
