@@ -40,19 +40,23 @@ const MenuBar = ({ editor }: { editor: any }) => {
     const addYoutubeVideo = () => {
         const url = window.prompt("URL del video de YouTube:");
         if (url) {
-            editor.commands.setYoutubeVideo({
+            editor.chain().focus().setYoutubeVideo({
                 src: url,
                 width: 640,
                 height: 480,
-            });
+            }).run();
         }
     };
 
     const setLink = () => {
         const previousUrl = editor.getAttributes("link").href;
-        const url = window.prompt("URL del enlace:", previousUrl);
+        const url = window.prompt("URL del enlace:", previousUrl || "");
 
-        if (url === null) return; // cancelled
+        // If user cancelled or entered empty string
+        if (url === null) {
+            return;
+        }
+
         if (url === "") {
             editor.chain().focus().extendMarkRange("link").unsetLink().run();
             return;
@@ -192,6 +196,7 @@ export default function RichTextEditor({ content, onChange, placeholder = "Escri
             }),
         ],
         content: content,
+        immediatelyRender: false,
         editorProps: {
             attributes: {
                 class: 'prose prose-sm sm:prose-base dark:prose-invert max-w-none focus:outline-none min-h-[200px] p-4 text-brand-text',
@@ -203,9 +208,9 @@ export default function RichTextEditor({ content, onChange, placeholder = "Escri
     });
 
     return (
-        <div className="w-full bg-brand-card border border-brand-border rounded-xl shadow-sm overflow-hidden flex flex-col focus-within:ring-2 ring-brand-accent/50 transition-all">
+        <div className="w-full bg-white dark:bg-black/20 border border-brand-border rounded-input shadow-sm overflow-hidden flex flex-col focus-within:ring-2 ring-brand-accent/40 transition-all">
             <MenuBar editor={editor} />
-            <div className="bg-brand-bg relative flex-1 cursor-text">
+            <div className="bg-transparent relative flex-1 cursor-text">
                 <EditorContent editor={editor} className="w-full h-full" />
             </div>
 

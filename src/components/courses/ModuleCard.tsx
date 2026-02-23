@@ -1,7 +1,11 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ProgressBar from "@/components/ui/ProgressBar";
 import type { ModuleWithProgress } from "@/hooks/useModules";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { MoreHorizontal, Edit, LayoutList, Share2, Trash2 } from "lucide-react";
 
 interface ModuleCardProps {
     module: ModuleWithProgress;
@@ -10,8 +14,16 @@ interface ModuleCardProps {
 
 /**
  * Card displaying a course module with emoji, title, progress, and tier indicator.
+ * Includes an admin overlay if the current user has an 'admin' role.
  */
 export default function ModuleCard({ module, onClick }: ModuleCardProps) {
+    const router = useRouter();
+    const { profile } = useAuth();
+    const isAdmin = profile?.role === "admin";
+
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
     const progress =
         module.lesson_count > 0
             ? Math.round((module.completed_count / module.lesson_count) * 100)
@@ -20,57 +32,153 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
     const isCompleted = progress === 100;
     const isInnerCircle = module.tier_required === "inner_circle";
 
+    // Detect click outside menu
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMenuOpen(false);
+            }
+        }
+        if (isMenuOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isMenuOpen]);
+
+    const toggleMenu = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsMenuOpen((prev) => !prev);
+    };
+
+    const handleEditModule = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsMenuOpen(false);
+        // If we want to open the modal, we can route to /admin/cursos with a query param, 
+        // or just plain /admin/cursos for now since the main course info is handled there.
+        router.push("/admin/cursos");
+    };
+
+    const handleManageLessons = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsMenuOpen(false);
+        router.push(`/admin/cursos/${module.id}`);
+    };
+
     return (
-        <button
-            onClick={onClick}
-            className="w-full text-left bg-brand-card rounded-card border border-brand-border p-5
-                 transition-all hover:shadow-md hover:border-brand-accent/20 hover:-translate-y-0.5
-                 group"
+        <div
+            className="w-full h-full flex flex-col text-left bg-brand-card rounded-card border border-brand-border overflow-visible
+                 transition-all hover:shadow-lg hover:border-brand-accent/30 hover:-translate-y-1 relative group"
         >
-            {/* Header */}
-            <div className="flex items-start justify-between mb-3">
-                <span className="text-3xl group-hover:scale-110 transition-transform">
-                    {module.emoji}
-                </span>
+            {/* Admin Menu Toggle */}
+            {isAdmin && (
+                <div className="absolute top-2 right-2 z-20" ref={menuRef}>
+                    <button
+                        onClick={toggleMenu}
+                        className={`p-1.5 rounded-full transition-colors ${isMenuOpen
+                                ? "bg-black/60 text-white backdrop-blur-md"
+                                : "bg-black/40 text-white/80 hover:bg-black/80 hover:text-white backdrop-blur-sm opacity-0 group-hover:opacity-100"
+                            }`}
+                        title="Opciones de Administrador"
+                    >
+                        <MoreHorizontal size={20} />
+                    </button>
 
-                {isInnerCircle && (
-                    <span className="text-[10px] font-semibold uppercase tracking-wider
-                          bg-gradient-gold text-brand-dark px-2 py-0.5 rounded-pill">
-                        VIP
-                    </span>
+                    {/* Admin Dropdown Menu */}
+                    {isMenuOpen && (
+                        <div className="absolute top-full mt-1 right-0 w-48 bg-[#151921]/95 text-white/90 border border-brand-border/60 rounded-xl shadow-xl py-1 z-30 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200">
+                            <button
+                                onClick={handleEditModule}
+                                className="w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-white/10 hover:text-brand-accent transition-colors"
+                            >
+                                <Edit size={16} /> <span>Editar Curso</span>
+                            </button>
+                            <button
+                                onClick={handleManageLessons}
+                                className="w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-white/10 hover:text-brand-accent transition-colors"
+                            >
+                                <LayoutList size={16} /> <span>Lecciones</span>
+                            </button>
+                            {/* Optionals, visually matching the reference but inactive/stubbed */}
+                            <button
+                                onClick={(e) => e.stopPropagation()}
+                                className="w-full text-left px-4 py-2 text-sm flex items-center gap-2 hover:bg-white/10 transition-colors text-brand-muted cursor-not-allowed"
+                                title="Próximamente"
+                            >
+                                <Share2 size={16} /> <span>Compartir (Pronto)</span>
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Clickable Card Body */}
+            <div onClick={onClick} className="w-full h-full flex flex-col cursor-pointer overflow-hidden rounded-card">
+                {/* Cover Image Area */}
+                {module.cover_image_url && (
+                    <div className="w-full h-40 md:h-48 relative bg-brand-bg-2 overflow-hidden border-b border-brand-border shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={module.cover_image_url}
+                            alt={module.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute bottom-3 left-4 bg-brand-card/90 backdrop-blur-md rounded-xl p-2.5 shadow-sm border border-brand-border/50">
+                            <span className="text-3xl leading-none block">{module.emoji}</span>
+                        </div>
+                    </div>
                 )}
 
-                {isCompleted && (
-                    <span className="text-[10px] font-semibold uppercase tracking-wider
-                          bg-green-500/10 text-green-500 px-2 py-0.5 rounded-pill">
-                        ✓ Completado
-                    </span>
-                )}
-            </div>
+                <div className="p-6 flex flex-col flex-1 h-full">
+                    {/* Header Info */}
+                    <div className={`flex items-start justify-between mb-4 ${module.cover_image_url ? 'justify-end' : ''}`}>
+                        {!module.cover_image_url && (
+                            <span className="text-4xl group-hover:scale-110 transition-transform">
+                                {module.emoji}
+                            </span>
+                        )}
 
-            {/* Title & description */}
-            <h3 className="text-sm font-semibold text-brand-text mb-1 group-hover:text-brand-accent transition-colors">
-                {module.title}
-            </h3>
-            <p className="text-xs text-brand-muted line-clamp-2 mb-4">
-                {module.description}
-            </p>
+                        <div className="flex items-center gap-2 flex-wrap justify-end relative z-10">
+                            {isInnerCircle && (
+                                <span className="text-xs font-semibold uppercase tracking-wider
+                                      bg-gradient-gold text-brand-dark px-2.5 py-0.5 rounded-pill shrink-0">
+                                    VIP
+                                </span>
+                            )}
 
-            {/* Progress */}
-            <div className="space-y-1.5">
-                <ProgressBar
-                    value={progress}
-                    color={isCompleted ? "success" : "accent"}
-                    size="sm"
-                    showLabel={false}
-                />
-                <div className="flex items-center justify-between text-[10px] text-brand-muted">
-                    <span>
-                        {module.completed_count}/{module.lesson_count} lecciones
-                    </span>
-                    <span className="font-mono">{progress}%</span>
+                            {isCompleted && (
+                                <span className="text-xs font-semibold uppercase tracking-wider
+                                      bg-green-500/10 text-green-500 px-2.5 py-0.5 rounded-pill shrink-0">
+                                    ✓ Completado
+                                </span>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Title & description */}
+                    <h3 className="text-lg font-bold text-brand-text mb-2 group-hover:text-brand-accent transition-colors line-clamp-2">
+                        {module.title}
+                    </h3>
+                    <p className="text-sm text-brand-muted line-clamp-3 mb-6 flex-1">
+                        {module.description}
+                    </p>
+
+                    {/* Progress */}
+                    <div className="space-y-2 mt-auto">
+                        <ProgressBar
+                            value={progress}
+                            color={isCompleted ? "success" : "accent"}
+                            size="md"
+                            showLabel={false}
+                        />
+                        <div className="flex items-center justify-between text-xs text-brand-muted font-medium">
+                            <span>
+                                {module.completed_count}/{module.lesson_count} lecciones
+                            </span>
+                            <span className="font-mono">{progress}%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </button>
+        </div>
     );
 }

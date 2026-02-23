@@ -80,18 +80,21 @@ export default async function AdminDashboardPage() {
                         </div>
                     </Link>
 
-                    {/* Placeholder for future admin tools */}
-                    <div className="bg-brand-card rounded-card border border-brand-border border-dashed p-5 flex items-center gap-4 opacity-50 cursor-not-allowed">
-                        <div className="w-12 h-12 rounded-full bg-brand-hover-bg flex items-center justify-center text-2xl">
-                            📢
+                    {/* Site Settings */}
+                    <Link
+                        href="/admin/ajustes"
+                        className="bg-brand-card rounded-card border border-brand-border p-5 flex items-center gap-4 hover:border-brand-accent/50 transition-colors group"
+                    >
+                        <div className="w-12 h-12 rounded-full bg-brand-hover-bg flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                            ⚙️
                         </div>
                         <div>
-                            <h3 className="font-semibold text-brand-text">Anuncios Globales (Pronto)</h3>
+                            <h3 className="font-semibold text-brand-text">Ajustes Globales</h3>
                             <p className="text-sm text-brand-muted mt-1">
-                                Enviar notificaciones push a todos
+                                Configurar nombre del sitio, logo y colores
                             </p>
                         </div>
-                    </div>
+                    </Link>
                 </div>
             </div>
         </div>

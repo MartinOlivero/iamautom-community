@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "light" | "dark" | "midnight" | "sunset";
+type Theme = "light" | "dark";
 
 interface ThemeContextType {
     theme: Theme;
@@ -22,7 +22,7 @@ export function ThemeProvider({
     const [theme, setTheme] = useState<Theme>(() => {
         if (typeof window !== "undefined") {
             const saved = localStorage.getItem("iamautom_theme") as Theme;
-            if (saved) return saved;
+            if (saved === "light" || saved === "dark") return saved;
         }
         return defaultTheme;
     });
@@ -31,11 +31,13 @@ export function ThemeProvider({
         if (typeof window !== "undefined") {
             const root = window.document.documentElement;
             // Remove previous theme classes
-            root.classList.remove("theme-light", "theme-dark", "theme-midnight", "theme-sunset");
+            root.classList.remove("theme-light", "theme-dark", "dark");
 
             // Apply new theme (light is the default, so we don't strictly need a class, but we can add it for clarity)
-            if (theme !== "light") {
-                root.classList.add(`theme-${theme}`);
+            if (theme === "dark") {
+                root.classList.add("theme-dark");
+                // Enable Tailwind's built-in dark variant for all non-light themes
+                root.classList.add("dark");
             }
 
             localStorage.setItem("iamautom_theme", theme);

@@ -90,9 +90,9 @@ export default function LeaderboardPage() {
         <div className="max-w-3xl mx-auto space-y-5">
             {/* Header */}
             <div>
-                <h1 className="text-xl font-display font-bold text-brand-text">🏆 Leaderboard</h1>
+                <h1 className="text-xl font-display font-bold text-brand-text">💻 El Mainframe</h1>
                 <p className="text-sm text-brand-muted mt-1">
-                    Los miembros más activos de la comunidad
+                    Los nodos con mayor ancho de banda en la red de IamAutom.
                 </p>
             </div>
 
@@ -103,8 +103,8 @@ export default function LeaderboardPage() {
                 </div>
             ) : members.length === 0 ? (
                 <div className="text-center py-12">
-                    <p className="text-4xl mb-3">🏆</p>
-                    <p className="text-brand-muted text-sm">Aún no hay miembros en el leaderboard</p>
+                    <p className="text-4xl mb-3">🖥️</p>
+                    <p className="text-brand-muted text-sm">El Mainframe está iniciando datos...</p>
                 </div>
             ) : (
                 <div className="space-y-2">
@@ -118,7 +118,7 @@ export default function LeaderboardPage() {
                                 className={`bg-brand-card rounded-card border p-4
                            transition-all hover:shadow-md
                            ${rank <= 3
-                                        ? "border-brand-accent/20"
+                                        ? "border-brand-accent/50 shadow-[0_0_15px_rgba(255,77,0,0.15)] bg-gradient-to-r from-brand-accent/5 to-transparent relative overflow-hidden"
                                         : "border-brand-border"
                                     }`}
                             >
@@ -158,7 +158,7 @@ export default function LeaderboardPage() {
                                                 <ProgressBar value={xpPercent} size="sm" showLabel={false} />
                                             </div>
                                             <span className="text-[10px] font-mono text-brand-muted flex-shrink-0">
-                                                {member.xp_points.toLocaleString()} XP
+                                                {member.xp_points.toLocaleString()} Sinapsis
                                             </span>
                                         </div>
                                     </div>
@@ -167,7 +167,7 @@ export default function LeaderboardPage() {
                                     <div className="hidden sm:flex items-center gap-3 flex-shrink-0">
                                         {/* Level */}
                                         <div className="text-center">
-                                            <p className="text-[10px] text-brand-muted uppercase">Nivel</p>
+                                            <p className="text-[10px] text-brand-muted uppercase">Proceso</p>
                                             <p className="text-xs font-semibold text-brand-text capitalize">
                                                 {member.level.replace("_", " ")}
                                             </p>
@@ -175,9 +175,9 @@ export default function LeaderboardPage() {
 
                                         {/* Badges */}
                                         <div className="text-center">
-                                            <p className="text-[10px] text-brand-muted uppercase">Badges</p>
+                                            <p className="text-[10px] text-brand-muted uppercase">Nodos</p>
                                             <p className="text-xs font-semibold text-brand-text">
-                                                {member.badge_count} 🏅
+                                                {member.badge_count} 🧠
                                             </p>
                                         </div>
 

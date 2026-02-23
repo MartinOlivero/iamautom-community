@@ -35,7 +35,7 @@ export default function ChannelTabs({ activeChannel, onChannelChange }: ChannelT
                                 ? isVIP
                                     ? "bg-gradient-gold text-white border-transparent shadow-[0_4px_12px_rgba(245,158,11,0.3)]"
                                     : "bg-[#6366f1] text-white border-transparent shadow-[0_4px_12px_rgba(99,102,241,0.3)]"
-                                : "bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:text-slate-700 hover:bg-slate-50 shadow-card-sm"
+                                : "bg-brand-card text-brand-muted border-brand-border hover:text-brand-text hover:bg-brand-hover-bg shadow-card-sm"
                             }
                         `}
                     >

@@ -1,101 +1,77 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================================
-   IamAutom v3 — "Clean Vibrant" Design System
-   Light, colorful, alive. Depth via shadows, not darkness.
+   IamAutom v4 — "Task Master" Design System
+   Modern, graphite/black depth, vibrant neon accents.
    ============================================================ */
 
 :root {
-  /* Default Theme (Light/Clean Vibrant) */
-  --color-bg: #f4f6fb;
-  --color-bg-2: #eef1f8;
+  /* Default Theme (Light/Clean Graphite) */
+  --color-bg: #f5f7f9;
+  --color-bg-2: #ffffff;
   --color-card: #ffffff;
   --color-card-solid: #ffffff;
-  --color-dark: #1e293b;
-  --color-hover-bg: rgba(99, 102, 241, 0.06);
+  --color-dark: #121316;
+  --color-hover-bg: rgba(34, 197, 94, 0.08);
 
   /* Text */
-  --color-text: #1e293b;
-  --color-text-secondary: #475569;
-  --color-muted: #94a3b8;
+  --color-text: #1a1d24;
+  --color-text-secondary: #5a6474;
+  --color-muted: #8d98a8;
 
-  /* Brand Accent — vibrant orange */
-  --color-accent: #f97316;
-  --color-accent-hover: #ea6c0a;
-  --color-gold: #f59e0b;
+  /* Task Master Accents */
+  --color-accent: #22C55E;
+  /* Neon Green */
+  --color-accent-hover: #16A34A;
+  --color-gold: #F59E0B;
 
   /* Electric accents */
-  --color-electric-blue: #6366f1;
+  --color-electric-blue: #06B6D4;
+  /* Cyan */
   --color-violet: #8b5cf6;
   --color-cyan: #06b6d4;
-  --color-success: #10b981;
+  --color-success: #22C55E;
   --color-pink: #ec4899;
+  --color-orange: #F97316;
 
   /* Borders */
   --color-border: #e2e8f0;
-  --color-border-focus: rgba(99, 102, 241, 0.4);
+  --color-border-focus: rgba(34, 197, 94, 0.4);
 }
 
 .theme-dark {
-  --color-bg: #0f172a;
-  --color-bg-2: #1e293b;
-  --color-card: #1e293b;
-  --color-card-solid: #1e293b;
-  --color-dark: #0f172a;
-  --color-hover-bg: rgba(99, 102, 241, 0.1);
-  --color-text: #f8fafc;
-  --color-text-secondary: #cbd5e1;
-  --color-muted: #64748b;
-  --color-accent: #f97316;
-  --color-accent-hover: #ea6c0a;
-  --color-border: #334155;
-  --color-border-focus: rgba(99, 102, 241, 0.6);
-}
+  /* Task Master Deep Graphite Theme */
+  --color-bg: #0F1014;
+  --color-bg-2: #16181D;
+  --color-card: #1C1F26;
+  --color-card-solid: #1C1F26;
+  --color-dark: #0F1014;
+  --color-hover-bg: rgba(34, 197, 94, 0.1);
+  --color-text: #F8FAFC;
+  --color-text-secondary: #A0ABC0;
+  --color-muted: #64748B;
 
-.theme-midnight {
-  --color-bg: #09090b;
-  --color-bg-2: #18181b;
-  --color-card: #18181b;
-  --color-card-solid: #18181b;
-  --color-dark: #09090b;
-  --color-hover-bg: rgba(6, 182, 212, 0.1);
-  --color-text: #fafafa;
-  --color-text-secondary: #a1a1aa;
-  --color-muted: #52525b;
-  --color-accent: #06b6d4;
-  /* Cyan accent for midnight */
-  --color-accent-hover: #0891b2;
-  --color-electric-blue: #a855f7;
-  --color-border: #27272a;
-  --color-border-focus: rgba(6, 182, 212, 0.6);
-}
+  /* Neon Accents */
+  --color-accent: #00FF66;
+  /* Bright Neon Green */
+  --color-accent-hover: #00D656;
+  --color-electric-blue: #00F0FF;
+  /* Bright Neon Cyan */
+  --color-orange: #FF7B00;
+  /* Bright Neon Orange */
+  --color-violet: #9D4EDD;
 
-.theme-sunset {
-  --color-bg: #fffbf5;
-  --color-bg-2: #fceddb;
-  --color-card: #ffffff;
-  --color-card-solid: #ffffff;
-  --color-dark: #431407;
-  --color-hover-bg: rgba(244, 63, 94, 0.05);
-  --color-text: #431407;
-  --color-text-secondary: #7f1d1d;
-  --color-muted: #991b1b;
-  --color-accent: #f43f5e;
-  /* Rose accent for sunset */
-  --color-accent-hover: #e11d48;
-  --color-electric-blue: #f97316;
-  --color-violet: #d946ef;
-  --color-border: #fca5a5;
-  --color-border-focus: rgba(244, 63, 94, 0.4);
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-focus: rgba(0, 255, 102, 0.6);
 }
 
 /* ── Base ──────────────────────────────────────────────── */
 body {
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
@@ -280,12 +256,22 @@ select {
     box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  /* Glassmorphism (light) */
+  /* Glassmorphism */
   .glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.04), inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .glass-dark {
+    background: rgba(28, 31, 38, 0.4);
+    /* #1C1F26 at 40% */
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 1px 1px 0 rgba(255, 255, 255, 0.04);
   }
 
   /* Animations */

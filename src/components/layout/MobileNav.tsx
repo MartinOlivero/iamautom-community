@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MOBILE_NAV_ITEMS } from "@/lib/constants";
+import PremiumIcon from "@/components/ui/PremiumIcon";
 
 /**
  * Bottom navigation bar for mobile devices (5 tabs).
@@ -12,8 +13,9 @@ export default function MobileNav() {
     const pathname = usePathname();
 
     return (
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-brand-card/95 backdrop-blur-md border-t border-brand-border safe-area-inset-bottom">
-            <div className="flex items-center justify-around h-16 px-2">
+        <nav className="lg:hidden fixed bottom-4 left-4 right-4 z-40 rounded-2xl glass dark:glass-dark border border-white/20 shadow-glass safe-area-inset-bottom overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full hover:translate-x-full duration-1000 transition-transform" />
+            <div className="flex items-center justify-around h-[4.5rem] px-2 relative z-10">
                 {MOBILE_NAV_ITEMS.map((item) => {
                     const isActive = pathname.startsWith(item.href);
                     return (
@@ -29,7 +31,7 @@ export default function MobileNav() {
                                 }
               `}
                         >
-                            <span className="text-xl">{item.emoji}</span>
+                            <PremiumIcon href={item.href} isActive={isActive} size={20} variant="ghost" />
                             <span className="text-[10px] font-medium">{item.label}</span>
                         </Link>
                     );

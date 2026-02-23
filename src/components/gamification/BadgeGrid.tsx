@@ -27,56 +27,69 @@ export default function BadgeGrid({ badges, isLoading }: BadgeGridProps) {
     if (badges.length === 0) {
         return (
             <p className="text-sm text-brand-muted text-center py-6">
-                No hay badges disponibles aún
+                Red Neuronal inactiva (Aún no hay nodos disponibles)
             </p>
         );
     }
 
     return (
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 pt-4 pb-8 relative">
+            {/* Background connecting line (aesthetic only) */}
+            <div className="absolute top-1/2 left-4 right-4 h-0.5 bg-brand-border -z-10 hidden sm:block"></div>
+
             {badges.map((badge) => (
                 <div
                     key={badge.id}
-                    className={`relative overflow-hidden rounded-card border p-3 text-center transition-all duration-300
-                     ${badge.earned
-                            ? "group bg-gradient-to-br from-brand-accent/10 to-transparent backdrop-blur-xl border-brand-accent/30 shadow-[0_0_20px_rgba(255,77,0,0.1)] hover:shadow-[0_0_30px_rgba(255,77,0,0.4)] hover:-translate-y-1 hover:border-brand-accent/70"
-                            : "bg-white/5 border-white/5 opacity-50 grayscale hover:opacity-70 hover:grayscale-0"
-                        }`}
+                    className="relative group flex flex-col items-center gap-3 w-24"
                     title={
                         badge.earned
-                            ? `${badge.name} — Ganado`
+                            ? `${badge.name} — Nodo Activado`
                             : `${badge.name} — ${badge.description}`
                     }
                 >
-                    {/* Emoji */}
-                    <span className={`text-3xl block mb-1.5 ${badge.earned ? "" : "opacity-40"}`}>
-                        {badge.emoji}
-                    </span>
-
-                    {/* Name */}
-                    <p
-                        className={`text-[10px] font-semibold leading-tight
-                       ${badge.earned ? "text-brand-text" : "text-brand-muted"}`}
+                    {/* The Node */}
+                    <div
+                        className={`w-16 h-16 rounded-[2rem] flex items-center justify-center relative transition-all duration-500
+                         ${badge.earned
+                                ? "bg-gradient-to-br from-brand-accent/20 to-brand-electric/10 border-2 border-brand-accent shadow-[0_0_20px_rgba(255,77,0,0.3)] group-hover:shadow-[0_0_35px_rgba(255,77,0,0.6)] group-hover:-translate-y-2 group-hover:scale-110"
+                                : "bg-brand-bg-2 border-2 border-brand-border opacity-50 grayscale hover:opacity-70 hover:grayscale-0"
+                            }`}
                     >
-                        {badge.name}
-                    </p>
+                        {/* Glow inside */}
+                        {badge.earned && (
+                            <div className="absolute inset-0 bg-brand-accent/10 rounded-full blur-md animate-pulse"></div>
+                        )}
 
-                    {/* Lock icon for unearned */}
-                    {!badge.earned && (
-                        <span className="absolute top-1.5 right-1.5 text-[10px] text-brand-muted">
-                            🔒
+                        <span className={`text-2xl z-10 ${badge.earned ? "scale-110" : "opacity-40"}`}>
+                            {badge.emoji}
                         </span>
-                    )}
 
-                    {/* Earned date */}
-                    {badge.earned && badge.earned_at && (
-                        <p className="text-[8px] text-brand-muted mt-1">
-                            {new Date(badge.earned_at).toLocaleDateString("es-AR", {
-                                month: "short",
-                                day: "numeric",
-                            })}
+                        {/* Lock icon for unearned */}
+                        {!badge.earned && (
+                            <span className="absolute -top-1 -right-1 text-[10px] text-brand-muted bg-brand-card rounded-full w-4 h-4 flex items-center justify-center border border-brand-border">
+                                🔒
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Node Info */}
+                    <div className="text-center w-full">
+                        <p
+                            className={`text-[10px] font-bold leading-tight uppercase tracking-wider
+                           ${badge.earned ? "text-brand-text drop-shadow-sm" : "text-brand-muted"}`}
+                        >
+                            {badge.name}
                         </p>
-                    )}
+                        {badge.earned && badge.earned_at ? (
+                            <p className="text-[9px] text-brand-accent/80 font-mono mt-1">
+                                [ACTIVADO]
+                            </p>
+                        ) : (
+                            <p className="text-[9px] text-brand-muted font-mono mt-1">
+                                [OFLINE]
+                            </p>
+                        )}
+                    </div>
                 </div>
             ))}
         </div>

@@ -48,9 +48,9 @@ export default function PostCard({ post, onToggleReaction, onDelete }: PostCardP
 
     return (
         <div
-            className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${hovered
-                    ? "border-slate-200 shadow-card-hover -translate-y-0.5"
-                    : "border-slate-200/80 shadow-card"
+            className={`bg-brand-card rounded-2xl border transition-all duration-300 overflow-hidden ${hovered
+                ? "border-brand-border shadow-card-hover -translate-y-0.5"
+                : "border-brand-border/80 shadow-card"
                 }`}
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
@@ -58,8 +58,8 @@ export default function PostCard({ post, onToggleReaction, onDelete }: PostCardP
             {/* Pinned / Announcement tag */}
             {(post.is_pinned || post.is_announcement) && (
                 <div className={`px-5 py-2.5 flex items-center gap-2 border-b ${post.is_announcement
-                        ? "bg-orange-50 border-orange-100"
-                        : "bg-indigo-50 border-indigo-100"
+                    ? "bg-orange-50 border-orange-100"
+                    : "bg-indigo-50 border-indigo-100"
                     }`}>
                     <span className="text-xs font-semibold">
                         {post.is_announcement ? "📢" : "📌"}
@@ -85,12 +85,12 @@ export default function PostCard({ post, onToggleReaction, onDelete }: PostCardP
                         </div>
                         <div>
                             <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-sm font-semibold text-slate-900">
+                                <span className="text-sm font-semibold text-brand-text">
                                     {post.author.full_name}
                                 </span>
                                 <PlanBadge planType={post.author.plan_type} />
                             </div>
-                            <span className="text-[11px] text-slate-400">
+                            <span className="text-[11px] text-brand-muted">
                                 {timeAgo(post.created_at)}
                             </span>
                         </div>
@@ -99,7 +99,7 @@ export default function PostCard({ post, onToggleReaction, onDelete }: PostCardP
                     {(isAuthor || user?.user_metadata?.role === "admin") && onDelete && (
                         <button
                             onClick={() => onDelete(post.id)}
-                            className={`p-1.5 rounded-lg text-slate-300 hover:text-red-400 hover:bg-red-50 text-xs transition-all duration-200 ${hovered ? 'opacity-100' : 'opacity-0'}`}
+                            className={`p-1.5 rounded-lg text-brand-muted hover:text-red-400 hover:bg-red-50 text-xs transition-all duration-200 ${hovered ? 'opacity-100' : 'opacity-0'}`}
                         >
                             ✕
                         </button>
@@ -107,7 +107,7 @@ export default function PostCard({ post, onToggleReaction, onDelete }: PostCardP
                 </div>
 
                 {/* Content */}
-                <div className="text-[14px] text-slate-700 leading-relaxed whitespace-pre-wrap mb-4">
+                <div className="text-[14px] text-brand-text-secondary leading-relaxed whitespace-pre-wrap mb-4">
                     {post.content}
                 </div>
 
@@ -126,7 +126,7 @@ export default function PostCard({ post, onToggleReaction, onDelete }: PostCardP
                 )}
 
                 {/* Footer */}
-                <div className="pt-3 border-t border-slate-100 space-y-3">
+                <div className="pt-3 border-t border-brand-border space-y-3">
                     <ReactionPicker
                         reactions={aggregatedReactions}
                         onToggle={(emoji) => onToggleReaction(post.id, emoji)}

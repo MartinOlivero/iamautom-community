@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { triggerXPAward } from "@/lib/xpClient";
 import type { Profile } from "@/types";
 import type { User } from "@supabase/supabase-js";
 
@@ -81,7 +82,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.log("[AuthProvider] getUser() complete:", { currentUser, error });
             if (currentUser) {
                 setUser(currentUser);
-                fetchProfile(currentUser.id).finally(() => setIsLoading(false));
+                fetchProfile(currentUser.id).finally(() => {
+                    setIsLoading(false);
+                    triggerXPAward("ping");
+                });
             } else {
                 setIsLoading(false);
             }
@@ -96,7 +100,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setUser(session.user);
                 // Fire and forget fetchProfile, DO NOT AWAIT IT!
                 // Awaiting here causes a deadlock with the GoTrue client's internal session lock.
-                fetchProfile(session.user.id).finally(() => setIsLoading(false));
+                fetchProfile(session.user.id).finally(() => {
+                    setIsLoading(false);
+                    triggerXPAward("ping");
+                });
             } else {
                 setUser(null);
                 setProfile(null);

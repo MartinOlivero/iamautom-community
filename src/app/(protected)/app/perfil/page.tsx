@@ -26,10 +26,8 @@ export default function PerfilPage() {
     const [saveMessage, setSaveMessage] = useState("");
 
     const THEMES = [
-        { id: "light", label: "Día ☀️", color: "#f4f6fb" },
-        { id: "dark", label: "Noche 🌙", color: "#0f172a" },
-        { id: "midnight", label: "Ciberpunk 👾", color: "#09090b" },
-        { id: "sunset", label: "Atardecer 🌇", color: "#fffbf5" },
+        { id: "light", label: "Día ☀️", color: "#f5f7f9" },
+        { id: "dark", label: "Noche 🌙", color: "#0F1014" },
     ] as const;
 
     if (!user || !profile) return null;
@@ -252,8 +250,8 @@ export default function PerfilPage() {
             {/* Badges */}
             <div className="bg-brand-card rounded-2xl border border-brand-border p-6 shadow-card-sm">
                 <div className="flex items-center gap-2 mb-5">
-                    <span className="text-xl">🏅</span>
-                    <h3 className="text-lg font-bold text-brand-text">Insignias Desbloqueadas</h3>
+                    <span className="text-xl">🧠</span>
+                    <h3 className="text-lg font-bold text-brand-text">Nodos Neurales</h3>
                 </div>
                 <BadgeGridSection userId={user.id} />
             </div>
@@ -269,7 +267,7 @@ function BadgeGridSection({ userId }: { userId: string }) {
         <div>
             <div className="flex justify-between items-center mb-4">
                 <p className="text-xs font-semibold text-brand-muted uppercase tracking-wider">
-                    Colección
+                    Red Activada
                 </p>
                 <div className="px-2 py-0.5 rounded-full bg-brand-hover-bg border border-brand-border">
                     <span className="text-[10px] font-mono text-brand-text font-bold">

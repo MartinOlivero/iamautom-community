@@ -72,6 +72,7 @@ export interface Module {
     title: string;
     description: string;
     emoji: string;
+    cover_image_url: string | null;
     order_index: number;
     tier_required: TierRequired;
     is_published: boolean;

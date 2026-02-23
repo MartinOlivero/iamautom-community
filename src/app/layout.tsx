@@ -42,6 +42,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -51,7 +53,9 @@ export default function RootLayout({
     <html lang="es" suppressHydrationWarning>
       <body className="antialiased">
         <ThemeProvider defaultTheme="light">
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <SiteSettingsProvider>{children}</SiteSettingsProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

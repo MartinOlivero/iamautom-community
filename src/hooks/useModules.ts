@@ -8,6 +8,7 @@ export interface ModuleWithProgress {
     title: string;
     description: string;
     emoji: string;
+    cover_image_url: string | null;
     order_index: number;
     tier_required: "member" | "inner_circle";
     is_published: boolean;
@@ -26,7 +27,7 @@ export function useModules() {
 
         try {
             const supabase = createClient();
-            
+
             const {
                 data: { user },
             } = await supabase.auth.getUser();

@@ -47,9 +47,10 @@ export const PLANS = {
 } as const;
 
 /**
- * XP reward values for different user actions.
+ * Synapse reward values for different user actions.
  */
-export const XP_REWARDS = {
+export const SYNAPSE_REWARDS = {
+    daily_ping: 5,
     complete_lesson: 10,
     create_post: 5,
     create_comment: 2,
@@ -59,14 +60,14 @@ export const XP_REWARDS = {
 } as const;
 
 /**
- * Level thresholds — XP required to reach each level.
+ * Level thresholds — Synapses required to reach each Processing Power level.
  */
 export const LEVEL_THRESHOLDS = {
     novato: 0,
-    aprendiz: 500,
-    automatizador: 1500,
-    experto: 3500,
-    maestro_ia: 7000,
+    aprendiz: 100,
+    automatizador: 500,
+    experto: 2000,
+    maestro_ia: 5000,
 } as const;
 
 /**
