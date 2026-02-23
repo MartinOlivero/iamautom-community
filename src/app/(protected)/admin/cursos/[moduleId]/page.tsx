@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
+import RichTextEditor from "@/components/ui/RichTextEditor";
 import type { Lesson, Module } from "@/types/database";
 
 export default function AdminLessonsPage() {
@@ -195,12 +196,13 @@ export default function AdminLessonsPage() {
                     <Input label="Título" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ej: Introducción a Zapier" />
 
                     <div>
-                        <label className="block text-sm font-medium text-brand-text mb-1">Descripción (Opcional)</label>
-                        <textarea
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className="w-full bg-brand-hover-bg border border-brand-border rounded-input px-3 py-2 text-sm text-brand-text resize-none focus:outline-none focus:border-brand-accent"
-                            rows={3}
+                        <label className="block text-sm font-medium text-brand-text mb-1 flex justify-between">
+                            Contenido de la Lección
+                        </label>
+                        <RichTextEditor
+                            content={description}
+                            onChange={setDescription}
+                            placeholder="Añade texto, imágenes, enlaces..."
                         />
                     </div>
 

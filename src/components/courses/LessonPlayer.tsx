@@ -90,11 +90,12 @@ export default function LessonPlayer({ lesson, isCompleted, onComplete }: Lesson
                 )}
             </div>
 
-            {/* Description */}
+            {/* Description (Rich Text) */}
             {lesson.description && (
-                <p className="text-sm text-brand-text-secondary leading-relaxed whitespace-pre-wrap">
-                    {lesson.description}
-                </p>
+                <div
+                    className="tiptap prose-content text-sm text-brand-text-secondary leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: lesson.description }}
+                />
             )}
 
             {/* Attachments */}

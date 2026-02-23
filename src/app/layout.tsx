@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     siteName: "IamAutom",
     images: [
       {
-        url: "/og-image.jpg", // The user can add this image later
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "IamAutom Community Preview",
@@ -47,9 +48,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
       <body className="antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <ThemeProvider defaultTheme="light">
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
