@@ -110,11 +110,12 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/30">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="relative flex items-center">
+            <div className="absolute inset-0 -inset-x-4 -inset-y-2 bg-white/15 rounded-2xl blur-xl" />
             <motion.div
               animate={{ scale: [1, 1.03, 1] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              style={{ filter: "drop-shadow(0 0 12px rgba(255,255,255,0.6)) drop-shadow(0 0 4px rgba(255,255,255,0.3))" }}
+              className="relative"
             >
               <Image src="/logo.png" alt="IamAutom Lab" width={480} height={106} className="h-10 w-auto" priority />
             </motion.div>
