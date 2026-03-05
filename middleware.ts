@@ -55,7 +55,15 @@ export async function middleware(request: NextRequest) {
             .eq("id", user.id)
             .single();
 
-        if (profile) {
+        // No profile found — treat as unpaid user
+        if (!profile || profile.subscription_status === null) {
+            if (pathname.startsWith("/admin") || pathname.startsWith("/app")) {
+                const url = request.nextUrl.clone();
+                url.pathname = "/planes";
+                url.searchParams.set("reason", "inactive");
+                return NextResponse.redirect(url);
+            }
+        } else {
             // Admin route check
             if (pathname.startsWith("/admin") && profile.role !== "admin") {
                 const url = request.nextUrl.clone();
