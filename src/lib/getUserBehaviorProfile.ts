@@ -1,8 +1,7 @@
-import { SupabaseClient } from '@supabase/supabase-js'
-
-export async function getUserBehaviorProfile(userId: string, supabase: SupabaseClient) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function getUserBehaviorProfile(userId: string, client: any) {
     const [participations, badges, gamificationEvents, recentPosts] = await Promise.all([
-        supabase
+        client
             .from('challenge_participants')
             .select(`
         challenge_id, 
@@ -17,19 +16,19 @@ export async function getUserBehaviorProfile(userId: string, supabase: SupabaseC
             .order('completed_at', { ascending: false })
             .limit(20),
 
-        supabase
+        client
             .from('user_badges')
             .select('badge_id, earned_at')
             .eq('user_id', userId),
 
-        supabase
+        client
             .from('gamification_events')
             .select('event_type, points, description, created_at')
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
             .limit(50),
 
-        supabase
+        client
             .from('posts')
             .select('id, created_at')
             .eq('user_id', userId)

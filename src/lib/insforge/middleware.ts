@@ -58,5 +58,5 @@ export async function createClient(request: NextRequest) {
         };
     }
 
-    return { supabase: extendedClient, supabaseResponse: insforgeResponse };
+    return { supabase: extendedClient, supabaseResponse: insforgeResponse, insforge: extendedClient, insforgeResponse };
 }

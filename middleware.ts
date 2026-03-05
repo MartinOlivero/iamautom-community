@@ -4,19 +4,19 @@ import { createClient } from "@/lib/insforge/middleware";
 /**
  * Next.js Middleware
  * Runs on every request. Handles:
- * 1. Supabase session refresh (keeps auth tokens alive)
+ * 1. Insforge session refresh (keeps auth tokens alive)
  * 2. Auth protection — redirects unauthenticated users to /login
  * 3. Subscription gating — redirects users without active sub to /planes
  * 4. Admin protection — only admins can access /admin routes
  */
 export async function middleware(request: NextRequest) {
-    const { supabase, supabaseResponse } = await createClient(request);
+    const { insforge, insforgeResponse } = await createClient(request);
     const { pathname } = request.nextUrl;
 
     // ── Always refresh the session ──────────────────────────
     const {
         data: { user },
-    } = await supabase.auth.getUser();
+    } = await insforge.auth.getUser();
 
     // ── Public routes — no protection needed ────────────────
     const isPublicRoute =
@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
             url.pathname = "/app/feed";
             return NextResponse.redirect(url);
         }
-        return supabaseResponse;
+        return insforgeResponse;
     }
 
     // ── Protected routes — require authentication ───────────
@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
 
     // ── Subscription & role checks (only for /app and /admin) ─
     if (user && isProtectedRoute) {
-        const { data: profile } = await supabase
+        const { data: profile } = await insforge
             .from("profiles")
             .select("subscription_status, plan_type, role")
             .eq("id", user.id)
@@ -90,7 +90,7 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    return supabaseResponse;
+    return insforgeResponse;
 }
 
 export const config = {
