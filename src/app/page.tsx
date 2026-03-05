@@ -112,15 +112,9 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center">
             <motion.div
-              animate={{
-                scale: [1, 1.03, 1],
-                filter: [
-                  "drop-shadow(0 0 0px rgba(56,189,248,0))",
-                  "drop-shadow(0 0 8px rgba(56,189,248,0.4))",
-                  "drop-shadow(0 0 0px rgba(56,189,248,0))",
-                ],
-              }}
+              animate={{ scale: [1, 1.03, 1] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              style={{ filter: "drop-shadow(0 0 12px rgba(255,255,255,0.6)) drop-shadow(0 0 4px rgba(255,255,255,0.3))" }}
             >
               <Image src="/logo.png" alt="IamAutom Lab" width={480} height={106} className="h-10 w-auto" priority />
             </motion.div>
