@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Zap, Users, BookOpen, Trophy, ArrowRight, Star, CheckCircle, Shield, Clock, Sparkles, Crown } from "lucide-react";
@@ -109,11 +110,8 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/30">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Zap className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-display font-bold text-lg">Iamautom Lab</span>
+          <Link href="/" className="flex items-center">
+            <Image src="/logo.png" alt="IamAutom Lab" width={180} height={40} className="h-9 w-auto" priority />
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <a href="#planes" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -465,11 +463,8 @@ export default function LandingPage() {
       <footer className="border-t border-border/30 py-12">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-                <Zap className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="font-display font-bold">Iamautom Lab</span>
+            <div className="flex items-center">
+              <Image src="/logo.png" alt="IamAutom Lab" width={150} height={34} className="h-8 w-auto" />
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <Link href="/login" className="hover:text-foreground transition-colors">Login</Link>
