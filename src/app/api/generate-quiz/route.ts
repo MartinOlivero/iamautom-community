@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { createClient } from '@/lib/insforge/server'
 
 const client = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
@@ -7,6 +8,13 @@ const client = new Anthropic({
 
 export async function POST(req: NextRequest) {
     try {
+        // Auth check — prevent unauthenticated API abuse
+        const supabase = await createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+        }
+
         const { lessonTitle, lessonDescription } = await req.json()
 
         if (!lessonTitle || !lessonDescription) {

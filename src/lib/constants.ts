@@ -7,41 +7,50 @@
  * These map each plan + billing cycle to a Stripe Price.
  */
 export const STRIPE_PRICES = {
-    member_monthly: process.env.STRIPE_MEMBER_MONTHLY_PRICE_ID ?? "",
-    member_annual: process.env.STRIPE_MEMBER_ANNUAL_PRICE_ID ?? "",
-    inner_circle_monthly: process.env.STRIPE_INNER_CIRCLE_MONTHLY_PRICE_ID ?? "",
-    inner_circle_annual: process.env.STRIPE_INNER_CIRCLE_ANNUAL_PRICE_ID ?? "",
+    member_quarterly: process.env.STRIPE_MEMBER_QUARTERLY_PRICE_ID ?? "",
+    member_biannual: process.env.STRIPE_MEMBER_BIANNUAL_PRICE_ID ?? "",
+    inner_circle_quarterly: process.env.STRIPE_INNER_CIRCLE_QUARTERLY_PRICE_ID ?? "",
+    inner_circle_biannual: process.env.STRIPE_INNER_CIRCLE_BIANNUAL_PRICE_ID ?? "",
 } as const;
 
 /**
  * Plan display information for the pricing page.
+ * Prices in USD matching iamautom.com
  */
 export const PLANS = {
     member: {
         name: "IamAutom Member",
-        monthlyPrice: 127,
-        annualPrice: 1270,
+        quarterlyPrice: 397,
+        quarterlyOriginal: 591,
+        biannualPrice: 647,
+        biannualOriginal: 1182,
+        quarterlyEquiv: "~$132 USD/mes",
+        biannualEquiv: "Equivale a $108 USD/mes — ahorrás $147 USD vs trimestral",
         features: [
-            "Acceso a la comunidad completa",
-            "Todos los cursos y módulos",
-            "Feed, encuestas y eventos",
-            "Sistema de gamificación",
-            "Chat de la comunidad",
-            "Soporte de la comunidad",
+            "Plataforma privada exclusiva de IamAutom",
+            "Acceso a +600 deals exclusivos de apps a través de gold.iamautom.com — con valor de mercado documentado de más de $500.000/año en ahorros",
+            "Red de networking y oportunidades laborales en IA",
+            "Clases en vivo semanales + módulos grabados con acceso permanente",
+            "Liberación mensual de material exclusivo",
+            "Acceso anticipado a nuevos lanzamientos",
         ],
     },
     inner_circle: {
         name: "IamAutom Inner Circle",
-        monthlyPrice: 227,
-        annualPrice: 2270,
+        quarterlyPrice: 697,
+        quarterlyOriginal: 1191,
+        biannualPrice: 1147,
+        biannualOriginal: 2382,
+        quarterlyEquiv: "~$232 USD/mes",
+        biannualEquiv: "Equivale a $191 USD/mes — ahorrás $147 USD vs trimestral",
         features: [
-            "Todo lo de Member",
-            "Chat VIP exclusivo",
-            "Eventos exclusivos Inner Circle",
-            "Grabaciones de sesiones en vivo",
-            "Acceso prioritario a nuevos contenidos",
-            "Badge dorado exclusivo ✨",
-            "Soporte directo de Tincho",
+            "Todo lo del plan Member incluido",
+            "1 llamada 1:1 mensual directa con Tincho Olivero (valor de mercado: $200-$300 por sesión)",
+            "Prioridad total en soporte y consultas",
+            "Revisión personalizada de proyectos o propuestas para clientes",
+            "Acceso a templates y propuestas comerciales reales de IamAutom Agency",
+            "Grupo VIP con acceso directo a Tincho",
+            "Todo el contenido premium sin restricciones",
         ],
     },
 } as const;

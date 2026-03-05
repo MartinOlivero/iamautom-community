@@ -9,8 +9,8 @@ import { createAdminClient } from "@/lib/insforge/admin";
  */
 function getPlanTypeFromPriceId(priceId: string): "member" | "inner_circle" {
     const innerCirclePriceIds = [
-        process.env.STRIPE_INNER_CIRCLE_MONTHLY_PRICE_ID,
-        process.env.STRIPE_INNER_CIRCLE_ANNUAL_PRICE_ID,
+        process.env.STRIPE_INNER_CIRCLE_QUARTERLY_PRICE_ID,
+        process.env.STRIPE_INNER_CIRCLE_BIANNUAL_PRICE_ID,
     ];
     return innerCirclePriceIds.includes(priceId) ? "inner_circle" : "member";
 }

@@ -136,7 +136,7 @@
 
 /* ── Base ──────────────────────────────────────────────── */
 body {
-  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  font-family: "Outfit", system-ui, sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;

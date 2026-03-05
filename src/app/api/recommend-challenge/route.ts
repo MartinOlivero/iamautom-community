@@ -9,8 +9,19 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
     try {
-        const { userId, justCompletedChallenge } = await request.json()
         const supabase = await createClient()
+
+        // Auth check — verify the requesting user matches the userId
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+        }
+
+        const { userId, justCompletedChallenge } = await request.json()
+
+        if (userId !== user.id) {
+            return NextResponse.json({ error: 'Forbidden: userId mismatch' }, { status: 403 })
+        }
 
         // Cache: reutilizar si tiene menos de 1 hora
         const { data: cached } = await supabase

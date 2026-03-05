@@ -7,16 +7,16 @@ import { createAdminClient } from "@/lib/insforge/admin";
  * Price ID mapping for each plan + billing cycle combination.
  */
 const PRICE_MAP: Record<string, string> = {
-    member_monthly: process.env.STRIPE_MEMBER_MONTHLY_PRICE_ID ?? "",
-    member_annual: process.env.STRIPE_MEMBER_ANNUAL_PRICE_ID ?? "",
-    inner_circle_monthly: process.env.STRIPE_INNER_CIRCLE_MONTHLY_PRICE_ID ?? "",
-    inner_circle_annual: process.env.STRIPE_INNER_CIRCLE_ANNUAL_PRICE_ID ?? "",
+    member_quarterly: process.env.STRIPE_MEMBER_QUARTERLY_PRICE_ID ?? "",
+    member_biannual: process.env.STRIPE_MEMBER_BIANNUAL_PRICE_ID ?? "",
+    inner_circle_quarterly: process.env.STRIPE_INNER_CIRCLE_QUARTERLY_PRICE_ID ?? "",
+    inner_circle_biannual: process.env.STRIPE_INNER_CIRCLE_BIANNUAL_PRICE_ID ?? "",
 };
 
 /**
  * POST /api/stripe/checkout
  * Creates a Stripe Checkout Session for the authenticated user.
- * Body: { planType: 'member' | 'inner_circle', billingCycle: 'monthly' | 'annual' }
+ * Body: { planType: 'member' | 'inner_circle', billingCycle: 'quarterly' | 'biannual' }
  */
 export async function POST(request: Request) {
     try {

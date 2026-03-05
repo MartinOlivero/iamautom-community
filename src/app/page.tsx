@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Zap, Users, BookOpen, Trophy, ArrowRight, Star, CheckCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Zap, Users, BookOpen, Trophy, ArrowRight, Star, CheckCircle, Shield, Clock, Sparkles, Crown } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { PLANS } from "@/lib/constants";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -58,11 +60,50 @@ const testimonials = [
   },
 ];
 
-/**
- * Public landing page at "/".
- * Full redesign with glassmorphism, animations, and modern UI.
- */
+function Countdown({ targetDate }: { targetDate: string }) {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const target = new Date(targetDate).getTime();
+    const tick = () => {
+      const diff = Math.max(0, target - Date.now());
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+
+  const boxes = [
+    { value: timeLeft.days, label: "Dias" },
+    { value: timeLeft.hours, label: "Horas" },
+    { value: timeLeft.minutes, label: "Min" },
+    { value: timeLeft.seconds, label: "Seg" },
+  ];
+
+  return (
+    <div className="flex items-center gap-3">
+      {boxes.map((b) => (
+        <div key={b.label} className="flex flex-col items-center">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center">
+            <span className="text-xl sm:text-2xl font-black text-white">{String(b.value).padStart(2, "0")}</span>
+          </div>
+          <span className="text-xs text-slate-500 mt-1">{b.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function LandingPage() {
+  const [billingCycle, setBillingCycle] = useState<"quarterly" | "biannual">("quarterly");
+  const isQuarterly = billingCycle === "quarterly";
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       {/* Navbar */}
@@ -75,6 +116,9 @@ export default function LandingPage() {
             <span className="font-display font-bold text-lg">Iamautom Lab</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
+            <a href="#planes" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Planes
+            </a>
             <Link href="/login">
               <Button size="sm" className="glow-orange-sm">
                 Iniciar Sesión
@@ -85,7 +129,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative pt-32 pb-20 md:pt-44 md:pb-32">
+      <section className="relative min-h-screen flex flex-col justify-center">
         {/* Decorative orbs */}
         <div className="absolute top-20 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-[120px] animate-float-2" />
         <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-[150px] animate-float-2" style={{ animationDelay: "2s" }} />
@@ -203,6 +247,187 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="planes" className="py-20 md:py-32 relative bg-[#0d0d18]">
+        {/* Decorative blur */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-600/[0.08] blur-3xl rounded-full pointer-events-none" />
+
+        <div className="container mx-auto px-6 relative z-10">
+          {/* Header */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} className="text-center mb-10">
+            <motion.span variants={fadeUp} custom={0} className="text-indigo-400 text-xs font-semibold tracking-widest uppercase">
+              Planes
+            </motion.span>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-black text-white mt-3">
+              Elegí el plan que{" "}
+              <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                se adapte a vos
+              </span>
+            </motion.h2>
+          </motion.div>
+
+          {/* Countdown */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={2} className="flex flex-col items-center gap-4 mb-10">
+            <p className="text-amber-400 text-sm flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Precio de lanzamiento disponible hasta el cierre del primer trimestre
+            </p>
+            <Countdown targetDate="2026-04-01T00:00:00" />
+          </motion.div>
+
+          {/* Billing toggle */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={3} className="flex flex-col items-center gap-3 mb-12">
+            <div className="bg-slate-900/80 border border-slate-700 rounded-xl p-1.5 flex">
+              <button
+                onClick={() => setBillingCycle("quarterly")}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  isQuarterly
+                    ? "bg-indigo-600 text-white shadow-lg"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Trimestral
+              </button>
+              <button
+                onClick={() => setBillingCycle("biannual")}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                  !isQuarterly
+                    ? "bg-indigo-600 text-white shadow-lg"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Semestral
+              </button>
+            </div>
+            {!isQuarterly && (
+              <span className="text-green-400 text-xs font-medium">Ahorras mas con el plan semestral</span>
+            )}
+          </motion.div>
+
+          {/* Plan cards */}
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto relative">
+            {/* Member */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={0}
+              className="border border-slate-800 bg-[#0f0f1e] rounded-2xl p-6 sm:p-8"
+            >
+              <div className="flex items-center gap-2 mb-6">
+                <Sparkles className="w-5 h-5 text-slate-400" />
+                <h3 className="text-lg font-bold text-white">{PLANS.member.name}</h3>
+              </div>
+
+              <div className="mb-2 flex items-center gap-2">
+                <span className="text-slate-500 text-lg line-through">
+                  ${isQuarterly ? PLANS.member.quarterlyOriginal.toLocaleString() : PLANS.member.biannualOriginal.toLocaleString()}
+                </span>
+                <span className="text-sm px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 font-semibold">
+                  LANZAMIENTO
+                </span>
+              </div>
+              <div className="mb-1">
+                <span className="text-4xl font-black text-white">
+                  ${isQuarterly ? PLANS.member.quarterlyPrice : PLANS.member.biannualPrice}
+                </span>
+                <span className="text-slate-500 text-sm ml-1">
+                  USD/{isQuarterly ? "trimestre" : "semestre"}
+                </span>
+              </div>
+              <p className="text-green-400 text-xs font-medium mb-6 pb-6 border-b border-slate-800">
+                {isQuarterly ? `Equivale a ${PLANS.member.quarterlyEquiv}` : PLANS.member.biannualEquiv}
+              </p>
+
+              <ul className="space-y-3 mb-8">
+                {PLANS.member.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 text-sm text-slate-300 leading-relaxed">
+                    <CheckCircle className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Link href="/login?plan=member">
+                <button className="w-full rounded-xl font-bold text-sm px-6 py-3.5 transition-all duration-200 border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20 flex items-center justify-center gap-2">
+                  Entrar a la formacion
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </Link>
+            </motion.div>
+
+            {/* Inner Circle */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={1}
+              className="border-2 border-indigo-500/50 bg-gradient-to-b from-indigo-950/50 to-[#0f0f1e] shadow-xl shadow-indigo-600/15 rounded-2xl p-6 sm:p-8 relative"
+            >
+              {/* Popular badge */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-xs font-bold rounded-full px-3 py-1 shadow-lg flex items-center gap-1.5 whitespace-nowrap">
+                  <Star className="w-3 h-3" /> Mas popular
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 mb-6 mt-2">
+                <Crown className="w-5 h-5 text-indigo-400" />
+                <h3 className="text-lg font-bold text-white">{PLANS.inner_circle.name}</h3>
+              </div>
+
+              <div className="mb-2 flex items-center gap-2">
+                <span className="text-slate-500 text-lg line-through">
+                  ${isQuarterly ? PLANS.inner_circle.quarterlyOriginal.toLocaleString() : PLANS.inner_circle.biannualOriginal.toLocaleString()}
+                </span>
+                <span className="text-sm px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 font-semibold">
+                  LANZAMIENTO
+                </span>
+              </div>
+              <div className="mb-1">
+                <span className="text-4xl font-black text-white">
+                  ${isQuarterly ? PLANS.inner_circle.quarterlyPrice.toLocaleString() : PLANS.inner_circle.biannualPrice.toLocaleString()}
+                </span>
+                <span className="text-slate-500 text-sm ml-1">
+                  USD/{isQuarterly ? "trimestre" : "semestre"}
+                </span>
+              </div>
+              <p className="text-green-400 text-xs font-medium mb-6 pb-6 border-b border-slate-800">
+                {isQuarterly ? `Equivale a ${PLANS.inner_circle.quarterlyEquiv}` : PLANS.inner_circle.biannualEquiv}
+              </p>
+
+              <ul className="space-y-3 mb-8">
+                {PLANS.inner_circle.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-3 text-sm text-slate-300 leading-relaxed">
+                    <CheckCircle className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Link href="/login?plan=inner_circle">
+                <button className="w-full rounded-xl font-bold text-sm px-6 py-3.5 transition-all duration-200 bg-gradient-to-r from-indigo-600 to-violet-600 text-white hover:from-indigo-500 hover:to-violet-500 shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2">
+                  Entrar a la formacion
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Guarantee */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={3} className="text-center mt-12">
+            <p className="text-sm text-slate-400 flex items-center justify-center gap-2">
+              <Shield className="w-5 h-5 text-green-500" />
+              <span>
+                <strong className="text-white">Garantia de 14 dias</strong> — si no es lo que esperabas, devolvemos el dinero. Sin preguntas.
+              </span>
+            </p>
+          </motion.div>
         </div>
       </section>
 
