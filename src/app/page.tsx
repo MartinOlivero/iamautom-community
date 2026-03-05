@@ -111,7 +111,19 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/30">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <Image src="/logo.png" alt="IamAutom Lab" width={480} height={150} className="h-10 w-auto" priority />
+            <motion.div
+              animate={{
+                scale: [1, 1.03, 1],
+                filter: [
+                  "drop-shadow(0 0 0px rgba(56,189,248,0))",
+                  "drop-shadow(0 0 8px rgba(56,189,248,0.4))",
+                  "drop-shadow(0 0 0px rgba(56,189,248,0))",
+                ],
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Image src="/logo.png" alt="IamAutom Lab" width={480} height={106} className="h-10 w-auto" priority />
+            </motion.div>
           </Link>
           <div className="hidden md:flex items-center gap-8">
             <a href="#planes" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
