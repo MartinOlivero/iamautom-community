@@ -414,33 +414,41 @@ select {
 
   /* TipTap Content Rendering */
   .prose-content p {
-    @apply my-3 leading-relaxed;
+    @apply my-4 text-base leading-relaxed text-brand-text-secondary;
+    font-size: 1.0625rem;
+    line-height: 1.8;
   }
 
   .prose-content h1 {
-    @apply text-2xl font-display font-bold mt-8 mb-4 text-brand-text;
+    @apply text-3xl font-display font-bold mt-10 mb-5 text-brand-text;
     text-wrap: balance;
   }
 
   .prose-content h2 {
-    @apply text-xl font-display font-semibold mt-6 mb-3 text-brand-text;
+    @apply text-2xl font-display font-semibold mt-8 mb-4 text-brand-text;
     text-wrap: balance;
   }
 
   .prose-content h3 {
-    @apply text-lg font-display font-medium mt-4 mb-2 text-brand-text;
+    @apply text-xl font-display font-medium mt-6 mb-3 text-brand-text;
   }
 
   .prose-content ul {
-    @apply list-disc list-outside ml-5 my-4 space-y-1 text-brand-text-secondary;
+    @apply list-disc list-outside ml-6 my-5 space-y-2 text-brand-text-secondary;
+    font-size: 1.0625rem;
+    line-height: 1.8;
   }
 
   .prose-content ol {
-    @apply list-decimal list-outside ml-5 my-4 space-y-1 text-brand-text-secondary;
+    @apply list-decimal list-outside ml-6 my-5 space-y-2 text-brand-text-secondary;
+    font-size: 1.0625rem;
+    line-height: 1.8;
   }
 
   .prose-content blockquote {
-    @apply border-l-4 border-brand-accent bg-brand-hover-bg pl-4 py-2 my-4 italic text-brand-text-secondary rounded-r-lg;
+    @apply border-l-4 border-brand-accent bg-brand-hover-bg pl-5 py-3 my-5 italic text-brand-text-secondary rounded-r-lg;
+    font-size: 1.0625rem;
+    line-height: 1.8;
   }
 
   .prose-content a {
@@ -468,7 +476,7 @@ select {
   }
 
   .prose-content pre {
-    @apply bg-brand-hover-bg rounded-lg p-4 my-4 text-sm text-brand-text-secondary overflow-x-auto;
+    @apply bg-brand-hover-bg rounded-lg p-4 my-5 text-sm text-brand-text-secondary overflow-x-auto;
     white-space: pre-wrap;
     word-wrap: break-word;
   }
@@ -482,18 +490,19 @@ select {
   }
 
   .prose-content table {
-    @apply w-full my-4 text-sm border-collapse;
+    @apply w-full my-5 border-collapse;
+    font-size: 1rem;
   }
 
   .prose-content th {
-    @apply text-left p-2 border-b border-brand-border text-brand-text font-semibold bg-brand-hover-bg;
+    @apply text-left p-3 border-b border-brand-border text-brand-text font-semibold bg-brand-hover-bg;
   }
 
   .prose-content td {
-    @apply p-2 border-b border-brand-border text-brand-text-secondary;
+    @apply p-3 border-b border-brand-border text-brand-text-secondary;
   }
 
   .prose-content hr {
-    @apply my-6 border-brand-border;
+    @apply my-8 border-brand-border;
   }
 }

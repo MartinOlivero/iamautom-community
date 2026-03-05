@@ -199,16 +199,16 @@ export default function ModuleDetailPage() {
     return (
         <div className="flex flex-col lg:flex-row gap-6 max-w-6xl mx-auto">
             {/* Sidebar — Lesson list */}
-            <aside className="lg:w-72 flex-shrink-0">
-                <div className="bg-brand-card rounded-card border border-brand-border p-4 sticky top-20">
+            <aside className="lg:w-80 flex-shrink-0">
+                <div className="bg-brand-card rounded-card border border-brand-border p-5 sticky top-20">
                     {/* Module header */}
-                    <div className="mb-4">
-                        <div className="flex items-center gap-2 mb-2">
+                    <div className="mb-5">
+                        <div className="flex items-center gap-2.5 mb-3">
                             <span className="text-2xl">{module_.emoji}</span>
-                            <h2 className="text-sm font-semibold text-brand-text">{module_.title}</h2>
+                            <h2 className="text-base font-semibold text-brand-text">{module_.title}</h2>
                         </div>
                         <ProgressBar value={progress} size="sm" showLabel={false} />
-                        <p className="text-[10px] text-brand-muted mt-1">
+                        <p className="text-xs text-brand-muted mt-1.5">
                             {completedCount}/{lessons.length} completadas · {progress}%
                         </p>
                     </div>
@@ -223,8 +223,8 @@ export default function ModuleDetailPage() {
                                 <button
                                     key={lesson.id}
                                     onClick={() => setActiveLessonId(lesson.id)}
-                                    className={`w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-input
-                             text-xs transition-all
+                                    className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-input
+                             text-sm transition-all
                              ${isActive
                                             ? "bg-brand-accent/10 text-brand-accent font-medium"
                                             : "text-brand-text-secondary hover:bg-brand-hover-bg"
@@ -232,7 +232,7 @@ export default function ModuleDetailPage() {
                                 >
                                     {/* Status indicator */}
                                     <span
-                                        className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px]
+                                        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs
                                flex-shrink-0 border
                                ${isDone
                                                 ? "bg-green-500 border-green-500 text-white"
@@ -246,7 +246,7 @@ export default function ModuleDetailPage() {
 
                                     <span className="truncate">{lesson.title}</span>
 
-                                    <span className="ml-auto text-[10px] text-brand-muted flex-shrink-0">
+                                    <span className="ml-auto text-xs text-brand-muted flex-shrink-0">
                                         {lesson.duration_minutes}m
                                     </span>
                                 </button>

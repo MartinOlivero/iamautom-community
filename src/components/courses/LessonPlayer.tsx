@@ -95,8 +95,8 @@ export default function LessonPlayer({ lesson, isCompleted, onComplete }: Lesson
             {/* Lesson info */}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                    <h2 className="text-lg font-display font-bold text-brand-text">{lesson.title}</h2>
-                    <p className="text-xs text-brand-muted mt-1">
+                    <h2 className="text-xl font-display font-bold text-brand-text">{lesson.title}</h2>
+                    <p className="text-sm text-brand-muted mt-1">
                         ⏱ {lesson.duration_minutes} min
                     </p>
                 </div>
@@ -154,7 +154,7 @@ export default function LessonPlayer({ lesson, isCompleted, onComplete }: Lesson
             {/* Description (Rich Text) */}
             {lesson.description && (
                 <div
-                    className="tiptap prose-content text-sm text-brand-text-secondary leading-relaxed overflow-hidden"
+                    className="tiptap prose-content text-brand-text-secondary leading-relaxed overflow-hidden"
                     dangerouslySetInnerHTML={{ __html: lesson.description }}
                 />
             )}
