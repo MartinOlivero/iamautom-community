@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 import type { Comment, Profile } from "@/types/database";
 import { triggerXPAward } from "@/lib/xpClient";
 
 export type CommentWithAuthor = Omit<Comment, "author"> & {
-    author: Pick<Profile, "id" | "full_name" | "avatar_url" | "plan_type">;
+    author: Pick<Profile, "id" | "full_name" | "avatar_url" | "plan_type" | "level" | "xp_points">;
 };
 
 export function useComments(postId: string) {
@@ -65,6 +65,21 @@ export function useComments(postId: string) {
         [supabase, postId]
     );
 
+    const updateComment = useCallback(
+        async (commentId: string, content: string) => {
+            const { error } = await supabase
+                .from("comments")
+                .update({ content })
+                .eq("id", commentId);
+            if (!error) {
+                setComments((prev) =>
+                    prev.map((c) => (c.id === commentId ? { ...c, content } : c))
+                );
+            }
+        },
+        [supabase]
+    );
+
     const deleteComment = useCallback(
         async (commentId: string) => {
             const { error } = await supabase.from("comments").delete().eq("id", commentId);
@@ -79,5 +94,5 @@ export function useComments(postId: string) {
         fetchComments();
     }, [fetchComments]);
 
-    return { comments, isLoading, addComment, deleteComment };
+    return { comments, isLoading, addComment, updateComment, deleteComment };
 }

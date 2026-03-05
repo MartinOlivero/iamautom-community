@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "gold";
-type ButtonSize = "sm" | "md" | "lg";
+type ButtonVariant = "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | "primary";
+type ButtonSize = "default" | "sm" | "lg" | "icon";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ButtonVariant;
@@ -10,22 +10,27 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-    primary:
-        "relative overflow-hidden group bg-gradient-to-r from-brand-accent to-brand-accent-hover text-white hover:text-white border-0 shadow-lg shadow-brand-accent/30 hover:shadow-brand-accent/50 hover:scale-105 active:scale-95 transition-all duration-300 before:absolute before:inset-0 before:bg-white/20 before:translate-x-[-100%] hover:before:translate-x-0 before:transition-transform before:duration-300",
+    default:
+        "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200",
+    destructive:
+        "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-lg shadow-destructive/25",
+    outline:
+        "border border-input bg-background hover:bg-accent hover:text-accent-foreground border-border/50",
     secondary:
-        "bg-brand-card/50 backdrop-blur-md text-brand-text border border-white/10 hover:border-white/30 hover:bg-white/5 active:scale-[0.98] transition-all duration-300",
+        "bg-secondary text-secondary-foreground hover:bg-secondary/80",
     ghost:
-        "bg-transparent text-brand-text-secondary hover:bg-white/5 hover:text-brand-text transition-all duration-300",
-    danger:
-        "bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 active:scale-[0.98] transition-all duration-300",
-    gold:
-        "relative overflow-hidden group bg-gradient-to-r from-brand-gold to-yellow-400 text-black font-bold shadow-lg shadow-brand-gold/30 hover:shadow-brand-gold/50 hover:scale-105 active:scale-95 transition-all duration-300 before:absolute before:inset-0 before:bg-white/30 before:translate-x-[-100%] hover:before:translate-x-0 before:transition-transform before:duration-300",
+        "hover:bg-accent hover:text-accent-foreground",
+    link:
+        "text-primary underline-offset-4 hover:underline",
+    primary:
+        "bg-gradient-to-r from-orange-600 to-orange-500 text-white hover:from-orange-600/90 hover:to-orange-500/90 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 rounded-xl",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-    sm: "px-3 py-1.5 text-sm rounded-input",
-    md: "px-5 py-2.5 text-sm rounded-input",
-    lg: "px-8 py-3.5 text-base rounded-input",
+    default: "h-10 px-4 py-2 rounded-md",
+    sm: "h-9 rounded-md px-3 text-sm",
+    lg: "h-11 rounded-md px-8 text-base",
+    icon: "h-10 w-10 rounded-md",
 };
 
 /**
@@ -35,8 +40,8 @@ const sizeStyles: Record<ButtonSize, string> = {
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     (
         {
-            variant = "primary",
-            size = "md",
+            variant = "default",
+            size = "default",
             isLoading = false,
             className = "",
             children,

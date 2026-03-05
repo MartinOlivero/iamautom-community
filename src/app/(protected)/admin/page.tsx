@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/insforge/server";
+import { RedemptionsAdmin } from "@/components/gamification/RedemptionsAdmin";
+import { AdminChallenges } from "@/components/gamification/AdminChallenges";
 
 export const dynamic = "force-dynamic";
 
@@ -65,20 +67,6 @@ export default async function AdminDashboardPage() {
             <div>
                 <h2 className="text-lg font-semibold text-brand-text mb-4">Acciones Rápidas</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Link
-                        href="/admin/cursos"
-                        className="bg-brand-card rounded-card border border-brand-border p-5 flex items-center gap-4 hover:border-brand-accent/50 transition-colors group"
-                    >
-                        <div className="w-12 h-12 rounded-full bg-brand-hover-bg flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                            📚
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-brand-text">Gestionar Cursos</h3>
-                            <p className="text-sm text-brand-muted mt-1">
-                                Crear, editar y organizar módulos y lecciones
-                            </p>
-                        </div>
-                    </Link>
 
                     {/* Site Settings */}
                     <Link
@@ -96,6 +84,16 @@ export default async function AdminDashboardPage() {
                         </div>
                     </Link>
                 </div>
+            </div>
+
+            {/* Challenges Management Section */}
+            <div className="pt-8 border-t border-brand-border">
+                <AdminChallenges />
+            </div>
+
+            {/* Redemptions Section */}
+            <div className="pt-8 border-t border-brand-border">
+                <RedemptionsAdmin />
             </div>
         </div>
     );

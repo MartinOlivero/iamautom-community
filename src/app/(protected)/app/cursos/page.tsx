@@ -1,51 +1,186 @@
 "use client";
 export const dynamic = "force-dynamic";
 
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useModules } from "@/hooks/useModules";
+import {
+    DndContext,
+    closestCenter,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+    SortableContext,
+    rectSortingStrategy,
+    arrayMove,
+} from "@dnd-kit/sortable";
+import { useModules, type ModuleWithProgress } from "@/hooks/useModules";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { createClient } from "@/lib/insforge/client";
 import ModuleCard from "@/components/courses/ModuleCard";
+import SortableModuleCard from "@/components/courses/SortableModuleCard";
 import Spinner from "@/components/ui/Spinner";
 
 /**
  * Courses page — grid of available modules with progress tracking.
+ * Admins can drag-and-drop modules to reorder them.
  */
 export default function CursosPage() {
-    const { modules, isLoading } = useModules();
+    const { modules, isLoading, isInTrialPeriod, trialEndsAt, refresh } = useModules();
+    const { profile } = useAuth();
     const router = useRouter();
+    const isAdmin = profile?.role === "admin";
 
-    return (
-        <div className="max-w-4xl mx-auto space-y-6">
-            {/* Header */}
-            <div>
-                <h1 className="text-xl font-display font-bold text-brand-text">Cursos</h1>
-                <p className="text-sm text-brand-muted mt-1">
-                    Módulos paso a paso con video, recursos y seguimiento de progreso
-                </p>
-            </div>
+    const [localModules, setLocalModules] = useState<ModuleWithProgress[] | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
 
-            {/* Module grid */}
-            {modules.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {modules.map((mod) => (
-                        <ModuleCard
-                            key={mod.id}
-                            module={mod}
-                            onClick={() => router.push(`/app/cursos/${mod.id}`)}
-                        />
-                    ))}
-                </div>
-            ) : isLoading ? (
-                <div className="flex justify-center py-12">
-                    <Spinner size="lg" />
-                </div>
-            ) : (
+    // Use localModules during drag operations, otherwise use hook data
+    const displayModules = localModules ?? modules;
+
+    // Require 8px movement before starting drag to avoid accidental drags on click
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: { distance: 8 },
+        })
+    );
+
+    const handleDragEnd = useCallback(
+        async (event: DragEndEvent) => {
+            const { active, over } = event;
+            if (!over || active.id === over.id) return;
+
+            const currentList = localModules ?? modules;
+            const oldIndex = currentList.findIndex((m) => m.id === active.id);
+            const newIndex = currentList.findIndex((m) => m.id === over.id);
+            if (oldIndex === -1 || newIndex === -1) return;
+
+            const reordered = arrayMove(currentList, oldIndex, newIndex);
+            setLocalModules(reordered);
+
+            // Persist new order to database
+            setIsSaving(true);
+            try {
+                const supabase = createClient();
+                const updates = reordered.map((m, i) => ({
+                    id: m.id,
+                    order_index: i,
+                }));
+
+                // Update each module's order_index
+                await Promise.all(
+                    updates.map(({ id, order_index }) =>
+                        supabase
+                            .from("modules")
+                            .update({ order_index })
+                            .eq("id", id)
+                    )
+                );
+
+                // Refresh from server to confirm
+                await refresh();
+                setLocalModules(null);
+            } catch (err) {
+                console.error("Error saving module order:", err);
+                // Revert on error
+                setLocalModules(null);
+            } finally {
+                setIsSaving(false);
+            }
+        },
+        [modules, localModules, refresh]
+    );
+
+    const renderGrid = () => {
+        if (displayModules.length === 0) {
+            if (isLoading) {
+                return (
+                    <div className="flex justify-center py-12">
+                        <Spinner size="lg" />
+                    </div>
+                );
+            }
+            return (
                 <div className="text-center py-12">
                     <p className="text-4xl mb-3">📚</p>
                     <p className="text-brand-muted text-sm">
                         Los cursos están siendo preparados. ¡Pronto habrá contenido!
                     </p>
                 </div>
-            )}
+            );
+        }
+
+        // Admin: drag-and-drop grid
+        if (isAdmin) {
+            return (
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                >
+                    <SortableContext
+                        items={displayModules.map((m) => m.id)}
+                        strategy={rectSortingStrategy}
+                    >
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {displayModules.map((mod) => {
+                                const locked = isInTrialPeriod && !mod.available_during_trial;
+                                return (
+                                    <SortableModuleCard
+                                        key={mod.id}
+                                        module={mod}
+                                        isLocked={locked}
+                                        trialEndsAt={trialEndsAt}
+                                        onClick={() => router.push(`/app/cursos/${mod.id}`)}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </SortableContext>
+                </DndContext>
+            );
+        }
+
+        // Regular users: static grid
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {displayModules.map((mod) => {
+                    const locked = isInTrialPeriod && !mod.available_during_trial;
+                    return (
+                        <ModuleCard
+                            key={mod.id}
+                            module={mod}
+                            isLocked={locked}
+                            trialEndsAt={trialEndsAt}
+                            onClick={() => router.push(`/app/cursos/${mod.id}`)}
+                        />
+                    );
+                })}
+            </div>
+        );
+    };
+
+    return (
+        <div className="max-w-7xl mx-auto space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-xl font-display font-bold text-brand-text">Cursos</h1>
+                    <p className="text-sm text-brand-muted mt-1">
+                        Módulos paso a paso con video, recursos y seguimiento de progreso
+                    </p>
+                </div>
+                {isSaving && (
+                    <div className="flex items-center gap-2 text-sm text-brand-muted">
+                        <Spinner size="sm" />
+                        <span>Guardando orden…</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Module grid */}
+            {renderGrid()}
         </div>
     );
 }

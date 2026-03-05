@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/insforge/server";
 import { awardSynapses } from "@/lib/xp";
-import { updateStreak } from "@/lib/streaks";
+// import { updateStreak } from "@/lib/streaks";
 import { checkAndAwardBadges } from "@/lib/badges";
 
 export const dynamic = "force-dynamic";
@@ -29,26 +29,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Missing action" }, { status: 400 });
         }
 
-        // 1. Update streak (Uptime) FIRST
-        const streakResult = await updateStreak(user.id);
+        // 1. Update streak (Uptime) in Database via RPC
+        // This handles "daily_ping" XP automatically inside SQL if it's a new day
+        await supabase.rpc("update_daily_streak", { p_user_id: user.id });
 
         let xpResult = null;
 
-        // 2. Award Daily Ping if it's a new day
-        if (streakResult.isNewDay) {
-            xpResult = await awardSynapses(user.id, "daily_ping", "Daily System Uptime Ping");
-        }
-
-        // 3. Award action-specific Synapses if Action is not just a Ping
+        // 2. Award action-specific Synapses if Action is not just a Ping
         if (action !== "ping") {
-            const actionResult = await awardSynapses(user.id, action as any);
-            // If we also got daily ping XP, combine them conceptually or just return the latest action
-            xpResult = {
-                newXP: actionResult.newXP,
-                leveledUp: (xpResult?.leveledUp || actionResult.leveledUp),
-                newLevel: actionResult.newLevel,
-                xpAmount: (xpResult?.xpAmount || 0) + actionResult.xpAmount,
-            };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            xpResult = await awardSynapses(user.id, action as any);
         }
 
         // 3. Check and award new badges
@@ -57,7 +47,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             xp: xpResult,
             earnedXp: xpResult?.xpAmount || 0,
-            streak: streakResult,
+            streak: { success: true }, // Streak details are now internal to DB
             newBadges: newBadges.map((b) => ({
                 name: b.name,
                 emoji: b.emoji,

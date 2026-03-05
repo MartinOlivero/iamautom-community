@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/insforge/admin";
 
 /**
  * Updates the user's streak based on their last active date.

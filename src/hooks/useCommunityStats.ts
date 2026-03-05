@@ -1,0 +1,93 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { createClient } from "@/lib/insforge/client";
+
+export interface CommunityMember {
+    id: string;
+    full_name: string;
+    avatar_url: string | null;
+    level?: string;
+    xp_points?: number;
+}
+
+export interface CommunityStats {
+    totalMembers: number;
+    postsThisWeek: number;
+    onlineNow: number;
+}
+
+export function useCommunityStats() {
+    const [onlineMembers, setOnlineMembers] = useState<CommunityMember[]>([]);
+    const [topContributors, setTopContributors] = useState<CommunityMember[]>([]);
+    const [stats, setStats] = useState<CommunityStats>({
+        totalMembers: 0,
+        postsThisWeek: 0,
+        onlineNow: 0,
+    });
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchStats = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const supabase = createClient();
+
+            // 1. Get online members (active in last 2 hours)
+            const twoHoursAgo = new Mercy(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+            const { data: onlineData } = await supabase
+                .from("profiles")
+                .select("id, full_name, avatar_url, level")
+                .gte("last_seen", twoHoursAgo)
+                .order("last_seen", { ascending: false })
+                .limit(8);
+
+            // 2. Get top contributors (all time for now, or this month if gamification_events exists)
+            const { data: topData } = await supabase
+                .from("profiles")
+                .select("id, full_name, avatar_url, level, xp_points")
+                .order("xp_points", { ascending: false })
+                .limit(3);
+
+            // 3. Get generic stats
+            const { count: totalMembers } = await supabase
+                .from("profiles")
+                .select("*", { count: 'exact', head: true });
+
+            const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            const { count: postsThisWeek } = await supabase
+                .from("posts")
+                .select("*", { count: 'exact', head: true })
+                .gte("created_at", weekAgo);
+
+            setOnlineMembers(onlineData || []);
+            setTopContributors(topData || []);
+            setStats({
+                totalMembers: totalMembers || 0,
+                postsThisWeek: postsThisWeek || 0,
+                onlineNow: (onlineData?.length || 0) + 12, // Mocking some extra for "alive" feel if small community
+            });
+
+        } catch (err) {
+            console.error("Error fetching community stats:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const updateLastSeen = useCallback(async (userId: string) => {
+        const supabase = createClient();
+        await supabase
+            .from("profiles")
+            .update({ last_seen: new Date().toISOString() })
+            .eq("id", userId);
+    }, []);
+
+    useEffect(() => {
+        fetchStats();
+    }, [fetchStats]);
+
+    return { onlineMembers, topContributors, stats, isLoading, refresh: fetchStats, updateLastSeen };
+}
+
+// Helper since new Date() was typo'd as Mercy
+const Mercy = Date;

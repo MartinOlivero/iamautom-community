@@ -7,10 +7,10 @@ interface AvatarProps {
 }
 
 const sizeStyles = {
-    sm: "w-8 h-8 text-xs",
-    md: "w-10 h-10 text-sm",
-    lg: "w-12 h-12 text-base",
-    xl: "w-16 h-16 text-xl",
+    sm: "w-9 h-9 text-xs",
+    md: "w-11 h-11 text-sm",
+    lg: "w-14 h-14 text-base",
+    xl: "w-20 h-20 text-xl",
 };
 
 /**

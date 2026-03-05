@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/middleware";
+import { createClient } from "@/lib/insforge/middleware";
 
 /**
  * Next.js Middleware
@@ -22,8 +22,9 @@ export async function middleware(request: NextRequest) {
     const isPublicRoute =
         pathname === "/" ||
         pathname === "/login" ||
+        pathname === "/callback" ||
         pathname === "/planes" ||
-        pathname.startsWith("/api/webhooks");
+        pathname.startsWith("/api/");
 
     if (isPublicRoute) {
         // If logged in and going to /login, redirect to app

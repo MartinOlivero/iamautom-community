@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { createClient } from "@/lib/insforge/client";
+import { AnimatePresence } from "framer-motion";
 import Button from "@/components/ui/Button";
+import { YouTubePlayerWithTracking } from "@/components/lessons/YouTubePlayerWithTracking";
+import { LessonQuiz } from "@/components/lessons/LessonQuiz";
+import { useQuiz } from "@/hooks/useQuiz";
 
 interface LessonPlayerProps {
     lesson: {
@@ -17,23 +23,58 @@ interface LessonPlayerProps {
 }
 
 /**
- * Extracts YouTube video ID from various URL formats.
- */
-function getYouTubeId(url: string): string | null {
-    const match = url.match(
-        /(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-    );
-    return match ? match[1] : null;
-}
-
-/**
  * Lesson viewer with YouTube embed, description, and mark-complete button.
  */
 export default function LessonPlayer({ lesson, isCompleted, onComplete }: LessonPlayerProps) {
     const [completing, setCompleting] = useState(false);
     const [completed, setCompleted] = useState(isCompleted);
 
-    const videoId = getYouTubeId(lesson.youtube_url);
+    // Sync internal state with props when navigation occurs
+    useEffect(() => {
+        setCompleted(isCompleted);
+    }, [isCompleted, lesson.id]);
+
+    const [canComplete, setCanComplete] = useState(false);
+    const { state: quizState, generateAndOpen, closeQuiz } = useQuiz();
+
+    const { user } = useAuth();
+    const [isAlreadyCompleted, setIsAlreadyCompleted] = useState(false);
+    const [checkingProgress, setCheckingProgress] = useState(true);
+
+    useEffect(() => {
+        if (!user?.id || !lesson?.id) return;
+
+        // Reset state for new lesson
+        setIsAlreadyCompleted(false);
+        setCheckingProgress(true);
+
+        const fetchProgress = async () => {
+            try {
+                const supabase = createClient();
+                const { data } = await supabase
+                    .from('lesson_progress')
+                    .select('completed')
+                    .eq('user_id', user.id)
+                    .eq('lesson_id', lesson.id)
+                    .single();
+
+                if (data?.completed === true) {
+                    setIsAlreadyCompleted(true);
+                }
+            } catch {
+                // If single() fails (no data), it's not completed
+                setIsAlreadyCompleted(false);
+            } finally {
+                setCheckingProgress(false);
+            }
+        };
+
+        fetchProgress();
+    }, [user?.id, lesson?.id]);
+
+    const handleCanCompleteChange = useCallback((value: boolean) => {
+        setCanComplete(value);
+    }, []);
 
     async function handleComplete() {
         setCompleting(true);
@@ -44,24 +85,12 @@ export default function LessonPlayer({ lesson, isCompleted, onComplete }: Lesson
 
     return (
         <div className="space-y-5">
-            {/* Video embed — 16:9 responsive */}
-            {videoId ? (
-                <div className="relative w-full pt-[56.25%] bg-black rounded-card overflow-hidden">
-                    <iframe
-                        src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
-                        title={lesson.title}
-                        className="absolute inset-0 w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                    />
-                </div>
-            ) : (
-                <div className="w-full pt-[56.25%] bg-brand-hover-bg rounded-card relative">
-                    <div className="absolute inset-0 flex items-center justify-center text-brand-muted text-sm">
-                        Video no disponible
-                    </div>
-                </div>
-            )}
+            {/* Video embed with tracking */}
+            <YouTubePlayerWithTracking
+                videoUrl={lesson.youtube_url}
+                durationMinutes={lesson.duration_minutes}
+                onCanCompleteChange={handleCanCompleteChange}
+            />
 
             {/* Lesson info */}
             <div className="flex items-start justify-between gap-4">
@@ -72,28 +101,60 @@ export default function LessonPlayer({ lesson, isCompleted, onComplete }: Lesson
                     </p>
                 </div>
 
-                {/* Complete button */}
-                {completed ? (
-                    <div className="flex items-center gap-1.5 text-green-500 text-sm font-medium bg-green-500/10 px-3 py-1.5 rounded-pill">
-                        <span>✓</span>
-                        <span>Completada</span>
+                {/* Complete button with tracking logic */}
+                {checkingProgress ? (
+                    <Button
+                        disabled
+                        variant="outline"
+                        size="sm"
+                        className="opacity-50 cursor-not-allowed border-white/10 text-brand-muted"
+                    >
+                        ...
+                    </Button>
+                ) : isAlreadyCompleted || completed ? (
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-green-500 text-sm font-medium bg-green-500/10 px-4 py-2 rounded-pill border border-green-500/20">
+                            <span>✓</span>
+                            <span>Lección completada</span>
+                        </div>
+                        <p className="text-[10px] text-brand-muted text-center italic">
+                            Ya sumaste XP por esta lección
+                        </p>
                     </div>
                 ) : (
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={handleComplete}
-                        isLoading={completing}
-                    >
-                        ✓ Marcar completa
-                    </Button>
+                    <div className="space-y-2 flex flex-col items-end">
+                        <Button
+                            variant={canComplete ? "primary" : "outline"}
+                            size="sm"
+                            onClick={() => generateAndOpen(lesson.title, lesson.description)}
+                            isLoading={completing || quizState.isLoading}
+                            disabled={!canComplete || quizState.isLoading}
+                            className={!canComplete ? "opacity-50 cursor-not-allowed border-white/10 text-brand-muted" : "shadow-glow-blue"}
+                        >
+                            {quizState.isLoading
+                                ? '⏳ Generando quiz...'
+                                : canComplete ? '✓ Marcar completa' : '🔒 Completá el video primero'}
+                        </Button>
+
+                        {quizState.error && (
+                            <p className="text-[10px] text-red-400 font-bold uppercase tracking-wider mt-1">
+                                {quizState.error}
+                            </p>
+                        )}
+
+                        {!canComplete && (
+                            <p className="text-[10px] text-brand-muted font-bold uppercase tracking-widest">
+                                Mirá el 80% para habilitar
+                            </p>
+                        )}
+                    </div>
                 )}
             </div>
 
             {/* Description (Rich Text) */}
             {lesson.description && (
                 <div
-                    className="tiptap prose-content text-sm text-brand-text-secondary leading-relaxed"
+                    className="tiptap prose-content text-sm text-brand-text-secondary leading-relaxed overflow-hidden"
                     dangerouslySetInnerHTML={{ __html: lesson.description }}
                 />
             )}
@@ -119,6 +180,22 @@ export default function LessonPlayer({ lesson, isCompleted, onComplete }: Lesson
                     </div>
                 </div>
             )}
+
+            {/* AI Generated Quiz Modal */}
+            <AnimatePresence>
+                {quizState.isOpen && (
+                    <LessonQuiz
+                        questions={quizState.questions}
+                        lessonTitle={lesson.title}
+                        onPass={() => {
+                            closeQuiz();
+                            handleComplete();
+                            setIsAlreadyCompleted(true);
+                        }}
+                        onClose={closeQuiz}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 }

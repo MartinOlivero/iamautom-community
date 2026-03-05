@@ -1,5 +1,3 @@
-import { showXPToast } from "@/components/gamification/XPToast";
-
 /**
  * Helper to call the XP award API and dispatch the toast notification.
  * Call this from client components or hooks after a user action.
@@ -21,15 +19,9 @@ export async function triggerXPAward(action: string) {
 
         const data = await res.json();
 
-        // Dispara el toast si hubo ganancia de experiencia, nivel o badges
-        if (data.earnedXp > 0 || data.xp?.leveledUp || (data.newBadges && data.newBadges.length > 0)) {
-            showXPToast({
-                xpAmount: data.earnedXp || 0,
-                leveledUp: data.xp?.leveledUp || false,
-                newLevel: data.xp?.newLevel || "",
-                badges: data.newBadges || [],
-            });
-        }
+        // El toast se dispara ahora via el Realtime listener en ProtectedLayout
+        // que escucha la tabla de notificaciones.
+        // No es necesario llamar a showXPToast aquí.
 
         return data;
     } catch (err) {

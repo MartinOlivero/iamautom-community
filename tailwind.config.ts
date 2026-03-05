@@ -10,6 +10,49 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        primary: {
+          DEFAULT: "hsl(24 94% 53%)",
+          foreground: "hsl(0 0% 100%)",
+        },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
         brand: {
           bg: "var(--color-bg)",
           card: "var(--color-card)",
@@ -31,7 +74,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ['"Outfit"', "system-ui", "sans-serif"],
+        sans: ['Inter', 'sans-serif'],
+        display: ['Space Grotesk', 'sans-serif'],
         body: ['"Plus Jakarta Sans"', "system-ui", "sans-serif"],
         mono: ['"JetBrains Mono"', "monospace"],
       },
@@ -76,23 +120,17 @@ const config: Config = {
         "scale-in": "scaleIn 0.25s cubic-bezier(0.34,1.56,0.64,1)",
         "spin-slow": "spin 1.2s linear infinite",
         "blob": "blob 10s infinite",
-      },
-      keyframes: {
-        fadeIn: { "0%": { opacity: "0", transform: "translateY(6px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
-        slideUp: { "0%": { opacity: "0", transform: "translateY(12px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
-        slideInRight: { "0%": { opacity: "0", transform: "translateX(100%) scale(0.9)" }, "100%": { opacity: "1", transform: "translateX(0) scale(1)" } },
-        scaleIn: { "0%": { opacity: "0", transform: "scale(0.92)" }, "100%": { opacity: "1", transform: "scale(1)" } },
-        spin: { to: { transform: "rotate(360deg)" } },
-        blob: {
-          "0%": { transform: "translate(0px, 0px) scale(1)" },
-          "33%": { transform: "translate(30px, -50px) scale(1.1)" },
-          "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
-          "100%": { transform: "translate(0px, 0px) scale(1)" },
-        },
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in-up": "fadeIn 0.5s ease-out",
+        float: "float 6s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+        shimmer: "shimmer 3s linear infinite",
+        gradient: "gradient-rotate 4s ease infinite",
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 };
 
 export default config;

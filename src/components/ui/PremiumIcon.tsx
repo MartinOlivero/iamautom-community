@@ -33,13 +33,17 @@ export default function PremiumIcon({ href = "", isActive = false, className = "
                     ? "bg-gradient-accent text-brand-dark shadow-glow-neon border border-brand-accent/30"
                     : variant === "ghost"
                         ? "bg-transparent text-brand-muted hover:text-brand-text group-hover:text-brand-accent"
-                        : "bg-brand-bg-2 dark:bg-black/40 text-brand-text border border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.05)] group-hover:text-brand-accent group-hover:border-brand-accent/50 group-hover:shadow-[0_0_15px_rgba(0,255,102,0.2)]"
+                        : "bg-brand-bg-2 dark:bg-black/40 text-brand-text border border-brand-border shadow-[0_2px_4px_rgba(0,0,0,0.05)] group-hover:text-brand-accent group-hover:border-brand-accent/60 group-hover:shadow-[0_0_22px_rgba(0,255,102,0.55)] group-hover:scale-105"
                 }
                 ${className}
             `}
             style={{ width: size * 2, height: size * 2 }}
         >
-            <Icon size={size} strokeWidth={isActive ? 2.5 : 2} className={isActive ? "drop-shadow-sm" : ""} />
+            <Icon
+                size={size}
+                strokeWidth={isActive ? 2.5 : 2}
+                className={isActive ? "drop-shadow-sm" : "transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(0,255,102,0.9)]"}
+            />
         </div>
     );
 }

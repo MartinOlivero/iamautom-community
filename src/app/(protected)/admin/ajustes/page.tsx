@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import { Image as ImageIcon, Upload, Loader2, Save } from "lucide-react";
 import Input from "@/components/ui/Input";
@@ -62,18 +62,14 @@ export default function AjustesPage() {
             const filePath = `logos/${fileName}`;
 
             // Upload the image
-            const { error: uploadError } = await supabase.storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
                 .from("site_assets")
                 .upload(filePath, file);
 
             if (uploadError) throw uploadError;
+            if (!uploadData?.url) throw new Error("No se pudo obtener la URL del logo");
 
-            // Get the public URL
-            const { data: { publicUrl } } = supabase.storage
-                .from("site_assets")
-                .getPublicUrl(filePath);
-
-            setLogoUrl(publicUrl);
+            setLogoUrl(uploadData.url);
             setMessage({ type: "success", text: "Logo subido correctamente. Haz clic en 'Guardar' para aplicar." });
 
         } catch (error: unknown) {

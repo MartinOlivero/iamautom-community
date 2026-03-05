@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import Input from "@/components/ui/Input";
-import RichTextEditor from "@/components/ui/RichTextEditor";
 import { Image as ImageIcon, Upload, Loader2 } from "lucide-react";
 import type { Module, TierRequired } from "@/types/database";
+
+function stripHtml(html: string): string {
+    return html.replace(/<[^>]*>/g, "").trim();
+}
 
 export default function AdminCursosPage() {
     const supabase = createClient();
@@ -27,6 +30,7 @@ export default function AdminCursosPage() {
     const [orderIndex, setOrderIndex] = useState(0);
     const [tierRequired, setTierRequired] = useState<TierRequired>("member");
     const [isPublished, setIsPublished] = useState(false);
+    const [availableDuringTrial, setAvailableDuringTrial] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -56,6 +60,7 @@ export default function AdminCursosPage() {
             setOrderIndex(mod.order_index);
             setTierRequired(mod.tier_required);
             setIsPublished(mod.is_published);
+            setAvailableDuringTrial(mod.available_during_trial);
         } else {
             setEditingModule(null);
             setTitle("");
@@ -65,6 +70,7 @@ export default function AdminCursosPage() {
             setOrderIndex(modules.length);
             setTierRequired("member");
             setIsPublished(false);
+            setAvailableDuringTrial(false);
         }
         setIsModalOpen(true);
     }
@@ -80,17 +86,14 @@ export default function AdminCursosPage() {
             const fileName = `module-${Date.now()}.${fileExt}`;
             const filePath = `${fileName}`;
 
-            const { error: uploadError } = await supabase.storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
                 .from("module_covers")
                 .upload(filePath, file);
 
             if (uploadError) throw uploadError;
+            if (!uploadData?.url) throw new Error("No se pudo obtener la URL de la imagen");
 
-            const { data: { publicUrl } } = supabase.storage
-                .from("module_covers")
-                .getPublicUrl(filePath);
-
-            setCoverImageUrl(publicUrl);
+            setCoverImageUrl(uploadData.url);
         } catch (error: unknown) {
             console.error("Error uploading cover:", error);
             alert("Error al subir imagen: " + (error as Error).message);
@@ -104,12 +107,13 @@ export default function AdminCursosPage() {
 
         const payload = {
             title,
-            description,
+            description: stripHtml(description),
             emoji,
             cover_image_url: coverImageUrl,
             order_index: orderIndex,
             tier_required: tierRequired,
             is_published: isPublished,
+            available_during_trial: availableDuringTrial,
         };
 
         if (editingModule) {
@@ -182,9 +186,12 @@ export default function AdminCursosPage() {
                                         {mod.tier_required === "inner_circle" && (
                                             <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-2 py-0.5 rounded-pill font-medium uppercase tracking-wider">VIP</span>
                                         )}
+                                        {mod.available_during_trial && (
+                                            <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-pill font-medium uppercase tracking-wider">14 días</span>
+                                        )}
                                     </div>
                                     <p className="text-xs text-brand-muted mt-1 max-w-xl truncate">
-                                        {mod.description}
+                                        {stripHtml(mod.description)}
                                     </p>
                                 </div>
                             </div>
@@ -223,10 +230,12 @@ export default function AdminCursosPage() {
                         <label className="block text-sm font-medium text-brand-text mb-1 flex justify-between">
                             Descripción
                         </label>
-                        <RichTextEditor
-                            content={description}
-                            onChange={setDescription}
+                        <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
                             placeholder="Describe el contenido de este módulo..."
+                            rows={3}
+                            className="w-full bg-brand-bg-2 border border-brand-border rounded-input px-3 py-2 text-sm text-brand-text placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-brand-accent resize-none"
                         />
                     </div>
 
@@ -282,17 +291,35 @@ export default function AdminCursosPage() {
                         </select>
                     </div>
 
-                    <div className="flex items-center gap-2 pt-2">
-                        <input
-                            type="checkbox"
-                            id="isPublished"
-                            checked={isPublished}
-                            onChange={(e) => setIsPublished(e.target.checked)}
-                            className="w-4 h-4 accent-brand-accent bg-brand-card border-brand-border rounded"
-                        />
-                        <label htmlFor="isPublished" className="text-sm text-brand-text cursor-pointer">
-                            Publicar (Visible para usuarios)
-                        </label>
+                    <div className="flex flex-col gap-3 pt-2">
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="isPublished"
+                                checked={isPublished}
+                                onChange={(e) => setIsPublished(e.target.checked)}
+                                className="w-4 h-4 accent-brand-accent bg-brand-card border-brand-border rounded"
+                            />
+                            <label htmlFor="isPublished" className="text-sm text-brand-text cursor-pointer">
+                                Publicar (Visible para usuarios)
+                            </label>
+                        </div>
+
+                        <div className="flex items-start gap-2">
+                            <input
+                                type="checkbox"
+                                id="availableDuringTrial"
+                                checked={availableDuringTrial}
+                                onChange={(e) => setAvailableDuringTrial(e.target.checked)}
+                                className="w-4 h-4 accent-brand-accent bg-brand-card border-brand-border rounded mt-0.5"
+                            />
+                            <label htmlFor="availableDuringTrial" className="text-sm text-brand-text cursor-pointer">
+                                <span>Disponible durante período de garantía</span>
+                                <span className="block text-xs text-brand-muted mt-0.5">
+                                    Los usuarios nuevos (primeros 14 días) podrán acceder a este módulo
+                                </span>
+                            </label>
+                        </div>
                     </div>
 
                     {/* Actions */}

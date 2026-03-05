@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 
 export interface ModuleWithProgress {
     id: string;
@@ -12,15 +12,20 @@ export interface ModuleWithProgress {
     order_index: number;
     tier_required: "member" | "inner_circle";
     is_published: boolean;
+    available_during_trial: boolean;
     release_date: string | null;
     created_at: string;
     lesson_count: number;
     completed_count: number;
 }
 
+const TRIAL_DAYS = 14;
+
 export function useModules() {
     const [modules, setModules] = useState<ModuleWithProgress[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isInTrialPeriod, setIsInTrialPeriod] = useState(false);
+    const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
 
     const fetchModules = useCallback(async () => {
         setIsLoading(true);
@@ -52,6 +57,26 @@ export function useModules() {
                 return;
             }
 
+            // Check if user is in trial period (first 14 days)
+            if (user) {
+                const { data: profile } = await supabase
+                    .from("profiles")
+                    .select("created_at, role")
+                    .eq("id", user.id)
+                    .single();
+
+                if (profile && profile.role !== "admin") {
+                    const createdAt = new Date(profile.created_at);
+                    const trialEnd = new Date(createdAt.getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000);
+                    const now = new Date();
+                    setIsInTrialPeriod(now < trialEnd);
+                    setTrialEndsAt(trialEnd);
+                } else {
+                    setIsInTrialPeriod(false);
+                    setTrialEndsAt(null);
+                }
+            }
+
             // If user is logged in, fetch their progress
             const progressMap: Record<string, number> = {};
             if (user) {
@@ -69,11 +94,13 @@ export function useModules() {
 
                     if (lessonToModule) {
                         const moduleMap: Record<string, string> = {};
-                        lessonToModule.forEach((l) => {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        lessonToModule.forEach((l: any) => {
                             moduleMap[l.id] = l.module_id;
                         });
 
-                        progressData.forEach((p) => {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        progressData.forEach((p: any) => {
                             const moduleId = moduleMap[p.lesson_id];
                             if (moduleId) {
                                 progressMap[moduleId] = (progressMap[moduleId] || 0) + 1;
@@ -107,5 +134,5 @@ export function useModules() {
         fetchModules();
     }, [fetchModules]);
 
-    return { modules, isLoading, refresh: fetchModules };
+    return { modules, isLoading, isInTrialPeriod, trialEndsAt, refresh: fetchModules };
 }

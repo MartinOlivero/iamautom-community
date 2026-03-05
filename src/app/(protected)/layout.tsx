@@ -1,13 +1,50 @@
+"use client";
+
 import Sidebar from "@/components/layout/Sidebar";
 import Topbar from "@/components/layout/Topbar";
 import MobileNav from "@/components/layout/MobileNav";
 import XPToast from "@/components/gamification/XPToast";
+import { useCallback } from "react";
+import { useToastQueue } from "@/hooks/useToastQueue";
+import { useGamificationRealtime } from "@/hooks/useGamificationRealtime";
+import { LevelUpModal } from "@/components/gamification/LevelUpModal";
+import { useLevelUpModal } from "@/hooks/useLevelUpModal";
+import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
 
 export default function ProtectedLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const { toasts, addToast, dismissToast } = useToastQueue();
+    const { isOpen, levelData, triggerLevelUp, closeLevelUp } = useLevelUpModal();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleNotification = useCallback((notification: any) => {
+        if (notification.type === 'level_up') {
+            triggerLevelUp({
+                level_number: notification.metadata.new_level,
+                level_name: notification.metadata.level_name,
+            });
+        } else {
+            addToast({
+                id: notification.id,
+                type: notification.type,
+                title: notification.title,
+                message: notification.message,
+                metadata: notification.metadata,
+            });
+        }
+    }, [addToast, triggerLevelUp]);
+
+    const handleXPChange = useCallback(() => {
+        // El sidebar se actualiza solo via useRealtimeProfile en Sidebar.tsx
+    }, []);
+
+    useGamificationRealtime({
+        onNotification: handleNotification,
+        onXPChange: handleXPChange,
+    });
     return (
         <div className="min-h-screen relative overflow-hidden bg-brand-bg dark:bg-brand-dark transition-colors duration-500">
             {/* 3D Static Mesh Background */}
@@ -28,7 +65,13 @@ export default function ProtectedLayout({
             </div>
 
             <MobileNav />
-            <XPToast />
+            <XPToast toasts={toasts} onDismiss={dismissToast} />
+            <LevelUpModal
+                isOpen={isOpen}
+                levelData={levelData}
+                onClose={closeLevelUp}
+            />
+            <WelcomeModal />
         </div>
     );
 }

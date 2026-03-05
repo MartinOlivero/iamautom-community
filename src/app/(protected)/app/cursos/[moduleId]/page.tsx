@@ -2,12 +2,13 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useParams, useRouter } from "next/navigation";
+import { createClient } from "@/lib/insforge/client";
 import LessonPlayer from "@/components/courses/LessonPlayer";
 import ProgressBar from "@/components/ui/ProgressBar";
 import Spinner from "@/components/ui/Spinner";
 import { triggerXPAward } from "@/lib/xpClient";
+import { Lock, ArrowLeft } from "lucide-react";
 
 interface Lesson {
     id: string;
@@ -24,21 +25,27 @@ interface ModuleDetail {
     title: string;
     description: string;
     emoji: string;
+    available_during_trial: boolean;
 }
 
 /**
  * Module detail page with lesson sidebar and video player.
  */
+const TRIAL_DAYS = 14;
+
 export default function ModuleDetailPage() {
     const params = useParams();
     const moduleId = params.moduleId as string;
     const supabase = createClient();
+    const router = useRouter();
 
     const [module_, setModule] = useState<ModuleDetail | null>(null);
     const [lessons, setLessons] = useState<Lesson[]>([]);
     const [completedLessonIds, setCompletedLessonIds] = useState<Set<string>>(new Set());
     const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isTrialLocked, setIsTrialLocked] = useState(false);
+    const [trialDaysRemaining, setTrialDaysRemaining] = useState(0);
 
     const fetchModuleData = useCallback(async () => {
         setIsLoading(true);
@@ -46,11 +53,37 @@ export default function ModuleDetailPage() {
         // Fetch module
         const { data: moduleData } = await supabase
             .from("modules")
-            .select("id, title, description, emoji")
+            .select("id, title, description, emoji, available_during_trial")
             .eq("id", moduleId)
             .single();
 
         if (moduleData) setModule(moduleData);
+
+        // Check trial lock
+        const {
+            data: { user: currentUser },
+        } = await supabase.auth.getUser();
+        if (currentUser && moduleData) {
+            const { data: profile } = await supabase
+                .from("profiles")
+                .select("created_at, role")
+                .eq("id", currentUser.id)
+                .single();
+
+            if (profile && profile.role !== "admin") {
+                const createdAt = new Date(profile.created_at);
+                const trialEnd = new Date(createdAt.getTime() + TRIAL_DAYS * 24 * 60 * 60 * 1000);
+                const now = new Date();
+                const inTrial = now < trialEnd;
+
+                if (inTrial && !moduleData.available_during_trial) {
+                    setIsTrialLocked(true);
+                    setTrialDaysRemaining(Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))));
+                    setIsLoading(false);
+                    return;
+                }
+            }
+        }
 
         // Fetch lessons
         const { data: lessonsData } = await supabase
@@ -78,7 +111,7 @@ export default function ModuleDetailPage() {
                 .eq("completed", true);
 
             if (progressData) {
-                setCompletedLessonIds(new Set(progressData.map((p) => p.lesson_id)));
+                setCompletedLessonIds(new Set(progressData.map((p: { lesson_id: string }) => p.lesson_id)));
             }
         }
 
@@ -121,6 +154,36 @@ export default function ModuleDetailPage() {
         return (
             <div className="flex justify-center py-12">
                 <Spinner size="lg" />
+            </div>
+        );
+    }
+
+    if (isTrialLocked && module_) {
+        return (
+            <div className="max-w-md mx-auto text-center py-16 px-6">
+                <div className="w-20 h-20 rounded-full bg-brand-bg-2 border border-brand-border flex items-center justify-center mx-auto mb-6">
+                    <Lock size={32} className="text-brand-muted" />
+                </div>
+                <h2 className="text-xl font-display font-bold text-brand-text mb-2">
+                    {module_.emoji} {module_.title}
+                </h2>
+                <p className="text-brand-muted text-sm mb-6">
+                    Este módulo se desbloqueará en{" "}
+                    <span className="text-brand-accent font-semibold">
+                        {trialDaysRemaining} {trialDaysRemaining === 1 ? "día" : "días"}
+                    </span>.
+                    <br />
+                    <span className="text-xs mt-2 block">
+                        Mientras tanto, explorá los módulos disponibles para tu período actual.
+                    </span>
+                </p>
+                <button
+                    onClick={() => router.push("/app/cursos")}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-accent text-white rounded-xl font-medium text-sm hover:bg-brand-accent/90 transition-colors"
+                >
+                    <ArrowLeft size={16} />
+                    Volver a Cursos
+                </button>
             </div>
         );
     }

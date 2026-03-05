@@ -94,6 +94,7 @@ export const NAV_ITEMS = [
     { label: "Cursos", emoji: "📚", href: "/app/cursos" },
     { label: "Calendario", emoji: "📅", href: "/app/calendario" },
     { label: "Leaderboard", emoji: "🏆", href: "/app/leaderboard" },
+    { label: "Desafíos", emoji: "🎯", href: "/app/desafios" },
     { label: "Miembros", emoji: "👥", href: "/app/miembros" },
 ] as const;
 

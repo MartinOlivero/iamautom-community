@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/insforge/admin";
 import type { Badge } from "@/types/database";
 
 /**
@@ -22,10 +22,12 @@ export async function checkAndAwardBadges(userId: string): Promise<Badge[]> {
         .select("badge_id")
         .eq("user_id", userId);
 
-    const earnedIds = new Set((earnedBadges || []).map((b) => b.badge_id));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const earnedIds = new Set((earnedBadges || []).map((b: any) => b.badge_id));
 
     // Only check badges the user hasn't earned yet
-    const unearned = allBadges.filter((b) => !earnedIds.has(b.id));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const unearned = allBadges.filter((b: any) => !earnedIds.has(b.id));
     if (unearned.length === 0) return [];
 
     // Fetch user stats in parallel

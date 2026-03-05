@@ -71,8 +71,8 @@ export default function PlanesPage() {
                         <button
                             onClick={() => setBillingCycle("monthly")}
                             className={`px-5 py-2 text-sm font-medium rounded-[6px] transition-all ${billingCycle === "monthly"
-                                    ? "bg-brand-dark text-white shadow-sm"
-                                    : "text-brand-muted hover:text-brand-text"
+                                ? "bg-brand-dark text-white shadow-sm"
+                                : "text-brand-muted hover:text-brand-text"
                                 }`}
                         >
                             Mensual
@@ -80,8 +80,8 @@ export default function PlanesPage() {
                         <button
                             onClick={() => setBillingCycle("annual")}
                             className={`px-5 py-2 text-sm font-medium rounded-[6px] transition-all ${billingCycle === "annual"
-                                    ? "bg-brand-dark text-white shadow-sm"
-                                    : "text-brand-muted hover:text-brand-text"
+                                ? "bg-brand-dark text-white shadow-sm"
+                                : "text-brand-muted hover:text-brand-text"
                                 }`}
                         >
                             Anual
@@ -165,7 +165,7 @@ export default function PlanesPage() {
                             ))}
                         </ul>
                         <Button
-                            variant="gold"
+                            variant="primary"
                             size="lg"
                             className="w-full"
                             isLoading={loadingPlan === "inner_circle"}

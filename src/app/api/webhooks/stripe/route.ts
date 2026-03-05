@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe/client";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/insforge/admin";
 
 /**
  * Determine plan_type from the Stripe Price ID.

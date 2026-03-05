@@ -26,7 +26,7 @@ export default function UpgradeWall({ isOpen, onClose }: UpgradeWallProps) {
                     Accedé a contenido VIP, chat exclusivo y más.
                 </p>
                 <div className="space-y-3">
-                    <Button variant="gold" size="lg" className="w-full">
+                    <Button variant="primary" size="lg" className="w-full">
                         ✨ Upgrade a Inner Circle
                     </Button>
                     <Button variant="ghost" size="sm" onClick={onClose}>

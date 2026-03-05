@@ -1,96 +1,258 @@
+"use client";
+
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { Zap, Users, BookOpen, Trophy, ArrowRight, Star, CheckCircle } from "lucide-react";
+import Button from "@/components/ui/Button";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" }
+  })
+};
+
+const benefits = [
+  {
+    icon: BookOpen,
+    title: "IA & Automatización",
+    description: "Aprende a dominar la Inteligencia Artificial y herramientas digitales para optimizar tu trabajo.",
+  },
+  {
+    icon: Users,
+    title: "Comunidad Activa",
+    description: "Conecta con emprendedores y profesionales que comparten tu visión de automatizar.",
+  },
+  {
+    icon: Zap,
+    title: "Negocios Digitales",
+    description: "Domina las herramientas necesarias para montar y escalar un negocio digital desde cero.",
+  },
+  {
+    icon: Trophy,
+    title: "Liderazgo en Automatización",
+    description: "Posiciónate como un experto en el uso de herramientas tecnológicas avanzadas.",
+  },
+];
+
+const testimonials = [
+  {
+    name: "Carlos M.",
+    role: "Founder, AutomateX",
+    text: "IamAutom transformó mi forma de trabajar. Automaticé el 80% de mis procesos en 3 meses.",
+    avatar: "CM",
+  },
+  {
+    name: "Laura G.",
+    role: "Marketing Manager",
+    text: "La comunidad es increíble. Siempre hay alguien dispuesto a ayudar y compartir conocimiento.",
+    avatar: "LG",
+  },
+  {
+    name: "Diego R.",
+    role: "Freelancer",
+    text: "Los cursos son prácticos y al grano. Cada lección tiene aplicación directa en mi trabajo.",
+    avatar: "DR",
+  },
+];
 
 /**
  * Public landing page at "/".
- * Minimal, premium design driving visitors to join or log in.
+ * Full redesign with glassmorphism, animations, and modern UI.
  */
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-brand-bg dark:bg-brand-dark text-brand-text relative overflow-hidden flex flex-col transition-colors duration-500">
-      {/* 3D Animated Mesh Background */}
-      <div className="absolute inset-0 z-0 opacity-80 dark:opacity-60">
-        <div className="absolute inset-0 bg-mesh-light dark:bg-mesh-dark animate-blob" />
-        <div className="absolute inset-0 backdrop-blur-[120px]" />
-      </div>
-
-      <div className="relative z-10 flex flex-col flex-1">
-        {/* ── Header ───────────────────────────────── */}
-        <header className="flex items-center justify-between px-6 lg:px-12 py-6 glass dark:glass-dark mx-4 lg:mx-8 mt-4 rounded-2xl shadow-glass border border-white/20">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">⚡</span>
-            <span className="font-display text-xl">IamAutom</span>
-          </div>
-          <Link
-            href="/login"
-            className="px-5 py-2 text-sm font-medium rounded-input
-                     border border-white/20 hover:bg-white/10 transition-colors"
-          >
-            Miembros
+    <div className="min-h-screen bg-background text-foreground overflow-hidden">
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/30">
+        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+              <Zap className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="font-display font-bold text-lg">Iamautom Lab</span>
           </Link>
-        </header>
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/login">
+              <Button size="sm" className="glow-orange-sm">
+                Iniciar Sesión
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
 
-        {/* ── Hero ─────────────────────────────────── */}
-        <main className="flex-1 flex items-center justify-center px-6">
-          <div className="max-w-2xl text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-pill
-                          bg-white/10 text-sm text-white/70 border border-white/10 shadow-glow-neon">
-              <span>🚀</span>
-              <span>Comunidad Premium de IA & Automatización</span>
-            </div>
+      {/* Hero */}
+      <section className="relative pt-32 pb-20 md:pt-44 md:pb-32">
+        {/* Decorative orbs */}
+        <div className="absolute top-20 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-[120px] animate-float-2" />
+        <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-[150px] animate-float-2" style={{ animationDelay: "2s" }} />
 
-            <h1 className="font-display text-5xl md:text-7xl leading-[1.1] tracking-tight">
-              Aprende.{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-electric-blue to-brand-violet">Automatiza.</span>{" "}
-              Crece.
-            </h1>
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <motion.div initial="hidden" animate="visible" className="max-w-4xl mx-auto">
+            <motion.div variants={fadeUp} custom={0} className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 mb-8">
+              <Star className="w-4 h-4 text-primary" />
+              <span className="text-sm text-muted-foreground">Tu comunidad de crecimiento con IA</span>
+            </motion.div>
 
-            <p className="text-lg md:text-xl text-white/60 max-w-lg mx-auto leading-relaxed">
-              Únete a la comunidad donde creamos negocios con inteligencia
-              artificial, automatizaciones y las tecnologías más nuevas del mercado.
-            </p>
+            <motion.h1 variants={fadeUp} custom={1} className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6">
+              <span className="text-foreground">Aprende.</span>{" "}
+              <span className="gradient-text">Evoluciona.</span>{" "}
+              <span className="text-foreground">Crece.</span>
+            </motion.h1>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/planes"
-                className="px-8 py-3.5 text-base font-semibold rounded-input
-                         bg-gradient-to-r from-brand-accent to-brand-electric-blue text-white
-                         hover:shadow-glow-neon
-                         active:scale-[0.98] transition-all"
-              >
-                Ver Planes →
+            <motion.p variants={fadeUp} custom={2} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+              Aprende a usar la Inteligencia Artificial para crecer profesionalmente, emprender y llevar tus ideas al siguiente nivel.
+            </motion.p>
+
+            <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/login">
+                <Button size="lg" className="text-base px-8 glow-orange animate-pulse-glow">
+                  Iniciar Sesión
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
               </Link>
-              <Link
-                href="/login"
-                className="px-8 py-3.5 text-base font-medium rounded-input
-                         border border-white/20 hover:bg-white/10 transition-all"
-              >
-                Ya soy miembro
+              <Link href="https://chat.whatsapp.com/G9L2rU7Z7H76k84C6S4W5G" target="_blank">
+                <Button variant="outline" size="lg" className="text-base px-8 glass border-border/50">
+                  Comunidad de WhatsApp
+                </Button>
               </Link>
-            </div>
+            </motion.div>
 
-            {/* Social proof */}
-            <div className="pt-8 flex items-center justify-center gap-8 text-sm text-white/40">
-              <div className="flex items-center gap-1.5">
-                <span>📚</span>
-                <span>Cursos exclusivos</span>
+            <motion.div variants={fadeUp} custom={4} className="mt-10 flex items-center justify-center gap-6 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> Acceso inmediato</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> +100 miembros</span>
+              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> Potenciado por IA</span>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Benefits */}
+      <section className="py-20 md:py-32">
+        <div className="container mx-auto px-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} className="text-center mb-16">
+            <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl md:text-5xl font-bold mb-4">
+              Todo lo que necesitas para <span className="gradient-text">crecer con IA</span>
+            </motion.h2>
+            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Recursos, comunidad y herramientas diseñadas para llevar tu negocio al siguiente nivel.
+            </motion.p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {benefits.map((b, i) => (
+              <motion.div
+                key={b.title}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                custom={i}
+                className="glass-hover rounded-2xl p-6 group cursor-default"
+              >
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                  <b.icon className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-display font-semibold text-lg mb-2">{b.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{b.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 md:py-32 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} className="text-center mb-16">
+            <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl md:text-5xl font-bold mb-4">
+              Lo que dicen nuestros <span className="gradient-text">miembros</span>
+            </motion.h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={t.name}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                custom={i}
+                className="glass rounded-2xl p-6"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{t.name}</p>
+                    <p className="text-xs text-muted-foreground">{t.role}</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">&quot;{t.text}&quot;</p>
+                <div className="flex gap-1 mt-4">
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} className="w-4 h-4 fill-primary text-primary" />
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 md:py-32">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="glass rounded-3xl p-12 md:p-16 text-center relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-orange-500/10" />
+            <div className="relative z-10">
+              <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl md:text-5xl font-bold mb-4">
+                ¿Listo para <span className="gradient-text">crecer con IA</span>?
+              </motion.h2>
+              <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
+                Únete hoy y accede a cursos, comunidad y herramientas que transformarán tu negocio.
+              </motion.p>
+              <motion.div variants={fadeUp} custom={2}>
+                <Link href="/login">
+                  <Button size="lg" className="text-base px-10 glow-orange">
+                    Iniciar Sesión
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-border/30 py-12">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+                <Zap className="w-4 h-4 text-primary-foreground" />
               </div>
-              <div className="flex items-center gap-1.5">
-                <span>🔴</span>
-                <span>Sesiones en vivo</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span>💬</span>
-                <span>Comunidad activa</span>
-              </div>
+              <span className="font-display font-bold">Iamautom Lab</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <Link href="/login" className="hover:text-foreground transition-colors">Login</Link>
+              <span>© {new Date().getFullYear()} Iamautom Lab</span>
             </div>
           </div>
-        </main>
-
-        {/* ── Footer minimal ──────────────────────── */}
-        <footer className="text-center py-6 text-xs text-white/30">
-          © {new Date().getFullYear()} IamAutom — Tincho Olivero
-        </footer>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 }

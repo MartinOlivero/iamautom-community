@@ -5,18 +5,30 @@ import { useRouter } from "next/navigation";
 import ProgressBar from "@/components/ui/ProgressBar";
 import type { ModuleWithProgress } from "@/hooks/useModules";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { MoreHorizontal, Edit, LayoutList, Share2, Trash2 } from "lucide-react";
+import { MoreHorizontal, Edit, LayoutList, Share2, Lock, GripVertical } from "lucide-react";
+
+function stripHtml(html: string): string {
+    return html.replace(/<[^>]*>/g, "").trim();
+}
 
 interface ModuleCardProps {
     module: ModuleWithProgress;
     onClick?: () => void;
+    isLocked?: boolean;
+    trialEndsAt?: Date | null;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    dragHandleProps?: {
+        attributes: any;
+        listeners: any;
+    };
+    isDragging?: boolean;
 }
 
 /**
  * Card displaying a course module with emoji, title, progress, and tier indicator.
  * Includes an admin overlay if the current user has an 'admin' role.
  */
-export default function ModuleCard({ module, onClick }: ModuleCardProps) {
+export default function ModuleCard({ module, onClick, isLocked = false, trialEndsAt, dragHandleProps, isDragging }: ModuleCardProps) {
     const router = useRouter();
     const { profile } = useAuth();
     const isAdmin = profile?.role === "admin";
@@ -31,6 +43,11 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
 
     const isCompleted = progress === 100;
     const isInnerCircle = module.tier_required === "inner_circle";
+
+    // Calculate days remaining until trial ends
+    const daysRemaining = trialEndsAt
+        ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+        : 0;
 
     // Detect click outside menu
     useEffect(() => {
@@ -66,17 +83,35 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
 
     return (
         <div
-            className="w-full h-full flex flex-col text-left bg-brand-card rounded-card border border-brand-border overflow-visible
-                 transition-all hover:shadow-lg hover:border-brand-accent/30 hover:-translate-y-1 relative group"
+            className={`w-full h-full flex flex-col text-left glass-hover rounded-card border overflow-visible
+                 transition-all hover:border-primary/30 hover:-translate-y-1 relative group
+                 ${isDragging ? "opacity-50 shadow-2xl" : ""}`}
         >
+            {/* Drag Handle */}
+            {dragHandleProps && (
+                <div className="absolute top-2 left-2 z-20">
+                    <button
+                        {...dragHandleProps.attributes}
+                        {...(dragHandleProps.listeners ?? {})}
+                        className="p-1.5 rounded-full bg-black/40 text-white/80 hover:bg-black/80 hover:text-white
+                            backdrop-blur-sm opacity-0 group-hover:opacity-100
+                            cursor-grab active:cursor-grabbing transition-all"
+                        title="Arrastrar para reordenar"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <GripVertical size={18} />
+                    </button>
+                </div>
+            )}
+
             {/* Admin Menu Toggle */}
             {isAdmin && (
                 <div className="absolute top-2 right-2 z-20" ref={menuRef}>
                     <button
                         onClick={toggleMenu}
                         className={`p-1.5 rounded-full transition-colors ${isMenuOpen
-                                ? "bg-black/60 text-white backdrop-blur-md"
-                                : "bg-black/40 text-white/80 hover:bg-black/80 hover:text-white backdrop-blur-sm opacity-0 group-hover:opacity-100"
+                            ? "bg-black/60 text-white backdrop-blur-md"
+                            : "bg-black/40 text-white/80 hover:bg-black/80 hover:text-white backdrop-blur-sm opacity-0 group-hover:opacity-100"
                             }`}
                         title="Opciones de Administrador"
                     >
@@ -111,8 +146,21 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
                 </div>
             )}
 
+            {/* Lock Overlay */}
+            {isLocked && (
+                <div className="absolute inset-0 z-10 bg-brand-card/80 backdrop-blur-[2px] rounded-card flex flex-col items-center justify-center text-center p-6 pointer-events-auto">
+                    <div className="w-14 h-14 rounded-full bg-brand-bg-2 border border-brand-border flex items-center justify-center mb-3">
+                        <Lock size={24} className="text-brand-muted" />
+                    </div>
+                    <p className="text-sm font-semibold text-brand-text mb-1">Contenido bloqueado</p>
+                    <p className="text-xs text-brand-muted">
+                        Disponible en <span className="text-brand-accent font-semibold">{daysRemaining} {daysRemaining === 1 ? "día" : "días"}</span>
+                    </p>
+                </div>
+            )}
+
             {/* Clickable Card Body */}
-            <div onClick={onClick} className="w-full h-full flex flex-col cursor-pointer overflow-hidden rounded-card">
+            <div onClick={isLocked ? undefined : onClick} className={`w-full h-full flex flex-col overflow-hidden rounded-card ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}>
                 {/* Cover Image Area */}
                 {module.cover_image_url && (
                     <div className="w-full h-40 md:h-48 relative bg-brand-bg-2 overflow-hidden border-b border-brand-border shrink-0">
@@ -159,7 +207,7 @@ export default function ModuleCard({ module, onClick }: ModuleCardProps) {
                         {module.title}
                     </h3>
                     <p className="text-sm text-brand-muted line-clamp-3 mb-6 flex-1">
-                        {module.description}
+                        {stripHtml(module.description)}
                     </p>
 
                     {/* Progress */}

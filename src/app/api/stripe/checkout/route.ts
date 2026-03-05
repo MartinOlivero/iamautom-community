@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe/client";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/insforge/server";
+import { createAdminClient } from "@/lib/insforge/admin";
 
 /**
  * Price ID mapping for each plan + billing cycle combination.

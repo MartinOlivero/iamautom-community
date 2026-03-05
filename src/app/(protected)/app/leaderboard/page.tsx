@@ -2,13 +2,14 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 import Avatar from "@/components/ui/Avatar";
 import PlanBadge from "@/components/ui/Badge";
 import ProgressBar from "@/components/ui/ProgressBar";
 import StreakFlame from "@/components/gamification/StreakFlame";
 import Spinner from "@/components/ui/Spinner";
 import { LEVEL_THRESHOLDS } from "@/lib/constants";
+import { GamificationTooltip } from "@/components/ui/GamificationTooltip";
 
 interface LeaderboardMember {
     id: string;
@@ -46,7 +47,8 @@ export default function LeaderboardPage() {
         }
 
         // Fetch badge counts for each user
-        const userIds = profiles.map((p) => p.id);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const userIds = profiles.map((p: any) => p.id);
         const { data: badgeCounts } = await supabase
             .from("user_badges")
             .select("user_id")
@@ -59,7 +61,8 @@ export default function LeaderboardPage() {
             }
         }
 
-        const leaderboard: LeaderboardMember[] = profiles.map((p) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const leaderboard: LeaderboardMember[] = profiles.map((p: any) => ({
             id: p.id,
             full_name: p.full_name,
             avatar_url: p.avatar_url,
@@ -90,7 +93,10 @@ export default function LeaderboardPage() {
         <div className="max-w-3xl mx-auto space-y-5">
             {/* Header */}
             <div>
-                <h1 className="text-xl font-display font-bold text-brand-text">💻 El Mainframe</h1>
+                <div className="flex items-center gap-2 mb-2">
+                    <h1 className="text-xl font-display font-bold text-brand-text">💻 El Mainframe</h1>
+                    <GamificationTooltip content="Ranking de los miembros con más Sinapsis acumuladas. Se actualiza en tiempo real." position="right" />
+                </div>
                 <p className="text-sm text-brand-muted mt-1">
                     Los nodos con mayor ancho de banda en la red de IamAutom.
                 </p>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 
 export interface SiteSettings {
     id: string;
@@ -55,7 +55,8 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         fetchSettings();
 
-        // Subscribe to real-time changes
+        // Subscribe to real-time changes (Temporarily disabled during Insforge migration)
+        /*
         const channel = supabase
             .channel("site_settings_changes")
             .on(
@@ -76,6 +77,7 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
         return () => {
             supabase.removeChannel(channel);
         };
+        */
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [supabase]);
 

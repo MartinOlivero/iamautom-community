@@ -1,9 +1,9 @@
 "use client";
 export const dynamic = "force-dynamic";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 import Avatar from "@/components/ui/Avatar";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 import PlanBadge from "@/components/ui/Badge";
@@ -13,22 +13,25 @@ import { LEVEL_THRESHOLDS } from "@/lib/constants";
 import { useBadges } from "@/hooks/useBadges";
 import BadgeGrid from "@/components/gamification/BadgeGrid";
 import { useTheme } from "@/components/theme/ThemeProvider";
+import { RewardsStore } from "@/components/gamification/RewardsStore";
+import { GamificationTooltip } from "@/components/ui/GamificationTooltip";
 
 export default function PerfilPage() {
     const { user, profile, refreshProfile } = useAuth();
     const supabase = createClient();
     const { theme, setTheme } = useTheme();
 
+    useEffect(() => {
+        if (theme !== "dark") {
+            setTheme("dark");
+        }
+    }, [theme, setTheme]);
+
     const [isEditing, setIsEditing] = useState(false);
     const [fullName, setFullName] = useState(profile?.full_name || "");
     const [bio, setBio] = useState(profile?.bio || "");
     const [isSaving, setIsSaving] = useState(false);
     const [saveMessage, setSaveMessage] = useState("");
-
-    const THEMES = [
-        { id: "light", label: "Día ☀️", color: "#f5f7f9" },
-        { id: "dark", label: "Noche 🌙", color: "#0F1014" },
-    ] as const;
 
     if (!user || !profile) return null;
 
@@ -126,7 +129,7 @@ export default function PerfilPage() {
                                         type="text"
                                         value={fullName}
                                         onChange={(e) => setFullName(e.target.value)}
-                                        className="w-full bg-brand-bg-2 border border-brand-border rounded-input px-4 py-2.5 text-sm text-brand-text focus:outline-none focus:border-brand-accent transition-colors shadow-sm"
+                                        className="w-full bg-white border border-brand-border rounded-input px-4 py-2.5 text-sm text-black focus:outline-none focus:border-brand-accent transition-colors shadow-sm"
                                     />
                                 </div>
                                 <div>
@@ -136,7 +139,7 @@ export default function PerfilPage() {
                                         onChange={(e) => setBio(e.target.value)}
                                         rows={3}
                                         maxLength={160}
-                                        className="w-full bg-brand-bg-2 border border-brand-border rounded-input px-4 py-2.5 text-sm text-brand-text resize-none focus:outline-none focus:border-brand-accent transition-colors shadow-sm"
+                                        className="w-full bg-white border border-brand-border rounded-input px-4 py-2.5 text-sm text-black resize-none focus:outline-none focus:border-brand-accent transition-colors shadow-sm"
                                         placeholder="Cuenta a la comunidad en qué te especializas, cuáles son tus metas..."
                                     />
                                     <p className="text-[10px] text-brand-muted mt-1 text-right font-mono">
@@ -144,35 +147,17 @@ export default function PerfilPage() {
                                     </p>
                                 </div>
 
-                                {/* THEME SELECTOR */}
-                                <div>
-                                    <label className="text-xs font-semibold text-brand-muted mb-2 block uppercase tracking-wide">Apariencia / Tema</label>
-                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                        {THEMES.map((t) => (
-                                            <button
-                                                key={t.id}
-                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                onClick={() => setTheme(t.id as any)}
-                                                className={`p-3 rounded-xl border flex flex-col items-center gap-2 transition-all ${theme === t.id
-                                                    ? "border-brand-accent bg-brand-accent/10 shadow-sm"
-                                                    : "border-brand-border bg-brand-bg hover:border-brand-muted"
-                                                    }`}
-                                            >
-                                                <div
-                                                    className="w-6 h-6 rounded-full border border-black/10 shadow-inner"
-                                                    style={{ backgroundColor: t.color }}
-                                                />
-                                                <span className="text-xs font-medium text-brand-text">{t.label}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
                                 <div className="flex items-center gap-3 pt-2 border-t border-brand-border/50">
-                                    <Button variant="primary" size="md" onClick={handleSave} isLoading={isSaving}>
+                                    <Button
+                                        variant="primary"
+                                        size="default"
+                                        className="shadow-xl shadow-orange-500/30 hover:shadow-orange-500/45"
+                                        onClick={handleSave}
+                                        isLoading={isSaving}
+                                    >
                                         Guardar Cambios
                                     </Button>
-                                    <Button variant="ghost" size="md" onClick={() => {
+                                    <Button variant="ghost" size="default" onClick={() => {
                                         setFullName(profile.full_name);
                                         setBio(profile.bio || "");
                                         setIsEditing(false);
@@ -218,7 +203,12 @@ export default function PerfilPage() {
                     >
                         <span className="text-3xl block mb-1 drop-shadow-sm">{stat.emoji}</span>
                         <p className="text-xl font-bold font-mono text-brand-text">{stat.value}</p>
-                        <p className="text-[10px] text-brand-muted font-semibold uppercase tracking-widest">{stat.label}</p>
+                        <div className="flex items-center justify-center">
+                            <p className="text-[10px] text-brand-muted font-semibold uppercase tracking-widest">{stat.label}</p>
+                            {(stat.label === "Racha Activa" || stat.label === "Racha Máx") && (
+                                <GamificationTooltip content="Días consecutivos activo en la plataforma. Si un día no entrás, la racha vuelve a 0." />
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
@@ -252,8 +242,19 @@ export default function PerfilPage() {
                 <div className="flex items-center gap-2 mb-5">
                     <span className="text-xl">🧠</span>
                     <h3 className="text-lg font-bold text-brand-text">Nodos Neurales</h3>
+                    <GamificationTooltip content="Logros que se desbloquean automáticamente al cumplir ciertos hitos. Los grises todavía no los alcanzaste." />
                 </div>
                 <BadgeGridSection userId={user.id} />
+            </div>
+
+            {/* Store */}
+            <div className="bg-brand-card rounded-2xl border border-brand-border p-6 shadow-card-sm overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-electric-blue/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+                <div className="flex items-center gap-2 mb-6">
+                    <span className="text-xl">🏪</span>
+                    <h3 className="text-lg font-bold text-brand-text">Tienda de Sinapsis</h3>
+                </div>
+                <RewardsStore />
             </div>
         </div>
     );

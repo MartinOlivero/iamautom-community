@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 import Avatar from "@/components/ui/Avatar";
 interface AvatarUploadProps {
     userId: string;
@@ -39,15 +39,14 @@ export default function AvatarUpload({ userId, fullName, avatarUrl, onUploadComp
             const fileName = `${userId}/avatar_${Date.now()}.${fileExt}`;
 
             // Upload to 'avatars' bucket
-            const { error: uploadError } = await supabase.storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
                 .from("avatars")
-                .upload(fileName, file, { cacheControl: "3600", upsert: true });
+                .upload(fileName, file);
 
             if (uploadError) throw uploadError;
+            if (!uploadData?.url) throw new Error("No se pudo obtener la URL del avatar");
 
-            // Get public URL
-            const { data } = supabase.storage.from("avatars").getPublicUrl(fileName);
-            const publicUrl = data.publicUrl;
+            const publicUrl = uploadData.url;
 
             // Update user profile in database
             const { error: updateError } = await supabase

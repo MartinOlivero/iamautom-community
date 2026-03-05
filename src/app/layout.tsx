@@ -52,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className="antialiased">
-        <ThemeProvider defaultTheme="light">
+        <ThemeProvider defaultTheme="dark">
           <AuthProvider>
             <SiteSettingsProvider>{children}</SiteSettingsProvider>
           </AuthProvider>

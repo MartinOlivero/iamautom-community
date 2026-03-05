@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 import type { Badge } from "@/types/database";
 
 export interface BadgeWithStatus extends Badge {
@@ -47,7 +47,8 @@ export function useBadges(userId?: string) {
             }
         }
 
-        const badgesWithStatus: BadgeWithStatus[] = allBadges.map((badge) => ({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const badgesWithStatus: BadgeWithStatus[] = allBadges.map((badge: any) => ({
             ...badge,
             earned: badge.id in earnedMap,
             earned_at: earnedMap[badge.id] || null,

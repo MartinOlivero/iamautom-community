@@ -4,7 +4,7 @@
 
 export type PlanType = "member" | "inner_circle" | "admin" | "none";
 export type SubscriptionStatus = "active" | "past_due" | "canceled" | "trialing" | "none";
-export type UserLevel = "novato" | "aprendiz" | "automatizador" | "experto" | "maestro_ia";
+export type UserLevel = "novato" | "aprendiz" | "practicante" | "especialista" | "experto" | "architect" | "innovador" | "mentor" | "visionario" | "automatizador" | "maestro_ia";
 export type Channel = "general" | "proyectos" | "soporte" | "off_topic" | "inner_circle_vip";
 export type TierRequired = "member" | "inner_circle";
 export type UserRole = "member" | "admin";
@@ -76,6 +76,7 @@ export interface Module {
     order_index: number;
     tier_required: TierRequired;
     is_published: boolean;
+    available_during_trial: boolean;
     release_date: string | null;
     created_at: string;
     // Joined

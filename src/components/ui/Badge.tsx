@@ -18,7 +18,7 @@ export default function PlanBadge({ planType, className = "" }: PlanBadgeProps) 
         <span
             className={`
         inline-flex items-center gap-1.5 px-2.5 py-0.5
-        text-[10px] font-bold font-mono uppercase tracking-widest
+        text-xs font-bold font-mono uppercase tracking-widest
         rounded-pill whitespace-nowrap shadow-sm border
         ${isInnerCircle
                     ? "bg-gradient-to-r from-brand-gold via-yellow-400 to-brand-gold bg-[length:200%_auto] animate-shimmer text-[#431407] border-yellow-300 drop-shadow-[0_0_8px_rgba(245,158,11,0.4)]"

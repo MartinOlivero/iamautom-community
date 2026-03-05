@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient } from "@/lib/insforge/admin";
 import { SYNAPSE_REWARDS } from "@/lib/constants";
 
 type SynapseAction = keyof typeof SYNAPSE_REWARDS;
@@ -49,7 +49,7 @@ export async function awardSynapses(userId: string, action: SynapseAction, descr
     await supabase.from("gamification_events").insert({
         user_id: userId,
         event_type: action,
-        synapse_amount: xpAmount,
+        points: xpAmount,
         description: description || `Awarded ${xpAmount} synapses for ${action}`,
     });
 

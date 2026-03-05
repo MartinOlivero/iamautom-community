@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -8,6 +8,70 @@
    IamAutom v4 — "Task Master" Design System
    Modern, graphite/black depth, vibrant neon accents.
    ============================================================ */
+
+/* Shadcn/Tailwind CSS Variables */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 24 94% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 24 94% 53%;
+    --radius: 0.75rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 24 94% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 24 94% 53%;
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 96%;
+    --card: 223 47% 8%;
+    --card-foreground: 210 40% 96%;
+    --popover: 223 47% 8%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 24 94% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 40% 14%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 222 40% 14%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 222 40% 14%;
+    --accent-foreground: 210 40% 96%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 30% 16%;
+    --input: 222 30% 16%;
+    --ring: 24 94% 53%;
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 90%;
+    --sidebar-primary: 24 94% 53%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 222 40% 12%;
+    --sidebar-accent-foreground: 210 40% 90%;
+    --sidebar-border: 222 30% 16%;
+    --sidebar-ring: 24 94% 53%;
+  }
+}
 
 :root {
   /* Default Theme (Light/Clean Graphite) */
@@ -41,6 +105,7 @@
   /* Borders */
   --color-border: #e2e8f0;
   --color-border-focus: rgba(34, 197, 94, 0.4);
+  --radius: 0.75rem;
 }
 
 .theme-dark {
@@ -97,11 +162,31 @@ body {
   background: #94a3b8;
 }
 
+/* ── Glassmorphism ───────────────────────────────────────── */
+.glass {
+  @apply bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg;
+}
+
+.dark .glass {
+  @apply bg-card/40 backdrop-blur-2xl border border-white/5 shadow-2xl;
+}
+
+.glass-hover {
+  @apply glass transition-all duration-300 hover:bg-card/80 hover:border-primary/30 hover:shadow-primary/10 hover:shadow-xl;
+}
+
+.glow-orange {
+  box-shadow: 0 0 30px -5px hsl(24 94% 53% / 0.3);
+}
+
+.glow-orange-sm {
+  box-shadow: 0 0 15px -3px hsl(24 94% 53% / 0.25);
+}
+
 /* ── Focus ─────────────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--color-electric-blue);
   outline-offset: 2px;
-  border-radius: 6px;
 }
 
 /* ── Selection ─────────────────────────────────────────── */
@@ -184,12 +269,24 @@ select {
   }
 }
 
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px -5px hsl(24 94% 53% / 0.3); }
+  50% { box-shadow: 0 0 40px -5px hsl(24 94% 53% / 0.5); }
+}
+
 /* ── Utilities ─────────────────────────────────────────── */
 @layer utilities {
 
   /* Text gradients */
   .text-gradient-accent {
     background: linear-gradient(135deg, #f97316, #fb923c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text {
+    background: linear-gradient(to right, hsl(24 94% 53%), hsl(45 96% 64%), hsl(45 100% 65%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -287,6 +384,14 @@ select {
     animation: float 4s ease-in-out infinite;
   }
 
+  .animate-float-2 {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
   .animate-pulse-ring {
     animation: pulse-ring 2s ease-in-out infinite;
   }
@@ -360,5 +465,35 @@ select {
 
   .prose-content s {
     @apply line-through opacity-70;
+  }
+
+  .prose-content pre {
+    @apply bg-brand-hover-bg rounded-lg p-4 my-4 text-sm text-brand-text-secondary overflow-x-auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .prose-content code {
+    @apply bg-brand-hover-bg text-brand-accent text-sm px-1.5 py-0.5 rounded;
+  }
+
+  .prose-content pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose-content table {
+    @apply w-full my-4 text-sm border-collapse;
+  }
+
+  .prose-content th {
+    @apply text-left p-2 border-b border-brand-border text-brand-text font-semibold bg-brand-hover-bg;
+  }
+
+  .prose-content td {
+    @apply p-2 border-b border-brand-border text-brand-text-secondary;
+  }
+
+  .prose-content hr {
+    @apply my-6 border-brand-border;
   }
 }

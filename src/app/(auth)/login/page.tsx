@@ -2,7 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Link from "next/link";
@@ -19,23 +19,18 @@ function LoginForm() {
 
     const searchParams = useSearchParams();
     const redirectTo = searchParams.get("redirect") || "/app/feed";
-    const supabase = createClient();
+    const insforge = createClient();
 
     async function handleGoogleLogin() {
         setError("");
         setIsGoogleLoading(true);
         try {
-            const { error } = await supabase.auth.signInWithOAuth({
+            await insforge.auth.signInWithOAuth({
                 provider: "google",
-                options: {
-                    redirectTo: `${window.location.origin}/callback?next=${encodeURIComponent(redirectTo)}`,
-                },
+                redirectTo: `${window.location.origin}/callback?next=${encodeURIComponent(redirectTo)}`,
             });
-            if (error) throw error;
         } catch (err: unknown) {
-            const message =
-                err instanceof Error ? err.message : "Error al conectar con Google";
-            setError(message);
+            setError(err instanceof Error ? err.message : "Error al conectar con Google");
             setIsGoogleLoading(false);
         }
     }
@@ -48,31 +43,32 @@ function LoginForm() {
 
         try {
             if (mode === "login") {
-                const { error } = await supabase.auth.signInWithPassword({
+                const { error } = await insforge.auth.signInWithPassword({
                     email,
                     password,
                 });
                 if (error) throw error;
-                // Previene race-conditions del Soft-Router de Next con cookies
+
+                // If successful, redirect
                 window.location.href = redirectTo;
             } else {
-                const { error } = await supabase.auth.signUp({
+                const { data, error } = await insforge.auth.signUp({
                     email,
                     password,
-                    options: {
-                        data: { full_name: fullName },
-                        emailRedirectTo: `${window.location.origin}/callback`,
-                    },
+                    name: fullName,
                 });
                 if (error) throw error;
-                setSuccessMessage(
-                    "¡Cuenta creada! Revisá tu email para confirmar tu cuenta."
-                );
+
+                if (data?.requireEmailVerification) {
+                    setSuccessMessage(
+                        "¡Cuenta creada! Revisá tu email para confirmar tu cuenta."
+                    );
+                } else {
+                    window.location.href = redirectTo;
+                }
             }
         } catch (err: unknown) {
-            const message =
-                err instanceof Error ? err.message : "Ocurrió un error inesperado";
-            setError(message);
+            setError(err instanceof Error ? err.message : "Ocurrió un error inesperado");
         } finally {
             setIsLoading(false);
         }
@@ -97,7 +93,7 @@ function LoginForm() {
                 {/* Card */}
                 <div className="bg-brand-card rounded-card border border-brand-border p-8">
                     {/* Tabs */}
-                    <div className="flex bg-brand-hover-bg rounded-input p-1 mb-6">
+                    <div className="flex bg-white/5 rounded-input p-1 mb-6">
                         <button
                             type="button"
                             onClick={() => { setMode("login"); setError(""); setSuccessMessage(""); }}
@@ -130,6 +126,7 @@ function LoginForm() {
                                 value={fullName}
                                 onChange={(e) => setFullName(e.target.value)}
                                 required
+                                className="focus:!ring-primary/40 focus:!border-primary hover:!border-primary/30"
                             />
                         )}
 
@@ -140,6 +137,7 @@ function LoginForm() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
+                            className="focus:!ring-primary/40 focus:!border-primary hover:!border-primary/30"
                         />
 
                         <Input
@@ -150,6 +148,7 @@ function LoginForm() {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                             minLength={6}
+                            className="focus:!ring-primary/40 focus:!border-primary hover:!border-primary/30"
                         />
 
                         {error && (
@@ -187,7 +186,7 @@ function LoginForm() {
                         type="button"
                         onClick={handleGoogleLogin}
                         disabled={isGoogleLoading}
-                        className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-input border border-brand-border bg-brand-hover-bg text-brand-text text-sm font-medium hover:bg-brand-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-input border border-brand-border bg-white/5 text-brand-text text-sm font-medium hover:bg-brand-border transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isGoogleLoading ? (
                             <div className="w-5 h-5 border-2 border-brand-muted border-t-brand-text rounded-full animate-spin" />
@@ -214,11 +213,6 @@ function LoginForm() {
     );
 }
 
-/**
- * Login/Register page with tab toggle.
- * Uses Supabase email/password authentication.
- * Wrapped in Suspense to prevent useSearchParams hydration errors in Next.js build.
- */
 export default function LoginPage() {
     return (
         <Suspense fallback={<div className="min-h-screen bg-brand-dark flex items-center justify-center text-brand-muted">Cargando plataforma...</div>}>

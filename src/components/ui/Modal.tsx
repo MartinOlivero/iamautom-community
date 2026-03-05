@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
     isOpen: boolean;
@@ -28,6 +29,7 @@ export default function Modal({
     size = "md",
 }: ModalProps) {
     const overlayRef = useRef<HTMLDivElement>(null);
+    const mouseDownOnOverlay = useRef(false);
 
     useEffect(() => {
         function handleEscape(e: KeyboardEvent) {
@@ -45,24 +47,32 @@ export default function Modal({
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div
             ref={overlayRef}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4
-                 bg-black/50 backdrop-blur-sm animate-fade-in"
-            onClick={(e) => {
-                if (e.target === overlayRef.current) onClose();
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4
+                 bg-black/60 backdrop-blur-sm animate-fade-in"
+            onMouseDown={(e) => {
+                if (e.target === overlayRef.current) {
+                    mouseDownOnOverlay.current = true;
+                }
+            }}
+            onMouseUp={(e) => {
+                if (e.target === overlayRef.current && mouseDownOnOverlay.current) {
+                    onClose();
+                }
+                mouseDownOnOverlay.current = false;
             }}
         >
             <div
                 className={`
           ${sizeStyles[size]} w-full bg-brand-card rounded-card
-          border border-brand-border shadow-xl
-          animate-scale-in
+          border border-brand-border shadow-2xl
+          animate-scale-in flex flex-col max-h-[90vh]
         `}
             >
                 {title && (
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-brand-border shrink-0">
                         <h2 className="text-lg font-semibold font-display">{title}</h2>
                         <button
                             onClick={onClose}
@@ -72,8 +82,9 @@ export default function Modal({
                         </button>
                     </div>
                 )}
-                <div className="p-6">{children}</div>
+                <div className="p-6 overflow-y-auto">{children}</div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

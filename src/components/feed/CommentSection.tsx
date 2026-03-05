@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Avatar from "@/components/ui/Avatar";
+import ProfileHoverCard from "@/components/ui/ProfileHoverCard";
 import { useComments, type CommentWithAuthor } from "@/hooks/useComments";
 import { useAuth } from "@/components/auth/AuthProvider";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
 interface CommentSectionProps {
     postId: string;
@@ -30,8 +32,13 @@ export default function CommentSection({ postId, commentCount }: CommentSectionP
     const [isOpen, setIsOpen] = useState(false);
     const [newComment, setNewComment] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { comments, isLoading, addComment } = useComments(postId);
+    const { comments, isLoading, addComment, updateComment, deleteComment } = useComments(postId);
     const { user } = useAuth();
+
+    const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+    const [editText, setEditText] = useState("");
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -40,6 +47,13 @@ export default function CommentSection({ postId, commentCount }: CommentSectionP
         await addComment(newComment.trim());
         setNewComment("");
         setIsSubmitting(false);
+    }
+
+    async function handleUpdate(commentId: string) {
+        if (!editText.trim()) return;
+        await updateComment(commentId, editText.trim());
+        setEditingCommentId(null);
+        setEditText("");
     }
 
     return (
@@ -60,23 +74,78 @@ export default function CommentSection({ postId, commentCount }: CommentSectionP
                     ) : (
                         comments.map((comment: CommentWithAuthor) => (
                             <div key={comment.id} className="flex gap-2">
-                                <Avatar
-                                    name={comment.author.full_name}
-                                    imageUrl={comment.author.avatar_url || undefined}
-                                    size="sm"
-                                />
-                                <div className="flex-1 bg-brand-hover-bg rounded-input px-3 py-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-xs font-medium text-brand-text">
-                                            {comment.author.full_name}
-                                        </span>
-                                        <span className="text-[10px] text-brand-muted">
-                                            {timeAgo(comment.created_at)}
-                                        </span>
+                                <ProfileHoverCard userId={comment.author_id}>
+                                    <div className="cursor-pointer">
+                                        <Avatar
+                                            name={comment.author.full_name}
+                                            imageUrl={comment.author.avatar_url || undefined}
+                                            size="sm"
+                                        />
                                     </div>
-                                    <p className="text-sm text-brand-text-secondary mt-0.5">
-                                        {comment.content}
-                                    </p>
+                                </ProfileHoverCard>
+                                <div className="flex-1 bg-brand-hover-bg rounded-input px-3 py-2 group">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <ProfileHoverCard userId={comment.author_id}>
+                                                <span className="text-xs font-medium text-brand-text cursor-pointer hover:text-brand-accent transition-colors">
+                                                    {comment.author.full_name}
+                                                </span>
+                                            </ProfileHoverCard>
+                                            <span className="text-[10px] text-brand-muted">
+                                                {timeAgo(comment.created_at)}
+                                            </span>
+                                        </div>
+                                        {user?.id === comment.author_id && (
+                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingCommentId(comment.id);
+                                                        setEditText(comment.content);
+                                                    }}
+                                                    className="text-[10px] text-brand-muted hover:text-brand-accent"
+                                                >
+                                                    Editar
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setCommentToDelete(comment.id);
+                                                        setShowDeleteConfirm(true);
+                                                    }}
+                                                    className="text-[10px] text-brand-muted hover:text-red-400"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {editingCommentId === comment.id ? (
+                                        <div className="mt-2 space-y-2">
+                                            <textarea
+                                                value={editText}
+                                                onChange={(e) => setEditText(e.target.value)}
+                                                className="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-sm focus:outline-none focus:border-brand-accent/50"
+                                                rows={2}
+                                            />
+                                            <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => setEditingCommentId(null)}
+                                                    className="text-xs text-brand-muted hover:text-brand-text"
+                                                >
+                                                    Cancelar
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUpdate(comment.id)}
+                                                    className="text-xs text-brand-accent font-medium"
+                                                >
+                                                    Guardar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="text-sm text-brand-text-secondary mt-0.5 whitespace-pre-wrap">
+                                            {comment.content}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         ))
@@ -106,6 +175,22 @@ export default function CommentSection({ postId, commentCount }: CommentSectionP
                     )}
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={showDeleteConfirm}
+                onClose={() => {
+                    setShowDeleteConfirm(false);
+                    setCommentToDelete(null);
+                }}
+                onConfirm={() => {
+                    if (commentToDelete) deleteComment(commentToDelete);
+                }}
+                title="¿Eliminar comentario?"
+                description="Esta acción no se puede deshacer. El comentario se borrará permanentemente."
+                confirmText="Eliminar"
+                variant="danger"
+            />
         </div>
     );
 }

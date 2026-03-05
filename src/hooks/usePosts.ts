@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/insforge/client";
 import type { Post, Profile, PostReaction } from "@/types/database";
 import { triggerXPAward } from "@/lib/xpClient";
 
 /** Post with joined author, reactions, and comment count */
 export type PostWithDetails = Omit<Post, "author" | "reactions"> & {
-    author: Pick<Profile, "id" | "full_name" | "avatar_url" | "plan_type" | "role">;
+    author: Pick<Profile, "id" | "full_name" | "avatar_url" | "plan_type" | "role" | "level" | "xp_points">;
     reactions: PostReaction[];
     comment_count: number;
 };
@@ -36,7 +36,7 @@ export function usePosts(options: UsePostsOptions = {}) {
                 let query = supabase
                     .from("posts")
                     .select(
-                        "*, author:profiles!author_id(id, full_name, avatar_url, plan_type, role), reactions:post_reactions(*), comments(count)"
+                        "*, author:profiles!author_id(id, full_name, avatar_url, plan_type, role, level, xp_points), reactions:post_reactions(*), comments(count)"
                     )
                     .eq("channel", channel)
                     .order("is_pinned", { ascending: false })
@@ -119,7 +119,7 @@ export function usePosts(options: UsePostsOptions = {}) {
                 .select(
                     `
           *,
-          author:profiles!author_id(id, full_name, avatar_url, plan_type, role),
+          author:profiles!author_id(id, full_name, avatar_url, plan_type, role, level, xp_points),
           reactions:post_reactions(*),
           comments:comments(count)
         `
@@ -191,13 +191,47 @@ export function usePosts(options: UsePostsOptions = {}) {
         [posts]
     );
 
-    /** Delete a post */
     const deletePost = useCallback(
         async (postId: string) => {
             const supabase = createClient();
             const { error } = await supabase.from("posts").delete().eq("id", postId);
             if (!error) {
                 setPosts((prev) => prev.filter((p) => p.id !== postId));
+            }
+        },
+        []
+    );
+
+    /** Update a post */
+    const updatePost = useCallback(
+        async (postId: string, content: string) => {
+            const supabase = createClient();
+            const { error } = await supabase
+                .from("posts")
+                .update({ content })
+                .eq("id", postId);
+            if (!error) {
+                setPosts((prev) =>
+                    prev.map((p) => (p.id === postId ? { ...p, content } : p))
+                );
+            }
+        },
+        []
+    );
+
+    /** Toggle Pin */
+    const togglePin = useCallback(
+        async (postId: string, isPinned: boolean) => {
+            const supabase = createClient();
+            const { error } = await supabase
+                .from("posts")
+                .update({ is_pinned: !isPinned })
+                .eq("id", postId);
+
+            if (!error) {
+                setPosts((prev) =>
+                    prev.map((p) => (p.id === postId ? { ...p, is_pinned: !isPinned } : p))
+                );
             }
         },
         []
@@ -216,6 +250,8 @@ export function usePosts(options: UsePostsOptions = {}) {
         createPost,
         toggleReaction,
         deletePost,
+        updatePost,
+        togglePin,
         refresh: () => fetchPosts(),
     };
 }
