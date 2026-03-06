@@ -67,7 +67,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning className="theme-dark dark">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("iamautom_theme");if(t==="light"){document.documentElement.classList.remove("theme-dark","dark")}else{document.documentElement.classList.add("theme-dark","dark")}}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className="antialiased">
         <ThemeProvider defaultTheme="dark">
           <AuthProvider>
