@@ -323,8 +323,14 @@ export default function AdminCursosPage() {
                                 <input
                                     type="number"
                                     min="1"
-                                    value={unlockCost}
-                                    onChange={(e) => setUnlockCost(Math.max(1, Number(e.target.value)))}
+                                    value={unlockCost ?? ""}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setUnlockCost(val === "" ? 1 : Number(val));
+                                    }}
+                                    onBlur={() => {
+                                        if (unlockCost !== null && unlockCost < 1) setUnlockCost(1);
+                                    }}
                                     className="w-40 px-4 py-2 rounded-input bg-white dark:bg-black/20 border border-brand-border text-brand-text focus:outline-none focus:ring-2 focus:ring-brand-accent/40 focus:border-brand-accent transition-all"
                                 />
                             </div>
