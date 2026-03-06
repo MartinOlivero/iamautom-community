@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import ProgressBar from "@/components/ui/ProgressBar";
 import type { ModuleWithProgress } from "@/hooks/useModules";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { MoreHorizontal, Edit, LayoutList, Share2, Lock, GripVertical } from "lucide-react";
+import { MoreHorizontal, Edit, LayoutList, Share2, Lock, GripVertical, Zap } from "lucide-react";
 
 function stripHtml(html: string): string {
     return html.replace(/<[^>]*>/g, "").trim();
@@ -16,6 +16,8 @@ interface ModuleCardProps {
     onClick?: () => void;
     isLocked?: boolean;
     trialEndsAt?: Date | null;
+    onUnlock?: (moduleId: string) => void;
+    isUnlocking?: boolean;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     dragHandleProps?: {
         attributes: any;
@@ -28,7 +30,7 @@ interface ModuleCardProps {
  * Card displaying a course module with emoji, title, progress, and tier indicator.
  * Includes an admin overlay if the current user has an 'admin' role.
  */
-export default function ModuleCard({ module, onClick, isLocked = false, trialEndsAt, dragHandleProps, isDragging }: ModuleCardProps) {
+export default function ModuleCard({ module, onClick, isLocked = false, trialEndsAt, onUnlock, isUnlocking, dragHandleProps, isDragging }: ModuleCardProps) {
     const router = useRouter();
     const { profile } = useAuth();
     const isAdmin = profile?.role === "admin";
@@ -48,6 +50,8 @@ export default function ModuleCard({ module, onClick, isLocked = false, trialEnd
     const daysRemaining = trialEndsAt
         ? Math.max(0, Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
         : 0;
+
+    const needsSynapsisUnlock = module.unlock_cost !== null && !module.is_unlocked && !isAdmin;
 
     // Detect click outside menu
     useEffect(() => {
@@ -146,8 +150,8 @@ export default function ModuleCard({ module, onClick, isLocked = false, trialEnd
                 </div>
             )}
 
-            {/* Lock Overlay - positioned over the image area */}
-            {isLocked && (
+            {/* Lock Overlay - trial period */}
+            {isLocked && !needsSynapsisUnlock && (
                 <div className="absolute inset-0 z-10 rounded-card flex flex-col items-center justify-center text-center pointer-events-auto"
                      style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(15,20,30,0.95) 60%)" }}>
                     <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-4">
@@ -159,6 +163,7 @@ export default function ModuleCard({ module, onClick, isLocked = false, trialEnd
                     </p>
                 </div>
             )}
+
 
             {/* Clickable Card Body */}
             <div onClick={isLocked ? undefined : onClick} className={`w-full h-full flex flex-col overflow-hidden rounded-card ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}>
@@ -211,20 +216,44 @@ export default function ModuleCard({ module, onClick, isLocked = false, trialEnd
                         {stripHtml(module.description)}
                     </p>
 
-                    {/* Progress */}
+                    {/* Progress or Unlock CTA */}
                     <div className="space-y-2 mt-auto">
-                        <ProgressBar
-                            value={progress}
-                            color={isCompleted ? "success" : "accent"}
-                            size="md"
-                            showLabel={false}
-                        />
-                        <div className="flex items-center justify-between text-xs text-brand-muted font-medium">
-                            <span>
-                                {module.completed_count}/{module.lesson_count} lecciones
-                            </span>
-                            <span className="font-mono">{progress}%</span>
-                        </div>
+                        {needsSynapsisUnlock ? (
+                            <div className="flex flex-col gap-2">
+                                {onUnlock && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onUnlock(module.id); }}
+                                        disabled={isUnlocking}
+                                        className="w-full py-2.5 bg-brand-electric-blue/15 hover:bg-brand-electric-blue/25 border border-brand-electric-blue/30 text-brand-electric-blue rounded-xl text-sm font-black transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                                    >
+                                        {isUnlocking ? '...' : (
+                                            <>
+                                                <Zap size={14} />
+                                                DESBLOQUEAR POR ⚡ {module.unlock_cost}
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                                <p className="text-[10px] text-brand-muted text-center">
+                                    {module.lesson_count} lecciones disponibles al desbloquear
+                                </p>
+                            </div>
+                        ) : (
+                            <>
+                                <ProgressBar
+                                    value={progress}
+                                    color={isCompleted ? "success" : "accent"}
+                                    size="md"
+                                    showLabel={false}
+                                />
+                                <div className="flex items-center justify-between text-xs text-brand-muted font-medium">
+                                    <span>
+                                        {module.completed_count}/{module.lesson_count} lecciones
+                                    </span>
+                                    <span className="font-mono">{progress}%</span>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

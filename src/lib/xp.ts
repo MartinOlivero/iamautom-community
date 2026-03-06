@@ -16,7 +16,7 @@ export async function awardSynapses(userId: string, action: SynapseAction, descr
     // Get current profile
     const { data: profile } = await db
         .from("profiles")
-        .select("xp_points, level")
+        .select("xp_points, level, coins")
         .eq("id", userId)
         .single();
 
@@ -27,11 +27,13 @@ export async function awardSynapses(userId: string, action: SynapseAction, descr
     const newXP = profile.xp_points + xpAmount;
     const oldLevel = profile.level;
 
-    // Update profile (Database triggers handle level updates)
+    // Update profile: xp_points (total, for level) + coins (spendable balance)
+    // Database triggers handle level updates based on xp_points
     const { data: updatedProfile, error: updateError } = await db
         .from("profiles")
         .update({
             xp_points: newXP,
+            coins: (profile as Record<string, number>).coins + xpAmount,
             updated_at: new Date().toISOString(),
         })
         .eq("id", userId)

@@ -334,7 +334,7 @@ export function AdminChallenges() {
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="text-right mr-2">
-                                        <div className="text-xs font-bold text-brand-accent">💎 {c.reward_coins}</div>
+                                        <div className="text-xs font-bold text-brand-accent">⚡ {c.reward_coins}</div>
                                         <div className={`text-[10px] uppercase font-bold ${c.is_active && !isExpired ? 'text-brand-success' : isExpired ? 'text-yellow-500' : 'text-brand-muted'}`}>
                                             {isExpired ? 'Expirado' : c.is_active ? 'Activo' : 'Inactivo'}
                                         </div>

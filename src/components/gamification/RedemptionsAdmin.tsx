@@ -117,7 +117,7 @@ export function RedemptionsAdmin() {
                                                 <span className="text-2xl">{r.rewards?.emoji}</span>
                                                 <span className="font-bold text-brand-text">{r.rewards?.title}</span>
                                                 <span className="px-2 py-0.5 rounded text-[10px] font-black bg-brand-electric-blue/20 text-brand-electric-blue border border-brand-electric-blue/20">
-                                                    💎 {r.coins_spent}
+                                                    ⚡ {r.coins_spent}
                                                 </span>
                                             </div>
 

@@ -24,6 +24,7 @@ export interface Profile {
     stripe_subscription_id: string | null;
     subscription_status: SubscriptionStatus;
     xp_points: number;
+    coins: number;
     level: UserLevel;
     current_streak: number;
     longest_streak: number;

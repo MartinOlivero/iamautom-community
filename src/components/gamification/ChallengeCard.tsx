@@ -120,7 +120,7 @@ export function ChallengeCard({ challenge }: { challenge: Challenge }) {
             <div className="flex items-center justify-between border-t border-white/5 pt-4">
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/40 border border-white/10">
-                        <span className="text-sm">💎</span>
+                        <span className="text-sm">⚡</span>
                         <span className="text-xs font-black text-brand-text">{challenge.reward_coins}</span>
                     </div>
 

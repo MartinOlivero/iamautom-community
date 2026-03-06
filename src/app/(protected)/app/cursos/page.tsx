@@ -35,6 +35,31 @@ export default function CursosPage() {
 
     const [localModules, setLocalModules] = useState<ModuleWithProgress[] | null>(null);
     const [isSaving, setIsSaving] = useState(false);
+    const [unlockingId, setUnlockingId] = useState<string | null>(null);
+    const [unlockMessage, setUnlockMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+
+    const handleUnlockModule = async (moduleId: string) => {
+        if (!profile?.id) return;
+        setUnlockingId(moduleId);
+        try {
+            const db = createClient();
+            const { data } = await db.rpc('unlock_module', {
+                p_user_id: profile.id,
+                p_module_id: moduleId
+            });
+            if (data?.success) {
+                setUnlockMessage({ text: 'Modulo desbloqueado!', type: 'success' });
+                await refresh();
+            } else {
+                setUnlockMessage({ text: data?.error || 'Error al desbloquear', type: 'error' });
+            }
+        } catch {
+            setUnlockMessage({ text: 'Error al desbloquear el modulo', type: 'error' });
+        } finally {
+            setUnlockingId(null);
+            setTimeout(() => setUnlockMessage(null), 4000);
+        }
+    };
 
     // Use localModules during drag operations, otherwise use hook data
     const displayModules = localModules ?? modules;
@@ -153,6 +178,8 @@ export default function CursosPage() {
                             module={mod}
                             isLocked={locked}
                             trialEndsAt={trialEndsAt}
+                            onUnlock={handleUnlockModule}
+                            isUnlocking={unlockingId === mod.id}
                             onClick={() => router.push(`/app/cursos/${mod.id}`)}
                         />
                     );
@@ -178,6 +205,17 @@ export default function CursosPage() {
                     </div>
                 )}
             </div>
+
+            {/* Unlock feedback message */}
+            {unlockMessage && (
+                <div className={`p-3 rounded-xl text-sm font-bold text-center border ${
+                    unlockMessage.type === 'success'
+                        ? 'bg-green-500/10 border-green-500/30 text-green-500'
+                        : 'bg-red-500/10 border-red-500/30 text-red-400'
+                }`}>
+                    {unlockMessage.text}
+                </div>
+            )}
 
             {/* Module grid */}
             {renderGrid()}

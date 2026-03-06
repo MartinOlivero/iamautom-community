@@ -91,7 +91,7 @@ export function ManualPage() {
                     { emoji: "🔥", name: "Popular", condition: "Recibí 50 reacciones en tus posts" },
                     { emoji: "📚", name: "Primer Módulo", condition: "Completá tu primer módulo" },
                     { emoji: "🦉", name: "Sabio", condition: "Completá 5 módulos" },
-                    { emoji: "💎", name: "Centenario", condition: "Alcanzá 1.000 Sinapsis" },
+                    { emoji: "⚡", name: "Centenario", condition: "Alcanzá 1.000 Sinapsis" },
                     { emoji: "🏆", name: "Élite", condition: "Alcanzá 5.000 Sinapsis" },
                     { emoji: "🔥", name: "Racha 7 Días", condition: "Mantené 7 días de Uptime" },
                     { emoji: "⚡", name: "Racha 30 Días", condition: "Mantené 30 días de Uptime" },

@@ -17,6 +17,8 @@ export interface ModuleWithProgress {
     created_at: string;
     lesson_count: number;
     completed_count: number;
+    unlock_cost: number | null;
+    is_unlocked: boolean;
 }
 
 const TRIAL_DAYS = 7;
@@ -77,9 +79,18 @@ export function useModules() {
                 }
             }
 
-            // If user is logged in, fetch their progress
+            // If user is logged in, fetch their unlocks and progress
+            const unlockedModules = new Set<string>();
             const progressMap: Record<string, number> = {};
             if (user) {
+                const { data: unlocks } = await db
+                    .from("module_unlocks")
+                    .select("module_id")
+                    .eq("user_id", user.id);
+
+                if (unlocks) {
+                    unlocks.forEach((u: { module_id: string }) => unlockedModules.add(u.module_id));
+                }
                 const { data: progressData } = await db
                     .from("lesson_progress")
                     .select("lesson_id, completed")
@@ -118,6 +129,8 @@ export function useModules() {
                             ? (m.lessons[0] as { count: number }).count
                             : 0,
                     completed_count: progressMap[m.id as string] || 0,
+                    unlock_cost: (m.unlock_cost as number | null) ?? null,
+                    is_unlocked: !m.unlock_cost || unlockedModules.has(m.id as string),
                 })
             ) as ModuleWithProgress[];
 

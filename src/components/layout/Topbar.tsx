@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Avatar from "@/components/ui/Avatar";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useSiteSettings } from "@/contexts/SiteSettingsContext";
 import PremiumIcon from "@/components/ui/PremiumIcon";
@@ -66,6 +65,7 @@ export default function Topbar() {
                         const thresholdEntries = Object.entries(LEVEL_THRESHOLDS)
                             .sort(([, a], [, b]) => a - b);
                         const xp = profile.xp_points || 0;
+                        const coins = profile.coins || 0;
                         let currentThreshold = 0;
                         let nextThreshold = thresholdEntries[thresholdEntries.length - 1][1];
                         for (let i = 0; i < thresholdEntries.length; i++) {
@@ -84,16 +84,16 @@ export default function Topbar() {
                             : Math.min(100, Math.round(((xp - currentThreshold) / (nextThreshold - currentThreshold)) * 100));
 
                         return (
-                            <div className="hidden md:flex flex-col w-[260px] relative overflow-hidden rounded-[20px] bg-white/40 dark:bg-black/20 backdrop-blur-md border border-white/30 px-5 py-3 group shadow-[inset_0_1px_2px_rgba(255,255,255,0.3)]">
+                            <Link href="/app/perfil" className="hidden md:flex flex-col w-[320px] relative overflow-hidden rounded-[20px] bg-white/40 dark:bg-black/20 backdrop-blur-md border border-white/30 px-5 py-3 group shadow-[inset_0_1px_2px_rgba(255,255,255,0.3)] hover:border-brand-accent/30 transition-all">
                                 {/* Shimmer on hover */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full duration-700 transition-transform pointer-events-none" />
 
-                                {/* Stats row */}
+                                {/* Stats row: XP left, Sinapsis right */}
                                 <div className="flex items-center justify-between text-sm font-bold relative z-10">
                                     <span className="text-brand-accent drop-shadow-sm">⚡ {xp.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} <span className="text-xs font-medium opacity-70">XP</span></span>
-                                    {profile.current_streak > 0 && (
-                                        <span className="text-orange-400 drop-shadow-sm">🔥 {profile.current_streak} días</span>
-                                    )}
+                                    <span className="text-brand-electric-blue drop-shadow-sm flex items-center gap-1">
+                                        ⚡ {coins.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} <span className="text-xs font-medium opacity-70">Sinapsis</span>
+                                    </span>
                                 </div>
 
                                 {/* Progress bar */}
@@ -109,29 +109,21 @@ export default function Topbar() {
                                     </div>
                                 </div>
 
-                                {/* Level label */}
+                                {/* Level label + streak */}
                                 <div className="mt-1.5 flex items-center justify-between relative z-10">
                                     <span className="text-[11px] font-semibold text-brand-text-secondary">
                                         {levelInfo.icon} Nivel {levelInfo.number} · {levelInfo.label}
                                     </span>
-                                    <span className="text-[10px] font-bold text-brand-muted">{progress}%</span>
+                                    <div className="flex items-center gap-2">
+                                        {profile.current_streak > 0 && (
+                                            <span className="text-[10px] font-bold text-orange-400">🔥 {profile.current_streak}d</span>
+                                        )}
+                                        <span className="text-[10px] font-bold text-brand-muted">{progress}%</span>
+                                    </div>
                                 </div>
-                            </div>
+                            </Link>
                         );
                     })()}
-
-                    {/* Profile link */}
-                    {profile && (
-                        <Link href="/app/perfil" className="group relative">
-                            <Avatar
-                                name={profile.full_name}
-                                imageUrl={profile.avatar_url}
-                                size="md"
-                                className="ring-2 ring-transparent group-hover:ring-brand-violet/40 transition-all duration-300"
-                            />
-                            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-brand-success rounded-full border-2 border-brand-card dark:border-brand-dark" />
-                        </Link>
-                    )}
                 </div>
             </div>
         </header>

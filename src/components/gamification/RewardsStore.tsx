@@ -70,7 +70,7 @@ export function RewardsStore() {
             {/* Balance de monedas */}
             <div className="flex items-center gap-4 p-5 rounded-2xl bg-white/5 dark:bg-black/20 border border-white/10 backdrop-blur-sm shadow-inner-glow relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-brand-electric-blue/10 to-transparent pointer-events-none" />
-                <span className="text-4xl filter drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">💎</span>
+                <span className="text-4xl filter drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">⚡</span>
                 <div>
                     <div className="text-[11px] font-bold text-brand-electric-blue uppercase tracking-[0.2em] mb-0.5">
                         <span className="flex items-center gap-1.5">
@@ -142,7 +142,7 @@ export function RewardsStore() {
                                 <div className="flex flex-col items-end gap-3 shrink-0">
                                     <div className="px-3 py-1.5 rounded-xl bg-black/40 border border-white/10 text-right">
                                         <p className="text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-0.5">Costo</p>
-                                        <p className="text-lg font-black text-brand-text">💎 {reward.cost_coins}</p>
+                                        <p className="text-lg font-black text-brand-text">⚡ {reward.cost_coins}</p>
                                     </div>
                                     <button
                                         onClick={() => handleRedeem(reward)}

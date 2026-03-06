@@ -31,6 +31,7 @@ export default function AdminCursosPage() {
     const [tierRequired, setTierRequired] = useState<TierRequired>("member");
     const [isPublished, setIsPublished] = useState(false);
     const [availableDuringTrial, setAvailableDuringTrial] = useState(false);
+    const [unlockCost, setUnlockCost] = useState<number | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -61,6 +62,7 @@ export default function AdminCursosPage() {
             setTierRequired(mod.tier_required);
             setIsPublished(mod.is_published);
             setAvailableDuringTrial(mod.available_during_trial);
+            setUnlockCost((mod as Module & { unlock_cost?: number | null }).unlock_cost ?? null);
         } else {
             setEditingModule(null);
             setTitle("");
@@ -71,6 +73,7 @@ export default function AdminCursosPage() {
             setTierRequired("member");
             setIsPublished(false);
             setAvailableDuringTrial(false);
+            setUnlockCost(null);
         }
         setIsModalOpen(true);
     }
@@ -114,6 +117,7 @@ export default function AdminCursosPage() {
             tier_required: tierRequired,
             is_published: isPublished,
             available_during_trial: availableDuringTrial,
+            unlock_cost: unlockCost,
         };
 
         if (editingModule) {
@@ -188,6 +192,9 @@ export default function AdminCursosPage() {
                                         )}
                                         {mod.available_during_trial && (
                                             <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-pill font-medium uppercase tracking-wider">7 días</span>
+                                        )}
+                                        {(mod as Module & { unlock_cost?: number | null }).unlock_cost && (
+                                            <span className="text-[10px] bg-brand-electric-blue/20 text-brand-electric-blue px-2 py-0.5 rounded-pill font-medium uppercase tracking-wider">⚡ {(mod as Module & { unlock_cost?: number | null }).unlock_cost}</span>
                                         )}
                                     </div>
                                     <p className="text-xs text-brand-muted mt-1 max-w-xl truncate">
@@ -289,6 +296,39 @@ export default function AdminCursosPage() {
                             <option value="member">Member (Todos)</option>
                             <option value="inner_circle">Inner Circle (Solo VIP)</option>
                         </select>
+                    </div>
+
+                    <div className="flex flex-col gap-3 pt-2">
+                        <div className="flex items-start gap-2">
+                            <input
+                                type="checkbox"
+                                id="unlockWithSynapsis"
+                                checked={unlockCost !== null}
+                                onChange={(e) => setUnlockCost(e.target.checked ? 100 : null)}
+                                className="w-4 h-4 accent-brand-accent bg-brand-card border-brand-border rounded mt-0.5"
+                            />
+                            <label htmlFor="unlockWithSynapsis" className="text-sm text-brand-text cursor-pointer">
+                                <span>Desbloqueable con Sinapsis ⚡</span>
+                                <span className="block text-xs text-brand-muted mt-0.5">
+                                    Los usuarios pueden gastar Sinapsis para acceder a este modulo
+                                </span>
+                            </label>
+                        </div>
+
+                        {unlockCost !== null && (
+                            <div className="ml-6">
+                                <label className="block text-xs font-medium text-brand-text-secondary mb-1">
+                                    Costo en Sinapsis
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={unlockCost}
+                                    onChange={(e) => setUnlockCost(Math.max(1, Number(e.target.value)))}
+                                    className="w-40 px-4 py-2 rounded-input bg-white dark:bg-black/20 border border-brand-border text-brand-text focus:outline-none focus:ring-2 focus:ring-brand-accent/40 focus:border-brand-accent transition-all"
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-3 pt-2">
