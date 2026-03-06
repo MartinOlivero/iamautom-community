@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Avatar from "@/components/ui/Avatar";
 import ProfileHoverCard from "@/components/ui/ProfileHoverCard";
+import RichTextDisplay from "@/components/ui/RichTextDisplay";
 import { useComments, type CommentWithAuthor } from "@/hooks/useComments";
 import { useAuth } from "@/components/auth/AuthProvider";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
@@ -141,15 +142,8 @@ export default function CommentSection({ postId, commentCount }: CommentSectionP
                                                 </button>
                                             </div>
                                         </div>
-                                    ) : comment.content.trim().startsWith('<img') && comment.content.includes('giphy.com') ? (
-                                        <div
-                                            className="mt-1 [&_img]:max-w-[160px] [&_img]:rounded-lg [&_img]:max-h-[120px] [&_img]:object-cover"
-                                            dangerouslySetInnerHTML={{ __html: comment.content }}
-                                        />
                                     ) : (
-                                        <p className="text-sm text-brand-text-secondary mt-0.5 whitespace-pre-wrap">
-                                            {comment.content}
-                                        </p>
+                                        <RichTextDisplay content={comment.content} className="text-sm text-brand-text-secondary mt-0.5 [&_img]:max-w-[180px] [&_img]:max-h-[130px] [&_img]:rounded-lg" />
                                     )}
                                 </div>
                             </div>

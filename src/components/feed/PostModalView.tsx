@@ -6,7 +6,7 @@ import Avatar from "@/components/ui/Avatar";
 import ProfileHoverCard from "@/components/ui/ProfileHoverCard";
 import PlanBadge from "@/components/ui/Badge";
 import RichTextDisplay from "@/components/ui/RichTextDisplay";
-import GifPicker from "@/components/ui/GifPicker";
+import RichTextEditor from "@/components/ui/RichTextEditor";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import ReactionPicker from "./ReactionPicker";
 import { getLevelInfo } from "@/lib/levels";
@@ -39,14 +39,12 @@ export default function PostModalView({ post, onToggleReaction, onDelete, onTogg
     const { comments, isLoading, addComment, updateComment, deleteComment } = useComments(post.id);
     const [newComment, setNewComment] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isGifPickerOpen, setIsGifPickerOpen] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
     const [editText, setEditText] = useState("");
     const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
     const [showCommentDeleteConfirm, setShowCommentDeleteConfirm] = useState(false);
     const commentsEndRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
 
     const isAuthor = user?.id === post.author_id;
 
@@ -68,20 +66,13 @@ export default function PostModalView({ post, onToggleReaction, onDelete, onTogg
         emoji, count: data.count, hasReacted: data.hasReacted,
     }));
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        if (!newComment.trim()) return;
+    async function handleSubmitComment() {
+        const isEmpty = !newComment.trim() || newComment === '<p></p>';
+        if (isEmpty) return;
         setIsSubmitting(true);
-        await addComment(newComment.trim());
+        await addComment(newComment);
         setNewComment("");
         setIsSubmitting(false);
-        inputRef.current?.focus();
-    }
-
-    function handleGifSelect(gifUrl: string) {
-        const gifHtml = `<img src="${gifUrl}" alt="GIF" />`;
-        addComment(gifHtml);
-        setIsGifPickerOpen(false);
     }
 
     async function handleUpdateComment(commentId: string) {
@@ -90,10 +81,6 @@ export default function PostModalView({ post, onToggleReaction, onDelete, onTogg
         setEditingCommentId(null);
         setEditText("");
     }
-
-    const isGifComment = (content: string) => {
-        return content.trim().startsWith('<img') && content.includes('giphy.com');
-    };
 
     return (
         <div className="flex flex-col -m-6">
@@ -232,26 +219,17 @@ export default function PostModalView({ post, onToggleReaction, onDelete, onTogg
                                     </div>
                                     {editingCommentId === comment.id ? (
                                         <div className="space-y-2">
-                                            <textarea
-                                                value={editText}
-                                                onChange={(e) => setEditText(e.target.value)}
-                                                className="w-full bg-brand-card border border-brand-border rounded-lg p-2 text-sm focus:outline-none focus:border-brand-accent/50"
-                                                rows={2}
+                                            <RichTextEditor
+                                                content={editText}
+                                                onChange={setEditText}
                                             />
                                             <div className="flex justify-end gap-2">
                                                 <button onClick={() => setEditingCommentId(null)} className="text-xs text-brand-muted hover:text-brand-text">Cancelar</button>
                                                 <button onClick={() => handleUpdateComment(comment.id)} className="text-xs text-brand-accent font-bold">Guardar</button>
                                             </div>
                                         </div>
-                                    ) : isGifComment(comment.content) ? (
-                                        <div
-                                            className="mt-1 [&_img]:max-w-[200px] [&_img]:rounded-lg [&_img]:max-h-[150px] [&_img]:object-cover"
-                                            dangerouslySetInnerHTML={{ __html: comment.content }}
-                                        />
                                     ) : (
-                                        <p className="text-sm text-brand-text-secondary whitespace-pre-wrap break-words">
-                                            {comment.content}
-                                        </p>
+                                        <RichTextDisplay content={comment.content} className="text-sm text-brand-text-secondary [&_img]:max-w-[220px] [&_img]:max-h-[160px] [&_img]:rounded-lg" />
                                     )}
                                 </div>
                             </div>
@@ -263,51 +241,41 @@ export default function PostModalView({ post, onToggleReaction, onDelete, onTogg
 
             {/* Comment Input */}
             {user && (
-                <div className="border-t border-brand-border p-4">
-                    <form onSubmit={handleSubmit} className="flex items-center gap-3">
-                        <Avatar
-                            name={user.user_metadata?.full_name || ""}
-                            imageUrl={user.user_metadata?.avatar_url || undefined}
-                            size="sm"
-                        />
-                        <div className="flex-1 flex items-center gap-2 bg-brand-hover-bg/60 border border-brand-border rounded-full px-4 py-2 focus-within:border-brand-accent/50 transition-colors">
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
+                <div className="border-t border-brand-border p-4 space-y-3">
+                    <div className="flex gap-3 items-start">
+                        <div className="flex-shrink-0 mt-1">
+                            <Avatar
+                                name={user.user_metadata?.full_name || ""}
+                                imageUrl={user.user_metadata?.avatar_url || undefined}
+                                size="sm"
+                            />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <RichTextEditor
+                                content={newComment}
+                                onChange={setNewComment}
                                 placeholder="Escribi un comentario..."
-                                className="flex-1 bg-transparent text-sm text-brand-text placeholder:text-brand-muted focus:outline-none"
                             />
-                            <button
-                                type="button"
-                                onClick={() => setIsGifPickerOpen(!isGifPickerOpen)}
-                                className={`text-[11px] font-extrabold px-1.5 py-0.5 rounded transition-colors ${isGifPickerOpen ? 'text-brand-accent bg-brand-accent/10' : 'text-brand-muted hover:text-brand-accent'}`}
-                                title="Insertar GIF"
-                            >
-                                GIF
-                            </button>
                         </div>
+                    </div>
+                    <div className="flex justify-end">
                         <button
-                            type="submit"
-                            disabled={!newComment.trim() || isSubmitting}
-                            className="p-2 text-brand-accent hover:bg-brand-accent/10 rounded-full disabled:opacity-40 transition-all"
+                            onClick={handleSubmitComment}
+                            disabled={!newComment.trim() || newComment === '<p></p>' || isSubmitting}
+                            className="px-5 py-2 rounded-xl text-sm font-bold text-white
+                                bg-brand-accent hover:bg-brand-accent-hover
+                                hover:scale-[1.02] hover:shadow-accent
+                                active:scale-[0.98] transition-all duration-200
+                                disabled:opacity-40 disabled:hover:scale-100 disabled:hover:shadow-none"
                         >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                            </svg>
+                            {isSubmitting ? (
+                                <span className="flex items-center gap-2">
+                                    <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    Enviando...
+                                </span>
+                            ) : "Comentar"}
                         </button>
-                    </form>
-
-                    {/* GIF Picker */}
-                    {isGifPickerOpen && (
-                        <div className="mt-3 flex justify-center">
-                            <GifPicker
-                                onSelect={handleGifSelect}
-                                onClose={() => setIsGifPickerOpen(false)}
-                            />
-                        </div>
-                    )}
+                    </div>
                 </div>
             )}
 
