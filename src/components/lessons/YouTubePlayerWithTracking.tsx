@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useId, useRef, useCallback } from 'react'
+import { useState, useEffect, useId, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useYouTubeProgress, extractYouTubeId } from '@/hooks/useYouTubeProgress'
 
