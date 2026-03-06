@@ -141,35 +141,81 @@ export default function LandingPage() {
               <span className="text-sm text-muted-foreground">Tu comunidad de crecimiento con IA</span>
             </motion.div>
 
-            <motion.h1 variants={fadeUp} custom={1} className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6">
+            <motion.h1 variants={fadeUp} custom={1} className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.05] mb-8">
               <span className="text-foreground">Aprende.</span>{" "}
               <span className="gradient-text">Evoluciona.</span>{" "}
               <span className="text-foreground">Crece.</span>
             </motion.h1>
 
-            <motion.p variants={fadeUp} custom={2} className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+            <motion.p variants={fadeUp} custom={2} className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-12 leading-relaxed">
               Aprende a usar la Inteligencia Artificial para crecer profesionalmente, emprender y llevar tus ideas al siguiente nivel.
             </motion.p>
 
             <motion.div variants={fadeUp} custom={3} className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/login">
-                <Button size="lg" className="text-base px-8 glow-orange animate-pulse-glow">
-                  Iniciar Sesión
+                <Button size="lg" className="text-lg px-10 py-4 glow-orange animate-pulse-glow">
+                  Explorar gratis 7 dias
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
               <Link href="https://chat.whatsapp.com/G9L2rU7Z7H76k84C6S4W5G" target="_blank">
-                <Button variant="outline" size="lg" className="text-base px-8 glass border-border/50">
+                <Button variant="outline" size="lg" className="text-lg px-10 py-4 glass border-border/50">
                   Comunidad de WhatsApp
                 </Button>
               </Link>
             </motion.div>
 
-            <motion.div variants={fadeUp} custom={4} className="mt-10 flex items-center justify-center gap-6 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> Acceso inmediato</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> +100 miembros</span>
-              <span className="flex items-center gap-1.5"><CheckCircle className="w-4 h-4 text-primary" /> Potenciado por IA</span>
+            <motion.div variants={fadeUp} custom={4} className="mt-10 flex flex-wrap items-center justify-center gap-6 text-base text-muted-foreground">
+              <span className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-primary" /> Sin tarjeta de credito</span>
+              <span className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-primary" /> +100 miembros</span>
+              <span className="flex items-center gap-2"><CheckCircle className="w-5 h-5 text-primary" /> Potenciado por IA</span>
             </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Free Trial Banner */}
+      <section className="py-16 md:py-24 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-orange-500/5 to-transparent" />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            className="glass rounded-3xl p-8 sm:p-12 md:p-16 border border-primary/20 relative overflow-hidden max-w-5xl mx-auto"
+          >
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[100px]" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/10 rounded-full blur-[80px]" />
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-full px-4 py-1.5 mb-5">
+                  <Zap className="w-4 h-4 text-green-400" />
+                  <span className="text-sm font-semibold text-green-400">100% Gratis para empezar</span>
+                </div>
+                <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+                  Proba <span className="gradient-text">7 dias gratis</span><br />
+                  sin tarjeta de credito
+                </h2>
+                <p className="text-lg md:text-xl text-muted-foreground leading-relaxed max-w-lg">
+                  Registrate con tu email o Google y accede a cursos, comunidad y desafios.
+                  Sin compromisos, sin costos ocultos. Solo curiosidad.
+                </p>
+              </div>
+              <div className="flex flex-col items-center gap-4 shrink-0">
+                <div className="flex flex-col items-center gap-1 glass rounded-2xl p-6 border border-primary/20">
+                  <span className="text-6xl font-black text-white">7</span>
+                  <span className="text-lg font-semibold text-primary">dias gratis</span>
+                  <span className="text-sm text-muted-foreground">para explorar todo</span>
+                </div>
+                <Link href="/login">
+                  <Button size="lg" className="text-base px-8 glow-orange whitespace-nowrap">
+                    Crear cuenta gratis
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -178,10 +224,10 @@ export default function LandingPage() {
       <section className="py-20 md:py-32">
         <div className="container mx-auto px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} className="text-center mb-16">
-            <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl md:text-5xl font-bold mb-4">
+            <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mb-5">
               Todo lo que necesitas para <span className="gradient-text">crecer con IA</span>
             </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
               Recursos, comunidad y herramientas diseñadas para llevar tu negocio al siguiente nivel.
             </motion.p>
           </motion.div>
@@ -197,11 +243,11 @@ export default function LandingPage() {
                 custom={i}
                 className="glass-hover rounded-2xl p-6 group cursor-default"
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <b.icon className="w-6 h-6 text-primary" />
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                  <b.icon className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="font-display font-semibold text-lg mb-2">{b.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{b.description}</p>
+                <h3 className="font-display font-semibold text-xl mb-3">{b.title}</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">{b.description}</p>
               </motion.div>
             ))}
           </div>
@@ -213,7 +259,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
         <div className="container mx-auto px-6 relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} className="text-center mb-16">
-            <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl md:text-5xl font-bold mb-4">
+            <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mb-5">
               Lo que dicen nuestros <span className="gradient-text">miembros</span>
             </motion.h2>
           </motion.div>
@@ -238,7 +284,7 @@ export default function LandingPage() {
                     <p className="text-xs text-muted-foreground">{t.role}</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">&quot;{t.text}&quot;</p>
+                <p className="text-base text-muted-foreground leading-relaxed">&quot;{t.text}&quot;</p>
                 <div className="flex gap-1 mt-4">
                   {[...Array(5)].map((_, j) => (
                     <Star key={j} className="w-4 h-4 fill-primary text-primary" />
@@ -420,13 +466,15 @@ export default function LandingPage() {
           </div>
 
           {/* Guarantee */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={3} className="text-center mt-12">
-            <p className="text-sm text-slate-400 flex items-center justify-center gap-2">
-              <Zap className="w-5 h-5 text-orange-500" />
-              <span>
-                <strong className="text-white">7 días de acceso gratuito</strong> — sin costo y sin tarjeta. Explorá la plataforma y empezá a aprender.
-              </span>
-            </p>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={3} className="text-center mt-14">
+            <div className="inline-flex items-center gap-3 glass rounded-2xl px-8 py-4 border border-green-500/20">
+              <Zap className="w-6 h-6 text-orange-500 shrink-0" />
+              <p className="text-base text-slate-300">
+                <strong className="text-white text-lg">7 dias de acceso gratuito</strong>
+                <br />
+                <span className="text-slate-400">Sin costo y sin tarjeta. Explora la plataforma y empeza a aprender.</span>
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -442,16 +490,19 @@ export default function LandingPage() {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-orange-500/10" />
             <div className="relative z-10">
-              <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl md:text-5xl font-bold mb-4">
+              <motion.h2 variants={fadeUp} custom={0} className="font-display text-3xl sm:text-4xl md:text-5xl font-bold mb-5">
                 ¿Listo para <span className="gradient-text">crecer con IA</span>?
               </motion.h2>
-              <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-lg max-w-xl mx-auto mb-8">
-                Únete hoy y accede a cursos, comunidad y herramientas que transformarán tu negocio.
+              <motion.p variants={fadeUp} custom={1} className="text-muted-foreground text-xl max-w-2xl mx-auto mb-4 leading-relaxed">
+                Registrate gratis, explora la plataforma durante 7 dias y descubri todo lo que la IA puede hacer por tu negocio.
+              </motion.p>
+              <motion.p variants={fadeUp} custom={1.5} className="text-muted-foreground/70 text-base mb-8">
+                Sin tarjeta. Sin compromiso. Solo registrate y empeza.
               </motion.p>
               <motion.div variants={fadeUp} custom={2}>
                 <Link href="/login">
-                  <Button size="lg" className="text-base px-10 glow-orange">
-                    Iniciar Sesión
+                  <Button size="lg" className="text-lg px-12 py-4 glow-orange">
+                    Crear cuenta gratis
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
