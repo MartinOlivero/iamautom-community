@@ -150,12 +150,25 @@ export default function ModuleCard({ module, onClick, isLocked = false, trialEnd
                 </div>
             )}
 
-            {/* Lock Overlay - trial period */}
-            {isLocked && !needsSynapsisUnlock && (
+            {/* Lock Overlay - trial period: only covers the image area */}
+            {isLocked && !needsSynapsisUnlock && module.cover_image_url && (
+                <div className="absolute top-0 left-0 right-0 h-40 md:h-48 z-10 rounded-t-card flex items-center justify-center pointer-events-none"
+                     style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%)" }}>
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-sm">
+                            <Lock size={22} className="text-white/80" />
+                        </div>
+                        <p className="text-sm font-semibold text-white/90">
+                            Disponible en <span className="text-brand-accent font-bold">{daysRemaining} {daysRemaining === 1 ? "día" : "días"}</span>
+                        </p>
+                    </div>
+                </div>
+            )}
+            {isLocked && !needsSynapsisUnlock && !module.cover_image_url && (
                 <div className="absolute inset-0 z-10 rounded-card flex flex-col items-center justify-center text-center pointer-events-auto"
                      style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(15,20,30,0.95) 60%)" }}>
-                    <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-4">
-                        <Lock size={28} className="text-white/70" />
+                    <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-3">
+                        <Lock size={24} className="text-white/70" />
                     </div>
                     <p className="text-lg font-bold text-white mb-1">Contenido bloqueado</p>
                     <p className="text-base text-white/70">
@@ -209,10 +222,10 @@ export default function ModuleCard({ module, onClick, isLocked = false, trialEnd
                     </div>
 
                     {/* Title & description */}
-                    <h3 className="text-lg font-bold text-brand-text mb-2 group-hover:text-brand-accent transition-colors line-clamp-2">
+                    <h3 className={`text-lg font-bold mb-2 line-clamp-2 transition-colors ${isLocked ? "text-brand-text" : "text-brand-text group-hover:text-brand-accent"}`}>
                         {module.title}
                     </h3>
-                    <p className="text-sm text-brand-muted line-clamp-3 mb-6 flex-1">
+                    <p className={`text-sm text-brand-muted line-clamp-3 mb-6 flex-1 ${isLocked && !needsSynapsisUnlock ? "blur-[3px] select-none" : ""}`}>
                         {stripHtml(module.description)}
                     </p>
 
