@@ -141,6 +141,11 @@ export default function CommentSection({ postId, commentCount }: CommentSectionP
                                                 </button>
                                             </div>
                                         </div>
+                                    ) : comment.content.trim().startsWith('<img') && comment.content.includes('giphy.com') ? (
+                                        <div
+                                            className="mt-1 [&_img]:max-w-[160px] [&_img]:rounded-lg [&_img]:max-h-[120px] [&_img]:object-cover"
+                                            dangerouslySetInnerHTML={{ __html: comment.content }}
+                                        />
                                     ) : (
                                         <p className="text-sm text-brand-text-secondary mt-0.5 whitespace-pre-wrap">
                                             {comment.content}

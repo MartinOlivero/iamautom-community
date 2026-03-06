@@ -202,7 +202,7 @@ export default function FeedPage({
             <Modal
                 isOpen={!!selectedPost}
                 onClose={() => setSelectedPost(null)}
-                size="lg"
+                size="xl"
             >
                 {selectedPost && (
                     <PostModalView
