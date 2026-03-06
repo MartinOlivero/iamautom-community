@@ -32,7 +32,8 @@ export default function RichTextDisplay({ content, className = "" }: RichTextDis
                 .rich-text-content .prose blockquote { border-left: 4px solid var(--color-accent); padding-left: 1rem; margin-left: 0; margin-right: 0; font-style: italic; color: var(--color-text-secondary); background: var(--color-hover-bg); padding: 0.5rem 1rem; border-radius: 0 0.5rem 0.5rem 0; }
                 .rich-text-content .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
                 .rich-text-content .prose ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
-                .rich-text-content .prose img { border-radius: 0.75rem; margin: 1rem 0; }
+                .rich-text-content .prose img { border-radius: 0.75rem; margin: 1rem 0; max-width: 100%; height: auto; }
+                .rich-text-content .prose img[src*="giphy.com"] { max-width: 280px; max-height: 200px; object-fit: cover; }
                 .rich-text-content .prose iframe { border-radius: 0.75rem; overflow: hidden; margin: 1rem 0; }
             `}</style>
         </div>

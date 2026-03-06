@@ -26,6 +26,7 @@ import data from '@emoji-mart/data';
 import { useToastQueue } from "@/hooks/useToastQueue";
 import { createClient } from "@/lib/insforge/client";
 import Modal from "./Modal";
+import GifPicker from "./GifPicker";
 
 interface RichTextEditorProps {
     content: string;
@@ -46,6 +47,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
     const [isUploading, setIsUploading] = useState(false);
     const [isYouTubeModalOpen, setIsYouTubeModalOpen] = useState(false);
     const [youtubeUrl, setYoutubeUrl] = useState("");
+    const [isGifPickerOpen, setIsGifPickerOpen] = useState(false);
 
     const emojiMenuRef = useRef<HTMLDivElement>(null);
     const linkInputRef = useRef<HTMLDivElement>(null);
@@ -328,6 +330,27 @@ const MenuBar = ({ editor }: { editor: any }) => {
                     document.body
                 )}
             </div>
+
+            <ToolbarButton
+                onClick={() => setIsGifPickerOpen(true)}
+                isActive={isGifPickerOpen}
+                title="Insertar GIF"
+            >
+                <span className="text-[11px] font-extrabold leading-none tracking-tight">GIF</span>
+            </ToolbarButton>
+
+            {isGifPickerOpen && createPortal(
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+                    <GifPicker
+                        onSelect={(gifUrl) => {
+                            editor.chain().focus().setImage({ src: gifUrl }).run();
+                            setIsGifPickerOpen(false);
+                        }}
+                        onClose={() => setIsGifPickerOpen(false)}
+                    />
+                </div>,
+                document.body
+            )}
 
             <div className="flex-1" />
 

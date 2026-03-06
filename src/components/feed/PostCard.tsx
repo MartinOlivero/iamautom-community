@@ -42,6 +42,18 @@ function extractYoutubeId(content: string): string | null {
     return match ? match[1] : null;
 }
 
+function extractGifFromContent(content: string): { gifUrl: string | null; contentWithoutGif: string } {
+    const gifRegex = /<img[^>]+src="(https?:\/\/[^"]*giphy\.com[^"]*\.gif[^"]*)"[^>]*\/?>/i;
+    const match = content.match(gifRegex);
+    if (match) {
+        return {
+            gifUrl: match[1],
+            contentWithoutGif: content.replace(match[0], '').trim(),
+        };
+    }
+    return { gifUrl: null, contentWithoutGif: content };
+}
+
 export default function PostCard({ post, onToggleReaction, onDelete, onUpdate, onTogglePin, onSelect }: PostCardProps) {
     const { user } = useAuth();
     const { addToast } = useToastQueue();
@@ -54,6 +66,7 @@ export default function PostCard({ post, onToggleReaction, onDelete, onUpdate, o
     const isAuthor = user?.id === post.author_id;
 
     const youtubeId = useMemo(() => extractYoutubeId(post.content), [post.content]);
+    const { gifUrl, contentWithoutGif } = useMemo(() => extractGifFromContent(post.content), [post.content]);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -99,8 +112,9 @@ export default function PostCard({ post, onToggleReaction, onDelete, onUpdate, o
     };
 
     // Simple "Read more" logic: if content length > 300 characters, truncate
-    const shouldTruncate = post.content.length > 300 && !isExpanded && !isEditing;
-    const displayedContent = shouldTruncate ? post.content.substring(0, 300) + "..." : post.content;
+    const textForDisplay = gifUrl ? contentWithoutGif : post.content;
+    const shouldTruncate = textForDisplay.length > 300 && !isExpanded && !isEditing;
+    const displayedContent = shouldTruncate ? textForDisplay.substring(0, 300) + "..." : textForDisplay;
 
     const handleCardClick = (e: React.MouseEvent) => {
         // Don't trigger if clicking on a button, link, or the reaction picker
@@ -252,15 +266,26 @@ export default function PostCard({ post, onToggleReaction, onDelete, onUpdate, o
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-3">
-                            <RichTextDisplay content={displayedContent} className="text-[15px] leading-relaxed text-brand-text" />
-                            {shouldTruncate && (
-                                <button
-                                    onClick={() => setIsExpanded(true)}
-                                    className="text-brand-accent text-sm font-bold hover:underline"
-                                >
-                                    Ver más
-                                </button>
+                        <div className={`flex gap-4 ${gifUrl ? 'items-start' : ''}`}>
+                            <div className="flex-1 min-w-0 space-y-3">
+                                <RichTextDisplay content={displayedContent} className="text-[15px] leading-relaxed text-brand-text" />
+                                {shouldTruncate && (
+                                    <button
+                                        onClick={() => setIsExpanded(true)}
+                                        className="text-brand-accent text-sm font-bold hover:underline"
+                                    >
+                                        Ver más
+                                    </button>
+                                )}
+                            </div>
+                            {gifUrl && !isEditing && (
+                                <div className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border border-brand-border">
+                                    <img
+                                        src={gifUrl}
+                                        alt="GIF"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
                             )}
                         </div>
                     )}
