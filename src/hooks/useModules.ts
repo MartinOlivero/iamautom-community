@@ -19,7 +19,7 @@ export interface ModuleWithProgress {
     completed_count: number;
 }
 
-const TRIAL_DAYS = 14;
+const TRIAL_DAYS = 7;
 
 export function useModules() {
     const [modules, setModules] = useState<ModuleWithProgress[]>([]);
@@ -57,7 +57,7 @@ export function useModules() {
                 return;
             }
 
-            // Check if user is in trial period (first 14 days)
+            // Check if user is in trial period (first 7 days)
             if (user) {
                 const { data: profile } = await db
                     .from("profiles")

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Zap, ArrowRight, CheckCircle, Shield, Star, Clock, Sparkles, Crown } from "lucide-react";
+import { Zap, ArrowRight, CheckCircle, Star, Clock, Sparkles, Crown } from "lucide-react";
 import { PLANS } from "@/lib/constants";
 
 const fadeUp = {
@@ -289,9 +289,9 @@ export default function PlanesPage() {
           {/* Guarantee */}
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={7} className="text-center mt-12">
             <p className="text-sm text-slate-400 flex items-center justify-center gap-2">
-              <Shield className="w-5 h-5 text-green-500" />
+              <Zap className="w-5 h-5 text-orange-500" />
               <span>
-                <strong className="text-white">Garantia de 14 dias</strong> — si no es lo que esperabas, devolvemos el dinero. Sin preguntas.
+                <strong className="text-white">7 días de acceso gratuito</strong> — sin costo y sin tarjeta. Explorá la plataforma y empezá a aprender.
               </span>
             </p>
           </motion.div>

@@ -187,7 +187,7 @@ export default function AdminCursosPage() {
                                             <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-2 py-0.5 rounded-pill font-medium uppercase tracking-wider">VIP</span>
                                         )}
                                         {mod.available_during_trial && (
-                                            <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-pill font-medium uppercase tracking-wider">14 días</span>
+                                            <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-pill font-medium uppercase tracking-wider">7 días</span>
                                         )}
                                     </div>
                                     <p className="text-xs text-brand-muted mt-1 max-w-xl truncate">
@@ -316,7 +316,7 @@ export default function AdminCursosPage() {
                             <label htmlFor="availableDuringTrial" className="text-sm text-brand-text cursor-pointer">
                                 <span>Disponible durante período de garantía</span>
                                 <span className="block text-xs text-brand-muted mt-0.5">
-                                    Los usuarios nuevos (primeros 14 días) podrán acceder a este módulo
+                                    Los usuarios nuevos (primeros 7 días) podrán acceder a este módulo
                                 </span>
                             </label>
                         </div>

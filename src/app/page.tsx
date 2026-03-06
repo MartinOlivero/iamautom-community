@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Zap, Users, BookOpen, Trophy, ArrowRight, Star, CheckCircle, Shield, Clock, Sparkles, Crown } from "lucide-react";
+import { Zap, Users, BookOpen, Trophy, ArrowRight, Star, CheckCircle, Clock, Sparkles, Crown } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { PLANS } from "@/lib/constants";
 
@@ -422,9 +422,9 @@ export default function LandingPage() {
           {/* Guarantee */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={3} className="text-center mt-12">
             <p className="text-sm text-slate-400 flex items-center justify-center gap-2">
-              <Shield className="w-5 h-5 text-green-500" />
+              <Zap className="w-5 h-5 text-orange-500" />
               <span>
-                <strong className="text-white">Garantia de 14 dias</strong> — si no es lo que esperabas, devolvemos el dinero. Sin preguntas.
+                <strong className="text-white">7 días de acceso gratuito</strong> — sin costo y sin tarjeta. Explorá la plataforma y empezá a aprender.
               </span>
             </p>
           </motion.div>

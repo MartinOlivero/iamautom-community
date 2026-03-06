@@ -146,15 +146,16 @@ export default function ModuleCard({ module, onClick, isLocked = false, trialEnd
                 </div>
             )}
 
-            {/* Lock Overlay */}
+            {/* Lock Overlay - positioned over the image area */}
             {isLocked && (
-                <div className="absolute inset-0 z-10 bg-brand-card/80 backdrop-blur-[2px] rounded-card flex flex-col items-center justify-center text-center p-6 pointer-events-auto">
-                    <div className="w-14 h-14 rounded-full bg-brand-bg-2 border border-brand-border flex items-center justify-center mb-3">
-                        <Lock size={24} className="text-brand-muted" />
+                <div className="absolute inset-0 z-10 rounded-card flex flex-col items-center justify-center text-center pointer-events-auto"
+                     style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(15,20,30,0.95) 60%)" }}>
+                    <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20 flex items-center justify-center mb-4">
+                        <Lock size={28} className="text-white/70" />
                     </div>
-                    <p className="text-sm font-semibold text-brand-text mb-1">Contenido bloqueado</p>
-                    <p className="text-xs text-brand-muted">
-                        Disponible en <span className="text-brand-accent font-semibold">{daysRemaining} {daysRemaining === 1 ? "día" : "días"}</span>
+                    <p className="text-lg font-bold text-white mb-1">Contenido bloqueado</p>
+                    <p className="text-base text-white/70">
+                        Disponible en <span className="text-brand-accent font-bold text-lg">{daysRemaining} {daysRemaining === 1 ? "día" : "días"}</span>
                     </p>
                 </div>
             )}

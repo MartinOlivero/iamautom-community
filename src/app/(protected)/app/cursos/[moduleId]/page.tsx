@@ -31,7 +31,7 @@ interface ModuleDetail {
 /**
  * Module detail page with lesson sidebar and video player.
  */
-const TRIAL_DAYS = 14;
+const TRIAL_DAYS = 7;
 
 export default function ModuleDetailPage() {
     const params = useParams();
