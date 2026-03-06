@@ -56,8 +56,9 @@ export function useComments(postId: string) {
                 const newComment = data as unknown as CommentWithAuthor;
                 setComments((prev) => [...prev, newComment]);
 
-                // Award XP for creating a comment
-                triggerXPAward("create_comment");
+                // XP is awarded by DB trigger (trigger_comment_xp)
+                // Only ping for daily streak
+                triggerXPAward("ping");
 
                 return newComment;
             }

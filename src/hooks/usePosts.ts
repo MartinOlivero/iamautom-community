@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/insforge/client";
 import type { Post, Profile, PostReaction } from "@/types/database";
 import { triggerXPAward } from "@/lib/xpClient";
+// Note: XP for post creation is handled by DB trigger (trigger_post_published_xp)
+// triggerXPAward("create_post") was removed to avoid double-awarding
 
 /** Post with joined author, reactions, and comment count */
 export type PostWithDetails = Omit<Post, "author" | "reactions"> & {
@@ -140,8 +142,9 @@ export function usePosts(options: UsePostsOptions = {}) {
 
             setPosts((prev) => [newPost, ...prev]);
 
-            // Award XP for creating a post
-            triggerXPAward("create_post");
+            // XP is awarded by DB trigger (trigger_post_published_xp)
+            // Only ping for daily streak
+            triggerXPAward("ping");
 
             return newPost;
         },

@@ -8,7 +8,7 @@ export type UserLevel = "novato" | "aprendiz" | "practicante" | "especialista" |
 export type Channel = "general" | "proyectos" | "soporte" | "off_topic" | "inner_circle_vip";
 export type TierRequired = "member" | "inner_circle";
 export type UserRole = "member" | "admin";
-export type NotificationType = "new_module" | "event_reminder" | "badge_earned" | "reply" | "announcement";
+export type NotificationType = "new_module" | "event_reminder" | "badge_earned" | "reply" | "announcement" | "level_up" | "challenge_completed";
 
 // ============================================================
 // Row types for each table
@@ -30,6 +30,7 @@ export interface Profile {
     longest_streak: number;
     last_active_date: string | null;
     role: UserRole;
+    theme: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -78,6 +79,7 @@ export interface Module {
     tier_required: TierRequired;
     is_published: boolean;
     available_during_trial: boolean;
+    unlock_cost: number | null;
     release_date: string | null;
     created_at: string;
     // Joined

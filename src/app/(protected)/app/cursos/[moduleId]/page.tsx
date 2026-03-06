@@ -142,8 +142,9 @@ export default function ModuleDetailPage() {
 
         setCompletedLessonIds((prev) => new Set([...Array.from(prev), lessonId]));
 
-        // Award XP for completing a lesson
-        triggerXPAward("complete_lesson");
+        // XP is awarded by DB trigger (trigger_lesson_complete_xp)
+        // Only ping for daily streak
+        triggerXPAward("ping");
     }
 
     const activeLesson = lessons.find((l) => l.id === activeLessonId);

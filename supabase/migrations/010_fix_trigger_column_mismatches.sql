@@ -189,7 +189,7 @@ BEGIN
   FROM lesson_progress
   WHERE user_id = p_user_id
     AND completed = true
-    AND updated_at >= NOW() - INTERVAL '1 hour';
+    AND completed_at >= NOW() - INTERVAL '1 hour';
 
   IF v_completions_last_hour >= 10 THEN
     INSERT INTO notifications (user_id, type, title, body)
