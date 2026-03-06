@@ -32,13 +32,13 @@ export function useCommunityStats() {
         try {
             const db = createClient();
 
-            // 1. Get online members (active in last 2 hours)
-            const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+            // 1. Get online members (active today)
+            const today = new Date().toISOString().split("T")[0];
             const { data: onlineData } = await db
                 .from("profiles")
                 .select("id, full_name, avatar_url, level")
-                .gte("last_seen", twoHoursAgo)
-                .order("last_seen", { ascending: false })
+                .gte("last_active_date", today)
+                .order("last_active_date", { ascending: false })
                 .limit(8);
 
             // 2. Get top contributors (all time for now, or this month if gamification_events exists)
@@ -64,7 +64,7 @@ export function useCommunityStats() {
             setStats({
                 totalMembers: totalMembers || 0,
                 postsThisWeek: postsThisWeek || 0,
-                onlineNow: (onlineData?.length || 0) + 12, // Mocking some extra for "alive" feel if small community
+                onlineNow: onlineData?.length || 0,
             });
 
         } catch (err) {
@@ -78,7 +78,7 @@ export function useCommunityStats() {
         const db = createClient();
         await db
             .from("profiles")
-            .update({ last_seen: new Date().toISOString() })
+            .update({ last_active_date: new Date().toISOString().split("T")[0] })
             .eq("id", userId);
     }, []);
 
