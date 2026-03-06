@@ -28,13 +28,13 @@ interface LeaderboardMember {
 export default function LeaderboardPage() {
     const [members, setMembers] = useState<LeaderboardMember[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const supabase = createClient();
+    const db = createClient();
 
     const fetchLeaderboard = useCallback(async () => {
         setIsLoading(true);
 
         // Fetch top 50 members by XP
-        const { data: profiles } = await supabase
+        const { data: profiles } = await db
             .from("profiles")
             .select("id, full_name, avatar_url, plan_type, xp_points, level, current_streak")
             .neq("plan_type", "none")
@@ -49,7 +49,7 @@ export default function LeaderboardPage() {
         // Fetch badge counts for each user
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const userIds = profiles.map((p: any) => p.id);
-        const { data: badgeCounts } = await supabase
+        const { data: badgeCounts } = await db
             .from("user_badges")
             .select("user_id")
             .in("user_id", userIds);
@@ -75,7 +75,7 @@ export default function LeaderboardPage() {
 
         setMembers(leaderboard);
         setIsLoading(false);
-    }, [supabase]);
+    }, [db]);
 
     useEffect(() => {
         fetchLeaderboard();
@@ -164,7 +164,7 @@ export default function LeaderboardPage() {
                                                 <ProgressBar value={xpPercent} size="sm" showLabel={false} />
                                             </div>
                                             <span className="text-[10px] font-mono text-brand-muted flex-shrink-0">
-                                                {member.xp_points.toLocaleString()} Sinapsis
+                                                {member.xp_points.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} Sinapsis
                                             </span>
                                         </div>
                                     </div>

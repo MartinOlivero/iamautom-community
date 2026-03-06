@@ -18,7 +18,7 @@ import { GamificationTooltip } from "@/components/ui/GamificationTooltip";
 
 export default function PerfilPage() {
     const { user, profile, refreshProfile } = useAuth();
-    const supabase = createClient();
+    const db = createClient();
     const { theme, setTheme } = useTheme();
 
     useEffect(() => {
@@ -49,7 +49,7 @@ export default function PerfilPage() {
         setIsSaving(true);
         setSaveMessage("");
 
-        const { error } = await supabase
+        const { error } = await db
             .from("profiles")
             .update({
                 full_name: fullName.trim(),
@@ -192,7 +192,7 @@ export default function PerfilPage() {
             {/* Stats grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 {[
-                    { label: "Puntos XP", value: profile.xp_points.toLocaleString(), emoji: "⚡" },
+                    { label: "Puntos XP", value: profile.xp_points.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'), emoji: "⚡" },
                     { label: "Nivel Actual", value: profile.level, emoji: "📊" },
                     { label: "Racha Activa", value: `${profile.current_streak} d`, emoji: "🔥" },
                     { label: "Racha Máx", value: `${profile.longest_streak} d`, emoji: "🏆" },
@@ -222,7 +222,7 @@ export default function PerfilPage() {
                         </h3>
                         {nextLevel && (
                             <p className="text-xs text-brand-muted mt-1">
-                                Faltan {(nextMin - profile.xp_points).toLocaleString()} XP para nivel {nextLevel.level}
+                                Faltan {(nextMin - profile.xp_points).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} XP para nivel {nextLevel.level}
                             </p>
                         )}
                     </div>

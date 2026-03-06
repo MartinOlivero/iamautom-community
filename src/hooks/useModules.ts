@@ -31,14 +31,14 @@ export function useModules() {
         setIsLoading(true);
 
         try {
-            const supabase = createClient();
+            const db = createClient();
 
             const {
                 data: { user },
-            } = await supabase.auth.getUser();
+            } = await db.auth.getUser();
 
             // Fetch modules with lesson count
-            const { data: modulesData, error } = await supabase
+            const { data: modulesData, error } = await db
                 .from("modules")
                 .select("*, lessons(count)")
                 .eq("is_published", true)
@@ -59,7 +59,7 @@ export function useModules() {
 
             // Check if user is in trial period (first 14 days)
             if (user) {
-                const { data: profile } = await supabase
+                const { data: profile } = await db
                     .from("profiles")
                     .select("created_at, role")
                     .eq("id", user.id)
@@ -80,7 +80,7 @@ export function useModules() {
             // If user is logged in, fetch their progress
             const progressMap: Record<string, number> = {};
             if (user) {
-                const { data: progressData } = await supabase
+                const { data: progressData } = await db
                     .from("lesson_progress")
                     .select("lesson_id, completed")
                     .eq("user_id", user.id)
@@ -88,7 +88,7 @@ export function useModules() {
 
                 if (progressData) {
                     // Get progress grouped by module
-                    const { data: lessonToModule } = await supabase
+                    const { data: lessonToModule } = await db
                         .from("lessons")
                         .select("id, module_id");
 

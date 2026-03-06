@@ -10,11 +10,11 @@ type SynapseAction = keyof typeof SYNAPSE_REWARDS;
  * Call from server actions or API routes only.
  */
 export async function awardSynapses(userId: string, action: SynapseAction, description?: string): Promise<{ newXP: number; leveledUp: boolean; newLevel: string; xpAmount: number }> {
-    const supabase = createAdminClient();
+    const db = createAdminClient();
     const xpAmount = SYNAPSE_REWARDS[action];
 
     // Get current profile
-    const { data: profile } = await supabase
+    const { data: profile } = await db
         .from("profiles")
         .select("xp_points, level")
         .eq("id", userId)
@@ -28,7 +28,7 @@ export async function awardSynapses(userId: string, action: SynapseAction, descr
     const oldLevel = profile.level;
 
     // Update profile (Database triggers handle level updates)
-    const { data: updatedProfile, error: updateError } = await supabase
+    const { data: updatedProfile, error: updateError } = await db
         .from("profiles")
         .update({
             xp_points: newXP,
@@ -46,7 +46,7 @@ export async function awardSynapses(userId: string, action: SynapseAction, descr
     const leveledUp = newLevel !== oldLevel;
 
     // Insert Gamification Event
-    await supabase.from("gamification_events").insert({
+    await db.from("gamification_events").insert({
         user_id: userId,
         event_type: action,
         points: xpAmount,

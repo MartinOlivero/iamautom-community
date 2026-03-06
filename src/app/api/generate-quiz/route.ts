@@ -9,8 +9,8 @@ const client = new Anthropic({
 export async function POST(req: NextRequest) {
     try {
         // Auth check — prevent unauthenticated API abuse
-        const supabase = await createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+        const db = await createClient()
+        const { data: { user } } = await db.auth.getUser()
         if (!user) {
             return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
         }

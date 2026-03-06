@@ -15,13 +15,13 @@ export interface BadgeWithStatus extends Badge {
 export function useBadges(userId?: string) {
     const [badges, setBadges] = useState<BadgeWithStatus[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const supabase = createClient();
 
     const fetchBadges = useCallback(async () => {
         setIsLoading(true);
+        const db = createClient();
 
         // Fetch all badges
-        const { data: allBadges } = await supabase
+        const { data: allBadges } = await db
             .from("badges")
             .select("*")
             .order("condition_value", { ascending: true });
@@ -35,7 +35,7 @@ export function useBadges(userId?: string) {
         const earnedMap: Record<string, string> = {};
 
         if (userId) {
-            const { data: userBadges } = await supabase
+            const { data: userBadges } = await db
                 .from("user_badges")
                 .select("badge_id, earned_at")
                 .eq("user_id", userId);
@@ -56,7 +56,7 @@ export function useBadges(userId?: string) {
 
         setBadges(badgesWithStatus);
         setIsLoading(false);
-    }, [supabase, userId]);
+    }, [userId]);
 
     useEffect(() => {
         fetchBadges();

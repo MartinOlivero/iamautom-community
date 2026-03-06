@@ -330,7 +330,7 @@ export default function LandingPage() {
 
               <div className="mb-2 flex items-center gap-2">
                 <span className="text-slate-500 text-lg line-through">
-                  ${isQuarterly ? PLANS.member.quarterlyOriginal.toLocaleString() : PLANS.member.biannualOriginal.toLocaleString()}
+                  ${isQuarterly ? PLANS.member.quarterlyOriginal.toLocaleString("es-AR") : PLANS.member.biannualOriginal.toLocaleString("es-AR")}
                 </span>
                 <span className="text-sm px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 font-semibold">
                   LANZAMIENTO
@@ -388,7 +388,7 @@ export default function LandingPage() {
 
               <div className="mb-2 flex items-center gap-2">
                 <span className="text-slate-500 text-lg line-through">
-                  ${isQuarterly ? PLANS.inner_circle.quarterlyOriginal.toLocaleString() : PLANS.inner_circle.biannualOriginal.toLocaleString()}
+                  ${isQuarterly ? PLANS.inner_circle.quarterlyOriginal.toLocaleString("es-AR") : PLANS.inner_circle.biannualOriginal.toLocaleString("es-AR")}
                 </span>
                 <span className="text-sm px-2 py-0.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 font-semibold">
                   LANZAMIENTO
@@ -396,7 +396,7 @@ export default function LandingPage() {
               </div>
               <div className="mb-1">
                 <span className="text-4xl font-black text-white">
-                  ${isQuarterly ? PLANS.inner_circle.quarterlyPrice.toLocaleString() : PLANS.inner_circle.biannualPrice.toLocaleString()}
+                  ${isQuarterly ? PLANS.inner_circle.quarterlyPrice.toLocaleString("es-AR") : PLANS.inner_circle.biannualPrice.toLocaleString("es-AR")}
                 </span>
                 <span className="text-slate-500 text-sm ml-1">
                   USD/{isQuarterly ? "trimestre" : "semestre"}

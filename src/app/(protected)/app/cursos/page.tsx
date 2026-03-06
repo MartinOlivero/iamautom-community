@@ -62,7 +62,7 @@ export default function CursosPage() {
             // Persist new order to database
             setIsSaving(true);
             try {
-                const supabase = createClient();
+                const db = createClient();
                 const updates = reordered.map((m, i) => ({
                     id: m.id,
                     order_index: i,
@@ -71,7 +71,7 @@ export default function CursosPage() {
                 // Update each module's order_index
                 await Promise.all(
                     updates.map(({ id, order_index }) =>
-                        supabase
+                        db
                             .from("modules")
                             .update({ order_index })
                             .eq("id", id)

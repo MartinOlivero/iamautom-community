@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createClient } from '@/lib/insforge/client';
 import { useAuth } from '@/components/auth/AuthProvider';
 
@@ -26,44 +26,51 @@ type Options = {
 
 export function useGamificationRealtime({ onNotification, onXPChange }: Options) {
     const { user } = useAuth();
-    const insforge = createClient();
+    const onNotificationRef = useRef(onNotification);
+    const onXPChangeRef = useRef(onXPChange);
+
+    // Keep refs up to date without triggering re-subscriptions
+    useEffect(() => {
+        onNotificationRef.current = onNotification;
+    }, [onNotification]);
+
+    useEffect(() => {
+        onXPChangeRef.current = onXPChange;
+    }, [onXPChange]);
 
     useEffect(() => {
         if (!user?.id) return;
 
+        const insforge = createClient();
         const channel = `gamification:${user.id}`;
 
         async function setupRealtime() {
             try {
-                // Ensure connection
                 if (!insforge.realtime.isConnected) {
                     await insforge.realtime.connect();
                 }
 
-                // Subscribe to user channel
                 const { ok } = await insforge.realtime.subscribe(channel);
                 if (!ok) return;
 
-                // Listen for notification inserts
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 insforge.realtime.on('notification_inserted', (notification: any) => {
                     if (['level_up', 'badge_earned'].includes(notification.type)) {
-                        onNotification({
+                        onNotificationRef.current({
                             id: notification.id,
                             type: notification.type,
                             title: notification.title,
                             message: notification.body || notification.message,
                             metadata: notification.metadata || {}
                         });
-                        onXPChange();
+                        onXPChangeRef.current();
                     }
                 });
 
-                // Listen for XP event inserts
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 insforge.realtime.on('gamification_event_inserted', (event: any) => {
                     if (event.points > 0) {
-                        onNotification({
+                        onNotificationRef.current({
                             id: event.id,
                             type: 'xp_gained',
                             title: `+${event.points} Sinapsis`,
@@ -73,7 +80,7 @@ export function useGamificationRealtime({ onNotification, onXPChange }: Options)
                                 event_type: event.event_type
                             }
                         });
-                        onXPChange();
+                        onXPChangeRef.current();
                     }
                 });
 
@@ -84,10 +91,19 @@ export function useGamificationRealtime({ onNotification, onXPChange }: Options)
 
         setupRealtime();
 
+        // Reconnect on visibility change (tab switch / inactivity)
+        function handleVisibilityChange() {
+            if (document.visibilityState === "visible" && !insforge.realtime.isConnected) {
+                setupRealtime();
+            }
+        }
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
         return () => {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
             insforge.realtime.off('notification_inserted');
             insforge.realtime.off('gamification_event_inserted');
             insforge.realtime.unsubscribe(channel);
         };
-    }, [user?.id, onNotification, onXPChange, insforge]);
+    }, [user?.id]); // Only re-run when user changes
 }

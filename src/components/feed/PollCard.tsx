@@ -25,7 +25,7 @@ interface PollCardProps {
  */
 export default function PollCard({ poll, votes }: PollCardProps) {
     const { user } = useAuth();
-    const supabase = createClient();
+    const db = createClient();
     const [localVotes, setLocalVotes] = useState(votes);
     const [isVoting, setIsVoting] = useState(false);
 
@@ -45,7 +45,7 @@ export default function PollCard({ poll, votes }: PollCardProps) {
         if (hasVoted || isExpired || !user) return;
         setIsVoting(true);
 
-        const { error } = await supabase.from("poll_votes").insert({
+        const { error } = await db.from("poll_votes").insert({
             poll_id: poll.id,
             user_id: user.id,
             option_id: optionId,

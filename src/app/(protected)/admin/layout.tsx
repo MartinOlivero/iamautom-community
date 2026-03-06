@@ -8,16 +8,16 @@ export default async function AdminLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const supabase = await createClient();
+    const db = await createClient();
 
     // Check auth
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await db.auth.getUser();
     if (!user) {
         redirect("/login");
     }
 
     // Check role
-    const { data: profile } = await supabase
+    const { data: profile } = await db
         .from("profiles")
         .select("role")
         .eq("id", user.id)

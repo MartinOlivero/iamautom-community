@@ -10,7 +10,7 @@ import { GamificationTooltip } from '@/components/ui/GamificationTooltip'
 
 export function ChallengesPage() {
     const router = useRouter()
-    const supabase = createClient()
+    const db = createClient()
     const { user } = useAuth()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [challenges, setChallenges] = useState<any[]>([])
@@ -23,7 +23,7 @@ export function ChallengesPage() {
         if (!user?.id) return
 
         async function fetchChallenges() {
-            const { data } = await supabase
+            const { data } = await db
                 .from('challenges')
                 .select(`
             *,
@@ -52,7 +52,7 @@ export function ChallengesPage() {
             setLoadingRec(true)
             try {
                 // Primero intentamos ver si ya hay una guardada que no haya caducado
-                const { data: existing } = await supabase
+                const { data: existing } = await db
                     .from('user_recommendations')
                     .select('*, challenges(*)')
                     .eq('user_id', user.id)
@@ -82,11 +82,11 @@ export function ChallengesPage() {
 
         fetchChallenges()
         fetchRecommendation()
-    }, [user?.id, supabase])
+    }, [user?.id, db])
 
     const handleAcceptRecommendation = async () => {
         if (!user || !recommendation) return
-        await supabase
+        await db
             .from('user_recommendations')
             .update({ was_accepted: true })
             .eq('user_id', user.id)

@@ -14,7 +14,7 @@ export default function AjustesPage() {
     const [isUploading, setIsUploading] = useState(false);
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const supabase = createClient();
+    const db = createClient();
 
     // Populate initial state
     useEffect(() => {
@@ -32,7 +32,7 @@ export default function AjustesPage() {
         setMessage(null);
 
         try {
-            const { error } = await supabase
+            const { error } = await db
                 .from("site_settings")
                 .update({ title, logo_url: logoUrl })
                 .eq("id", settings.id);
@@ -62,7 +62,7 @@ export default function AjustesPage() {
             const filePath = `logos/${fileName}`;
 
             // Upload the image
-            const { data: uploadData, error: uploadError } = await supabase.storage
+            const { data: uploadData, error: uploadError } = await db.storage
                 .from("site_assets")
                 .upload(filePath, file);
 

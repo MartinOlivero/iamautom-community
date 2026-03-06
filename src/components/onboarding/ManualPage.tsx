@@ -219,7 +219,7 @@ function ManualSection({
                             <span className="text-lg">{level.icon}</span>
                             <div>
                                 <p className="text-xs font-bold text-white">{level.name}</p>
-                                <p className="text-xs text-gray-500">{level.xp.toLocaleString()} XP</p>
+                                <p className="text-xs text-gray-500">{level.xp.toLocaleString("es-AR")} XP</p>
                             </div>
                         </div>
                     ))}

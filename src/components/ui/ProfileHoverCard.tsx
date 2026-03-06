@@ -214,7 +214,7 @@ export default function ProfileHoverCard({ userId, children }: ProfileHoverCardP
                                     <div className="flex items-center gap-1">
                                         <span className="text-xs">⚡</span>
                                         <span className="text-xs font-bold text-brand-accent">
-                                            {data.total_xp.toLocaleString()} XP
+                                            {data.total_xp.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} XP
                                         </span>
                                     </div>
                                 </div>

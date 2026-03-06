@@ -90,7 +90,7 @@ export default function Topbar() {
 
                                 {/* Stats row */}
                                 <div className="flex items-center justify-between text-sm font-bold relative z-10">
-                                    <span className="text-brand-accent drop-shadow-sm">⚡ {xp.toLocaleString()} <span className="text-xs font-medium opacity-70">XP</span></span>
+                                    <span className="text-brand-accent drop-shadow-sm">⚡ {xp.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')} <span className="text-xs font-medium opacity-70">XP</span></span>
                                     {profile.current_streak > 0 && (
                                         <span className="text-orange-400 drop-shadow-sm">🔥 {profile.current_streak} días</span>
                                     )}

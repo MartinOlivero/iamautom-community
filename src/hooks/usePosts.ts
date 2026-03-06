@@ -30,10 +30,10 @@ export function usePosts(options: UsePostsOptions = {}) {
 
             try {
                 console.log("[usePosts] Starting fetchPosts, creating client...");
-                const supabase = createClient();
+                const db = createClient();
 
                 console.log("[usePosts] Constructing query...");
-                let query = supabase
+                let query = db
                     .from("posts")
                     .select(
                         "*, author:profiles!author_id(id, full_name, avatar_url, plan_type, role, level, xp_points), reactions:post_reactions(*), comments(count)"
@@ -102,13 +102,13 @@ export function usePosts(options: UsePostsOptions = {}) {
     /** Create a new post */
     const createPost = useCallback(
         async (content: string, mediaUrls?: string[]) => {
-            const supabase = createClient();
+            const db = createClient();
             const {
                 data: { user },
-            } = await supabase.auth.getUser();
+            } = await db.auth.getUser();
             if (!user) return null;
 
-            const { data, error } = await supabase
+            const { data, error } = await db
                 .from("posts")
                 .insert({
                     author_id: user.id,
@@ -151,10 +151,10 @@ export function usePosts(options: UsePostsOptions = {}) {
     /** Toggle a reaction on a post */
     const toggleReaction = useCallback(
         async (postId: string, emoji: string) => {
-            const supabase = createClient();
+            const db = createClient();
             const {
                 data: { user },
-            } = await supabase.auth.getUser();
+            } = await db.auth.getUser();
             if (!user) return;
 
             const existingReaction = posts
@@ -163,7 +163,7 @@ export function usePosts(options: UsePostsOptions = {}) {
 
             if (existingReaction) {
                 // Remove reaction
-                await supabase.from("post_reactions").delete().eq("id", existingReaction.id);
+                await db.from("post_reactions").delete().eq("id", existingReaction.id);
                 setPosts((prev) =>
                     prev.map((p) =>
                         p.id === postId
@@ -173,7 +173,7 @@ export function usePosts(options: UsePostsOptions = {}) {
                 );
             } else {
                 // Add reaction
-                const { data } = await supabase
+                const { data } = await db
                     .from("post_reactions")
                     .insert({ post_id: postId, user_id: user.id, emoji })
                     .select()
@@ -193,8 +193,8 @@ export function usePosts(options: UsePostsOptions = {}) {
 
     const deletePost = useCallback(
         async (postId: string) => {
-            const supabase = createClient();
-            const { error } = await supabase.from("posts").delete().eq("id", postId);
+            const db = createClient();
+            const { error } = await db.from("posts").delete().eq("id", postId);
             if (!error) {
                 setPosts((prev) => prev.filter((p) => p.id !== postId));
             }
@@ -205,8 +205,8 @@ export function usePosts(options: UsePostsOptions = {}) {
     /** Update a post */
     const updatePost = useCallback(
         async (postId: string, content: string) => {
-            const supabase = createClient();
-            const { error } = await supabase
+            const db = createClient();
+            const { error } = await db
                 .from("posts")
                 .update({ content })
                 .eq("id", postId);
@@ -222,8 +222,8 @@ export function usePosts(options: UsePostsOptions = {}) {
     /** Toggle Pin */
     const togglePin = useCallback(
         async (postId: string, isPinned: boolean) => {
-            const supabase = createClient();
-            const { error } = await supabase
+            const db = createClient();
+            const { error } = await db
                 .from("posts")
                 .update({ is_pinned: !isPinned })
                 .eq("id", postId);

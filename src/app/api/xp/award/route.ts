@@ -13,10 +13,10 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(request: NextRequest) {
     try {
-        const supabase = await createClient();
+        const db = await createClient();
         const {
             data: { user },
-        } = await supabase.auth.getUser();
+        } = await db.auth.getUser();
 
         if (!user) {
             return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
         // 1. Update streak (Uptime) in Database via RPC
         // This handles "daily_ping" XP automatically inside SQL if it's a new day
-        await supabase.rpc("update_daily_streak", { p_user_id: user.id });
+        await db.rpc("update_daily_streak", { p_user_id: user.id });
 
         let xpResult = null;
 

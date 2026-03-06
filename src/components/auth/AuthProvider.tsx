@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/insforge/client";
 import { InsforgeBrowserProvider, useUser, useAuth as useInsforgeAuth } from "@insforge/nextjs";
 import type { Profile } from "@/types";
@@ -31,6 +32,9 @@ function AuthDataWrapper({ children }: { children: React.ReactNode }) {
     const { signOut: insforgeSignOut } = useInsforgeAuth();
     const [profile, setProfile] = useState<Profile | null>(null);
     const [isProfileLoading, setIsProfileLoading] = useState(true);
+    const hadUserRef = useRef(false);
+    const router = useRouter();
+    const pathname = usePathname();
 
     async function fetchProfile(userId: string) {
         try {
@@ -63,20 +67,30 @@ function AuthDataWrapper({ children }: { children: React.ReactNode }) {
     }
 
     async function signOut() {
+        hadUserRef.current = false;
         await insforgeSignOut();
         setProfile(null);
     }
 
     useEffect(() => {
-        if (isLoaded) {
-            if (insforgeUser) {
-                fetchProfile(insforgeUser.id);
-            } else {
-                setProfile(null);
-                setIsProfileLoading(false);
+        if (!isLoaded) return;
+
+        if (insforgeUser) {
+            hadUserRef.current = true;
+            fetchProfile(insforgeUser.id);
+        } else {
+            setProfile(null);
+            setIsProfileLoading(false);
+
+            // Session expired: user was logged in but refresh token failed (401).
+            // Redirect to login instead of showing a broken state.
+            const isProtectedRoute = pathname.startsWith("/app") || pathname.startsWith("/admin");
+            if (hadUserRef.current && isProtectedRoute) {
+                hadUserRef.current = false;
+                router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
             }
         }
-    }, [insforgeUser, isLoaded]);
+    }, [insforgeUser, isLoaded, pathname, router]);
 
     return (
         <AuthContext.Provider

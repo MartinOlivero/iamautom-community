@@ -16,8 +16,8 @@ export function useMembers() {
     const fetchMembers = useCallback(async () => {
         setIsLoading(true);
         try {
-            const supabase = createClient();
-            const { data, error } = await supabase
+            const db = createClient();
+            const { data, error } = await db
                 .from("profiles")
                 .select("id, full_name, avatar_url, plan_type, role, xp_points, level, current_streak, bio")
                 .neq("plan_type", "none")

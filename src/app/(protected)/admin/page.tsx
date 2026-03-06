@@ -6,20 +6,20 @@ import { AdminChallenges } from "@/components/gamification/AdminChallenges";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-    const supabase = await createClient();
+    const db = await createClient();
 
     // Fetch total members
-    const { count: membersCount } = await supabase
+    const { count: membersCount } = await db
         .from("profiles")
         .select("*", { count: "exact", head: true });
 
     // Fetch total modules
-    const { count: modulesCount } = await supabase
+    const { count: modulesCount } = await db
         .from("modules")
         .select("*", { count: "exact", head: true });
 
     // Fetch active subscriptions
-    const { count: subsCount } = await supabase
+    const { count: subsCount } = await db
         .from("profiles")
         .select("*", { count: "exact", head: true })
         .in("subscription_status", ["active", "trialing"]);

@@ -18,7 +18,7 @@ type Reward = {
 }
 
 export function RewardsStore() {
-    const supabase = createClient()
+    const db = createClient()
     const { user } = useAuth()
     const [rewards, setRewards] = useState<Reward[]>([])
     const [userCoins, setUserCoins] = useState(0)
@@ -31,8 +31,8 @@ export function RewardsStore() {
 
         async function fetchData() {
             const [rewardsRes, profileRes] = await Promise.all([
-                supabase.from('rewards').select('*').eq('is_active', true).order('cost_coins'),
-                supabase.from('profiles').select('coins').eq('id', user?.id).single()
+                db.from('rewards').select('*').eq('is_active', true).order('cost_coins'),
+                db.from('profiles').select('coins').eq('id', user?.id).single()
             ])
 
             if (rewardsRes.data) setRewards(rewardsRes.data as Reward[])
@@ -41,13 +41,13 @@ export function RewardsStore() {
         }
 
         fetchData()
-    }, [user?.id, supabase])
+    }, [user?.id, db])
 
     const handleRedeem = async (reward: Reward, userMessage?: string) => {
         if (!user?.id) return
 
         setRedeeming(reward.id)
-        const { data } = await supabase.rpc('redeem_reward', {
+        const { data } = await db.rpc('redeem_reward', {
             p_user_id: user.id,
             p_reward_id: reward.id,
             p_user_message: userMessage || null
@@ -78,7 +78,7 @@ export function RewardsStore() {
                             <GamificationTooltip content="Sinapsis disponibles para canjear. Al canjear se descuentan, pero tu nivel no se ve afectado." />
                         </span>
                     </div>
-                    <p className="text-3xl font-black text-brand-text tracking-tight">{userCoins.toLocaleString()}</p>
+                    <p className="text-3xl font-black text-brand-text tracking-tight">{userCoins.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}</p>
                 </div>
             </div>
 

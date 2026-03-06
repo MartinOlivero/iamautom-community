@@ -11,7 +11,7 @@ interface AvatarUploadProps {
 }
 
 export default function AvatarUpload({ userId, fullName, avatarUrl, onUploadComplete }: AvatarUploadProps) {
-    const supabase = createClient();
+    const db = createClient();
     const [isUploading, setIsUploading] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -39,7 +39,7 @@ export default function AvatarUpload({ userId, fullName, avatarUrl, onUploadComp
             const fileName = `${userId}/avatar_${Date.now()}.${fileExt}`;
 
             // Upload to 'avatars' bucket
-            const { data: uploadData, error: uploadError } = await supabase.storage
+            const { data: uploadData, error: uploadError } = await db.storage
                 .from("avatars")
                 .upload(fileName, file);
 
@@ -49,7 +49,7 @@ export default function AvatarUpload({ userId, fullName, avatarUrl, onUploadComp
             const publicUrl = uploadData.url;
 
             // Update user profile in database
-            const { error: updateError } = await supabase
+            const { error: updateError } = await db
                 .from("profiles")
                 .update({ avatar_url: publicUrl })
                 .eq("id", userId);

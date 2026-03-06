@@ -13,7 +13,7 @@ export function createClient() {
         anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
     });
 
-    // Attach Supabase-compatible methods to the instance to preserve prototype methods
+    // Attach Insforge-compatible methods to the instance to preserve prototype methods
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const extendedClient = rawClient as any;
 
@@ -25,11 +25,16 @@ export function createClient() {
     const authInstance = rawClient.auth as any;
     if (!authInstance.getUser) {
         authInstance.getUser = async () => {
-            const { data, error } = await rawClient.auth.getCurrentSession();
-            return {
-                data: { user: data?.session?.user || null },
-                error
-            };
+            try {
+                const { data, error } = await rawClient.auth.getCurrentSession();
+                return {
+                    data: { user: data?.session?.user || null },
+                    error
+                };
+            } catch {
+                // Session refresh failed (401) — return null user instead of throwing
+                return { data: { user: null }, error: null };
+            }
         };
     }
 
@@ -47,7 +52,7 @@ export function createClient() {
                 // Note: This is a simplified mapping.
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const handler = (payload: any) => {
-                    // Supabase payload structure for postgres_changes
+                    // Insforge payload structure for postgres_changes
                     callback({
                         new: payload,
                         old: {}, // simplified

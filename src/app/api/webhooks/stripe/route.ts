@@ -17,7 +17,7 @@ function getPlanTypeFromPriceId(priceId: string): "member" | "inner_circle" {
 
 /**
  * POST /api/webhooks/stripe
- * Handles Stripe webhook events to keep Supabase profiles in sync.
+ * Handles Stripe webhook events to keep Insforge profiles in sync.
  *
  * Events handled:
  * - checkout.session.completed → activate subscription
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
+    const db = createAdminClient();
 
     try {
         switch (event.type) {
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
                 const priceId = subscription.items.data[0]?.price?.id ?? "";
                 const planType = getPlanTypeFromPriceId(priceId);
 
-                await supabase
+                await db
                     .from("profiles")
                     .update({
                         stripe_customer_id: session.customer as string,
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
 
                 if (!customerId) break;
 
-                await supabase
+                await db
                     .from("profiles")
                     .update({
                         subscription_status: "active",
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 
                 if (!customerId) break;
 
-                await supabase
+                await db
                     .from("profiles")
                     .update({
                         subscription_status: "past_due",
@@ -135,7 +135,7 @@ export async function POST(request: Request) {
 
                 if (!customerId) break;
 
-                await supabase
+                await db
                     .from("profiles")
                     .update({
                         subscription_status: "canceled",
@@ -173,7 +173,7 @@ export async function POST(request: Request) {
                                     ? "trialing"
                                     : "none";
 
-                await supabase
+                await db
                     .from("profiles")
                     .update({
                         plan_type: planType,

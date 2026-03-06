@@ -36,7 +36,7 @@ const TRIAL_DAYS = 14;
 export default function ModuleDetailPage() {
     const params = useParams();
     const moduleId = params.moduleId as string;
-    const supabase = createClient();
+    const db = createClient();
     const router = useRouter();
 
     const [module_, setModule] = useState<ModuleDetail | null>(null);
@@ -51,7 +51,7 @@ export default function ModuleDetailPage() {
         setIsLoading(true);
 
         // Fetch module
-        const { data: moduleData } = await supabase
+        const { data: moduleData } = await db
             .from("modules")
             .select("id, title, description, emoji, available_during_trial")
             .eq("id", moduleId)
@@ -62,9 +62,9 @@ export default function ModuleDetailPage() {
         // Check trial lock
         const {
             data: { user: currentUser },
-        } = await supabase.auth.getUser();
+        } = await db.auth.getUser();
         if (currentUser && moduleData) {
-            const { data: profile } = await supabase
+            const { data: profile } = await db
                 .from("profiles")
                 .select("created_at, role")
                 .eq("id", currentUser.id)
@@ -86,7 +86,7 @@ export default function ModuleDetailPage() {
         }
 
         // Fetch lessons
-        const { data: lessonsData } = await supabase
+        const { data: lessonsData } = await db
             .from("lessons")
             .select("*")
             .eq("module_id", moduleId)
@@ -102,9 +102,9 @@ export default function ModuleDetailPage() {
         // Fetch user progress
         const {
             data: { user },
-        } = await supabase.auth.getUser();
+        } = await db.auth.getUser();
         if (user) {
-            const { data: progressData } = await supabase
+            const { data: progressData } = await db
                 .from("lesson_progress")
                 .select("lesson_id")
                 .eq("user_id", user.id)
@@ -116,7 +116,7 @@ export default function ModuleDetailPage() {
         }
 
         setIsLoading(false);
-    }, [supabase, moduleId, activeLessonId]);
+    }, [db, moduleId, activeLessonId]);
 
     useEffect(() => {
         fetchModuleData();
@@ -127,10 +127,10 @@ export default function ModuleDetailPage() {
     async function handleComplete(lessonId: string) {
         const {
             data: { user },
-        } = await supabase.auth.getUser();
+        } = await db.auth.getUser();
         if (!user) return;
 
-        await supabase.from("lesson_progress").upsert(
+        await db.from("lesson_progress").upsert(
             {
                 user_id: user.id,
                 lesson_id: lessonId,

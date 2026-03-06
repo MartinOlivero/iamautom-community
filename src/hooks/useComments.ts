@@ -12,11 +12,11 @@ export type CommentWithAuthor = Omit<Comment, "author"> & {
 export function useComments(postId: string) {
     const [comments, setComments] = useState<CommentWithAuthor[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const supabase = createClient();
 
     const fetchComments = useCallback(async () => {
         setIsLoading(true);
-        const { data, error } = await supabase
+        const db = createClient();
+        const { data, error } = await db
             .from("comments")
             .select(
                 `
@@ -31,16 +31,17 @@ export function useComments(postId: string) {
             setComments(data as unknown as CommentWithAuthor[]);
         }
         setIsLoading(false);
-    }, [supabase, postId]);
+    }, [postId]);
 
     const addComment = useCallback(
         async (content: string) => {
+            const db = createClient();
             const {
                 data: { user },
-            } = await supabase.auth.getUser();
+            } = await db.auth.getUser();
             if (!user) return null;
 
-            const { data, error } = await supabase
+            const { data, error } = await db
                 .from("comments")
                 .insert({ post_id: postId, author_id: user.id, content })
                 .select(
@@ -62,12 +63,13 @@ export function useComments(postId: string) {
             }
             return null;
         },
-        [supabase, postId]
+        [postId]
     );
 
     const updateComment = useCallback(
         async (commentId: string, content: string) => {
-            const { error } = await supabase
+            const db = createClient();
+            const { error } = await db
                 .from("comments")
                 .update({ content })
                 .eq("id", commentId);
@@ -77,17 +79,18 @@ export function useComments(postId: string) {
                 );
             }
         },
-        [supabase]
+        []
     );
 
     const deleteComment = useCallback(
         async (commentId: string) => {
-            const { error } = await supabase.from("comments").delete().eq("id", commentId);
+            const db = createClient();
+            const { error } = await db.from("comments").delete().eq("id", commentId);
             if (!error) {
                 setComments((prev) => prev.filter((c) => c.id !== commentId));
             }
         },
-        [supabase]
+        []
     );
 
     useEffect(() => {

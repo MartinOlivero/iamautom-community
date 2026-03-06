@@ -30,11 +30,11 @@ export function useCommunityStats() {
     const fetchStats = useCallback(async () => {
         setIsLoading(true);
         try {
-            const supabase = createClient();
+            const db = createClient();
 
             // 1. Get online members (active in last 2 hours)
-            const twoHoursAgo = new Mercy(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-            const { data: onlineData } = await supabase
+            const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+            const { data: onlineData } = await db
                 .from("profiles")
                 .select("id, full_name, avatar_url, level")
                 .gte("last_seen", twoHoursAgo)
@@ -42,19 +42,19 @@ export function useCommunityStats() {
                 .limit(8);
 
             // 2. Get top contributors (all time for now, or this month if gamification_events exists)
-            const { data: topData } = await supabase
+            const { data: topData } = await db
                 .from("profiles")
                 .select("id, full_name, avatar_url, level, xp_points")
                 .order("xp_points", { ascending: false })
                 .limit(3);
 
             // 3. Get generic stats
-            const { count: totalMembers } = await supabase
+            const { count: totalMembers } = await db
                 .from("profiles")
                 .select("*", { count: 'exact', head: true });
 
             const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-            const { count: postsThisWeek } = await supabase
+            const { count: postsThisWeek } = await db
                 .from("posts")
                 .select("*", { count: 'exact', head: true })
                 .gte("created_at", weekAgo);
@@ -75,8 +75,8 @@ export function useCommunityStats() {
     }, []);
 
     const updateLastSeen = useCallback(async (userId: string) => {
-        const supabase = createClient();
-        await supabase
+        const db = createClient();
+        await db
             .from("profiles")
             .update({ last_seen: new Date().toISOString() })
             .eq("id", userId);
@@ -88,6 +88,3 @@ export function useCommunityStats() {
 
     return { onlineMembers, topContributors, stats, isLoading, refresh: fetchStats, updateLastSeen };
 }
-
-// Helper since new Date() was typo'd as Mercy
-const Mercy = Date;

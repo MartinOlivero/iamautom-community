@@ -25,8 +25,8 @@ export default function MembersModal({ isOpen, onClose }: MembersModalProps) {
     useEffect(() => {
         if (isOpen) {
             const fetchMembers = async () => {
-                const supabase = createClient();
-                const { data, error } = await supabase
+                const db = createClient();
+                const { data, error } = await db
                     .from("profiles")
                     .select("id, full_name, avatar_url, created_at, level")
                     .order("created_at", { ascending: false });

@@ -15,7 +15,7 @@ type Props = {
     onClose: () => void
 }
 
-// Colores y configuración por nivel — deben coincidir con level_config en Supabase
+// Colores y configuración por nivel — deben coincidir con level_config en Insforge
 const LEVEL_CONFIG: Record<number, { color: string; gradient: string; icon: string; glow: string }> = {
     1: { color: '#9CA3AF', gradient: 'from-gray-700 to-gray-900', icon: '🌱', glow: 'shadow-gray-500/30' },
     2: { color: '#60A5FA', gradient: 'from-blue-700 to-blue-900', icon: '📚', glow: 'shadow-blue-500/40' },

@@ -10,9 +10,9 @@ export async function updateStreak(userId: string): Promise<{
     longestStreak: number;
     isNewDay: boolean;
 }> {
-    const supabase = createAdminClient();
+    const db = createAdminClient();
 
-    const { data: profile } = await supabase
+    const { data: profile } = await db
         .from("profiles")
         .select("current_streak, longest_streak, last_active_date")
         .eq("id", userId)
@@ -53,7 +53,7 @@ export async function updateStreak(userId: string): Promise<{
 
     const newLongest = Math.max(newStreak, profile.longest_streak);
 
-    await supabase
+    await db
         .from("profiles")
         .update({
             current_streak: newStreak,

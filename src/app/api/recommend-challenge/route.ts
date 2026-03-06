@@ -9,10 +9,10 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
     try {
-        const supabase = await createClient()
+        const db = await createClient()
 
         // Auth check — verify the requesting user matches the userId
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user } } = await db.auth.getUser()
         if (!user) {
             return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
         }
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Cache: reutilizar si tiene menos de 1 hora
-        const { data: cached } = await supabase
+        const { data: cached } = await db
             .from('user_recommendations')
             .select('*')
             .eq('user_id', userId)
@@ -33,11 +33,11 @@ export async function POST(request: NextRequest) {
 
         if (cached) return NextResponse.json(cached)
 
-        const profile = await getUserBehaviorProfile(userId, supabase)
+        const profile = await getUserBehaviorProfile(userId, db)
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const completedIds = profile.completedChallenges.map((c: any) => c.challenge_id)
-        let query = supabase
+        let query = db
             .from('challenges')
             .select('id, title, description, emoji, challenge_type, target_value, reward_coins, ends_at')
             .eq('is_active', true)
@@ -145,7 +145,7 @@ Respondé SOLO con JSON válido sin markdown ni texto extra:
             }
         }
 
-        await supabase.from('user_recommendations').upsert({
+        await db.from('user_recommendations').upsert({
             user_id: userId,
             challenge_id: recommendation.challengeId,
             reasoning: recommendation.reasoning,

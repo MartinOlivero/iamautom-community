@@ -10,12 +10,15 @@ import { useGamificationRealtime } from "@/hooks/useGamificationRealtime";
 import { LevelUpModal } from "@/components/gamification/LevelUpModal";
 import { useLevelUpModal } from "@/hooks/useLevelUpModal";
 import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { useVisibilityRefresh } from "@/hooks/useVisibilityRefresh";
 
 export default function ProtectedLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const { refreshProfile } = useAuth();
     const { toasts, addToast, dismissToast } = useToastQueue();
     const { isOpen, levelData, triggerLevelUp, closeLevelUp } = useLevelUpModal();
 
@@ -45,6 +48,9 @@ export default function ProtectedLayout({
         onNotification: handleNotification,
         onXPChange: handleXPChange,
     });
+
+    // Refresh auth profile when user returns to tab after inactivity
+    useVisibilityRefresh(refreshProfile);
     return (
         <div className="min-h-screen relative overflow-hidden bg-brand-bg dark:bg-brand-dark transition-colors duration-500">
             {/* 3D Static Mesh Background */}

@@ -1,5 +1,5 @@
 // ============================================================
-// Database type definitions matching the Supabase schema
+// Database type definitions matching the Insforge schema
 // ============================================================
 
 export type PlanType = "member" | "inner_circle" | "admin" | "none";

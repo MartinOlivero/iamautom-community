@@ -7,17 +7,17 @@ import type { Badge } from "@/types/database";
  * Uses admin client — call from server actions or API routes only.
  */
 export async function checkAndAwardBadges(userId: string): Promise<Badge[]> {
-    const supabase = createAdminClient();
+    const db = createAdminClient();
 
     // Fetch all available badges
-    const { data: allBadges } = await supabase
+    const { data: allBadges } = await db
         .from("badges")
         .select("*");
 
     if (!allBadges || allBadges.length === 0) return [];
 
     // Fetch user's already-earned badge IDs
-    const { data: earnedBadges } = await supabase
+    const { data: earnedBadges } = await db
         .from("user_badges")
         .select("badge_id")
         .eq("user_id", userId);
@@ -33,24 +33,24 @@ export async function checkAndAwardBadges(userId: string): Promise<Badge[]> {
     // Fetch user stats in parallel
     const [postsResult, commentsResult, reactionsResult, progressResult, profileResult] =
         await Promise.all([
-            supabase
+            db
                 .from("posts")
                 .select("id", { count: "exact", head: true })
                 .eq("author_id", userId),
-            supabase
+            db
                 .from("comments")
                 .select("id", { count: "exact", head: true })
                 .eq("author_id", userId),
-            supabase
+            db
                 .from("post_reactions")
                 .select("id, posts!inner(author_id)", { count: "exact", head: true })
                 .eq("posts.author_id", userId),
-            supabase
+            db
                 .from("lesson_progress")
                 .select("lesson_id, lessons!inner(module_id)", { count: "exact" })
                 .eq("user_id", userId)
                 .eq("completed", true),
-            supabase
+            db
                 .from("profiles")
                 .select("xp_points, current_streak, longest_streak, plan_type")
                 .eq("id", userId)
@@ -97,7 +97,7 @@ export async function checkAndAwardBadges(userId: string): Promise<Badge[]> {
 
         if (userValue >= badge.condition_value) {
             // Award the badge
-            const { error } = await supabase.from("user_badges").insert({
+            const { error } = await db.from("user_badges").insert({
                 user_id: userId,
                 badge_id: badge.id,
                 earned_at: new Date().toISOString(),

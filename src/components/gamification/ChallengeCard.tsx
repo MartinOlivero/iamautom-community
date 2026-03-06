@@ -27,7 +27,7 @@ function getDaysLeft(endsAt: string) {
 }
 
 export function ChallengeCard({ challenge }: { challenge: Challenge }) {
-    const supabase = createClient()
+    const db = createClient()
     const { user } = useAuth()
     const [participant, setParticipant] = useState(challenge.participant)
     const [joining, setJoining] = useState(false)
@@ -43,7 +43,7 @@ export function ChallengeCard({ challenge }: { challenge: Challenge }) {
     const handleJoin = async () => {
         if (!user?.id) return
         setJoining(true)
-        const { data } = await supabase.rpc('join_challenge', {
+        const { data } = await db.rpc('join_challenge', {
             p_user_id: user.id,
             p_challenge_id: challenge.id
         })
@@ -134,7 +134,7 @@ export function ChallengeCard({ challenge }: { challenge: Challenge }) {
                     <button
                         onClick={handleJoin}
                         disabled={joining}
-                        className="px-6 py-2 bg-brand-electric-blue hover:bg-brand-electric-blue/90 text-brand-dark rounded-xl text-xs font-black transition-all shadow-glow-blue scale-100 active:scale-95"
+                        className="px-6 py-2.5 bg-brand-accent hover:bg-brand-accent/90 text-white rounded-xl text-xs font-black transition-all shadow-glow-neon scale-100 active:scale-95"
                     >
                         {joining ? '...' : 'INICIAR DESAFÍO'}
                     </button>

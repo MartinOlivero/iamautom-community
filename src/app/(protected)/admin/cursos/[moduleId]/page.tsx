@@ -14,7 +14,7 @@ export default function AdminLessonsPage() {
     const params = useParams();
     const router = useRouter();
     const moduleId = params.moduleId as string;
-    const supabase = createClient();
+    const db = createClient();
 
     const [moduleData, setModuleData] = useState<Module | null>(null);
     const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -43,7 +43,7 @@ export default function AdminLessonsPage() {
         setIsLoading(true);
 
         // 1. Fetch Module info
-        const { data: mData, error: mError } = await supabase
+        const { data: mData, error: mError } = await db
             .from("modules")
             .select("*")
             .eq("id", moduleId)
@@ -57,7 +57,7 @@ export default function AdminLessonsPage() {
         setModuleData(mData as Module);
 
         // 2. Fetch Lessons
-        const { data: lData } = await supabase
+        const { data: lData } = await db
             .from("lessons")
             .select("*")
             .eq("module_id", moduleId)
@@ -100,14 +100,14 @@ export default function AdminLessonsPage() {
 
         if (editingLesson) {
             // Update
-            const { error } = await supabase
+            const { error } = await db
                 .from("lessons")
                 .update(payload)
                 .eq("id", editingLesson.id);
             if (!error) fetchData();
         } else {
             // Create
-            const { error } = await supabase
+            const { error } = await db
                 .from("lessons")
                 .insert([payload]);
             if (!error) fetchData();
@@ -120,7 +120,7 @@ export default function AdminLessonsPage() {
     async function handleDelete(id: string) {
         if (!confirm("¿Seguro que quieres eliminar esta lección? No se puede deshacer.")) return;
 
-        const { error } = await supabase.from("lessons").delete().eq("id", id);
+        const { error } = await db.from("lessons").delete().eq("id", id);
         if (!error) fetchData();
     }
 
@@ -206,7 +206,33 @@ export default function AdminLessonsPage() {
                         />
                     </div>
 
-                    <Input label="YouTube URL" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." />
+                    <div>
+                        <Input
+                            label="URL del Video (YouTube o Loom)"
+                            value={youtubeUrl}
+                            onChange={(e) => {
+                                const url = e.target.value
+                                setYoutubeUrl(url)
+
+                                // Auto-detect duration from Loom
+                                const loomMatch = url.match(/loom\.com\/(?:share|embed)\/([a-f0-9]+)/)
+                                if (loomMatch) {
+                                    fetch(`https://www.loom.com/v1/oembed?url=https://www.loom.com/share/${loomMatch[1]}`)
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            if (data.duration) {
+                                                setDurationMinutes(Math.ceil(data.duration / 60))
+                                            }
+                                        })
+                                        .catch(() => { })
+                                }
+                            }}
+                            placeholder="https://youtube.com/watch?v=... o https://www.loom.com/share/..."
+                        />
+                        {youtubeUrl && youtubeUrl.includes('loom.com') && (
+                            <p className="text-xs text-purple-400 mt-1">Video de Loom detectado — duración auto-completada</p>
+                        )}
+                    </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <Input

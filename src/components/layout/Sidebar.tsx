@@ -17,7 +17,6 @@ function useRealtimeProfile() {
     const { user, profile: initialProfile } = useAuth();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [profile, setProfile] = useState<any>(null);
-    const insforge = createClient();
 
     // Carga inicial y sincronización con AuthContext
     useEffect(() => {
@@ -30,6 +29,7 @@ function useRealtimeProfile() {
     useEffect(() => {
         if (!user?.id) return;
 
+        const insforge = createClient();
         const channel = `profile:${user.id}`;
 
         async function setupRealtime() {
@@ -51,11 +51,20 @@ function useRealtimeProfile() {
 
         setupRealtime();
 
+        // Reconectar cuando el usuario vuelve a la pestaña
+        function handleVisibilityChange() {
+            if (document.visibilityState === "visible" && !insforge.realtime.isConnected) {
+                setupRealtime();
+            }
+        }
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
         return () => {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
             insforge.realtime.off('update_profiles');
             insforge.realtime.unsubscribe(channel);
         };
-    }, [user?.id, insforge]);
+    }, [user?.id]); // Solo depende del user.id
 
     return profile;
 }

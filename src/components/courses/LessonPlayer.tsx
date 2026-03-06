@@ -50,8 +50,8 @@ export default function LessonPlayer({ lesson, isCompleted, onComplete }: Lesson
 
         const fetchProgress = async () => {
             try {
-                const supabase = createClient();
-                const { data } = await supabase
+                const db = createClient();
+                const { data } = await db
                     .from('lesson_progress')
                     .select('completed')
                     .eq('user_id', user.id)

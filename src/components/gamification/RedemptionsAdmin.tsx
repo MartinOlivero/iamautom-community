@@ -5,14 +5,14 @@ import { createClient } from '@/lib/insforge/client'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export function RedemptionsAdmin() {
-    const supabase = createClient()
+    const db = createClient()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [redemptions, setRedemptions] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [processing, setProcessing] = useState<string | null>(null)
 
     const fetchRedemptions = async () => {
-        const { data } = await supabase
+        const { data } = await db
             .from('reward_redemptions')
             .select(`
         *,
@@ -28,12 +28,12 @@ export function RedemptionsAdmin() {
 
     useEffect(() => {
         fetchRedemptions()
-    }, [supabase])
+    }, [db])
 
     const handleResolve = async (id: string, status: 'approved' | 'rejected', note?: string) => {
         setProcessing(id)
         try {
-            const { error: updateError } = await supabase
+            const { error: updateError } = await db
                 .from('reward_redemptions')
                 .update({
                     status,
@@ -48,7 +48,7 @@ export function RedemptionsAdmin() {
             if (status === 'rejected') {
                 const redemption = redemptions.find(r => r.id === id)
                 if (redemption) {
-                    await supabase.rpc('refund_coins', {
+                    await db.rpc('refund_coins', {
                         p_user_id: redemption.user_id,
                         p_amount: redemption.coins_spent
                     })

@@ -27,12 +27,12 @@ export const useSiteSettings = () => useContext(SiteSettingsContext);
 export function SiteSettingsProvider({ children }: { children: ReactNode }) {
     const [settings, setSettings] = useState<SiteSettings | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const supabase = createClient();
 
     const fetchSettings = async () => {
         setIsLoading(true);
         try {
-            const { data, error } = await supabase
+            const db = createClient();
+            const { data, error } = await db
                 .from("site_settings")
                 .select("*")
                 .limit(1)
@@ -54,32 +54,8 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         fetchSettings();
-
-        // Subscribe to real-time changes (Temporarily disabled during Insforge migration)
-        /*
-        const channel = supabase
-            .channel("site_settings_changes")
-            .on(
-                "postgres_changes",
-                {
-                    event: "*",
-                    schema: "public",
-                    table: "site_settings",
-                },
-                (payload) => {
-                    if (payload.new) {
-                        setSettings(payload.new as SiteSettings);
-                    }
-                }
-            )
-            .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
-        */
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [supabase]);
+    }, []);
 
     return (
         <SiteSettingsContext.Provider value={{ settings, isLoading, refreshSettings: fetchSettings }}>

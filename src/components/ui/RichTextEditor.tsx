@@ -110,12 +110,12 @@ const MenuBar = ({ editor }: { editor: any }) => {
 
         setIsUploading(true);
         try {
-            const supabase = createClient();
+            const db = createClient();
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
             const filePath = `${fileName}`;
 
-            const { data: uploadData, error: uploadError } = await supabase.storage
+            const { data: uploadData, error: uploadError } = await db.storage
                 .from('attachments')
                 .upload(filePath, file);
 

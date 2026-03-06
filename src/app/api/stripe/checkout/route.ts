@@ -21,10 +21,10 @@ const PRICE_MAP: Record<string, string> = {
 export async function POST(request: Request) {
     try {
         // 1. Verify the user is authenticated
-        const supabase = await createClient();
+        const db = await createClient();
         const {
             data: { user },
-        } = await supabase.auth.getUser();
+        } = await db.auth.getUser();
 
         if (!user) {
             return NextResponse.json({ error: "No autenticado" }, { status: 401 });
@@ -43,8 +43,8 @@ export async function POST(request: Request) {
         }
 
         // 3. Get or create Stripe customer
-        const adminSupabase = createAdminClient();
-        const { data: profile } = await adminSupabase
+        const adminDb = createAdminClient();
+        const { data: profile } = await adminDb
             .from("profiles")
             .select("stripe_customer_id, full_name")
             .eq("id", user.id)
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
             customerId = customer.id;
 
             // Save the Stripe customer ID to the profile
-            await adminSupabase
+            await adminDb
                 .from("profiles")
                 .update({ stripe_customer_id: customerId })
                 .eq("id", user.id);

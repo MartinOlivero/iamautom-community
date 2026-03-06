@@ -52,9 +52,9 @@ export function WelcomeModal() {
         const alreadyShown = localStorage.getItem(key)
 
         if (!alreadyShown) {
-            const supabase = createClient()
+            const db = createClient()
             // Mostrar solo si el perfil fue creado hace menos de 24 horas
-            supabase
+            db
                 .from('profiles')
                 .select('created_at')
                 .eq('id', user.id)

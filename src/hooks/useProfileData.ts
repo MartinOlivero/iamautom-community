@@ -34,7 +34,7 @@ export function useProfileData(userId: string | undefined) {
 
         async function fetchProfileData() {
             setIsLoading(true);
-            const supabase = createClient();
+            const db = createClient();
 
             try {
                 // 1. Fetch Profile & Level Info
@@ -42,7 +42,7 @@ export function useProfileData(userId: string | undefined) {
                 // Looking at database.ts, profile.level is UserLevel (enum).
                 // Let's find the level_number from the enum or query level_config.
 
-                const { data: profile, error: profileError } = await supabase
+                const { data: profile, error: profileError } = await db
                     .from("profiles")
                     .select("*, level")
                     .eq("id", userId)

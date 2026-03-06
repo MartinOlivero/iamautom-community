@@ -14,7 +14,7 @@ function stripHtml(html: string): string {
 }
 
 export default function AdminCursosPage() {
-    const supabase = createClient();
+    const db = createClient();
     const [modules, setModules] = useState<Module[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -41,7 +41,7 @@ export default function AdminCursosPage() {
 
     async function fetchModules() {
         setIsLoading(true);
-        const { data } = await supabase
+        const { data } = await db
             .from("modules")
             .select("*")
             .order("order_index", { ascending: true });
@@ -86,7 +86,7 @@ export default function AdminCursosPage() {
             const fileName = `module-${Date.now()}.${fileExt}`;
             const filePath = `${fileName}`;
 
-            const { data: uploadData, error: uploadError } = await supabase.storage
+            const { data: uploadData, error: uploadError } = await db.storage
                 .from("module_covers")
                 .upload(filePath, file);
 
@@ -118,14 +118,14 @@ export default function AdminCursosPage() {
 
         if (editingModule) {
             // Update
-            const { error } = await supabase
+            const { error } = await db
                 .from("modules")
                 .update(payload)
                 .eq("id", editingModule.id);
             if (!error) fetchModules();
         } else {
             // Create
-            const { error } = await supabase
+            const { error } = await db
                 .from("modules")
                 .insert([payload]);
             if (!error) fetchModules();
@@ -138,7 +138,7 @@ export default function AdminCursosPage() {
     async function handleDelete(id: string) {
         if (!confirm("¿Seguro que quieres eliminar este módulo? (También eliminará las lecciones)")) return;
 
-        const { error } = await supabase.from("modules").delete().eq("id", id);
+        const { error } = await db.from("modules").delete().eq("id", id);
         if (!error) fetchModules();
     }
 
@@ -234,8 +234,8 @@ export default function AdminCursosPage() {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Describe el contenido de este módulo..."
-                            rows={3}
-                            className="w-full bg-brand-bg-2 border border-brand-border rounded-input px-3 py-2 text-sm text-brand-text placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-brand-accent resize-none"
+                            rows={6}
+                            className="w-full bg-brand-dark border border-brand-border rounded-input px-4 py-3 text-base text-brand-text placeholder:text-brand-muted focus:outline-none focus:ring-1 focus:ring-brand-accent resize-y leading-relaxed"
                         />
                     </div>
 
