@@ -25,9 +25,11 @@ function LoginForm() {
         setError("");
         setIsGoogleLoading(true);
         try {
+            // Redirect directly to the final destination.
+            // InsforgeBrowserProvider detects OAuth params and establishes the session automatically.
             await insforge.auth.signInWithOAuth({
                 provider: "google",
-                redirectTo: `${window.location.origin}/callback?next=${encodeURIComponent(redirectTo)}`,
+                redirectTo: `${window.location.origin}${redirectTo}`,
             });
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : "Error al conectar con Google");
