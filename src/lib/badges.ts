@@ -96,12 +96,12 @@ export async function checkAndAwardBadges(userId: string): Promise<Badge[]> {
         const userValue = stats[badge.condition_type] || 0;
 
         if (userValue >= badge.condition_value) {
-            // Award the badge
-            const { error } = await db.from("user_badges").insert({
+            // Award the badge — upsert to handle concurrent requests gracefully
+            const { error } = await db.from("user_badges").upsert({
                 user_id: userId,
                 badge_id: badge.id,
                 earned_at: new Date().toISOString(),
-            });
+            }, { onConflict: "user_id,badge_id", ignoreDuplicates: true });
 
             if (!error) {
                 newlyEarned.push(badge);

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/insforge/client";
+import { useAuth } from "@/components/auth/AuthProvider";
 import type { Post, Profile, PostReaction } from "@/types/database";
 import { triggerXPAward } from "@/lib/xpClient";
 // Note: XP for post creation is handled by DB trigger (trigger_post_published_xp)
@@ -21,6 +22,7 @@ interface UsePostsOptions {
 
 export function usePosts(options: UsePostsOptions = {}) {
     const { channel = "general", pageSize = 20 } = options;
+    const { user, isLoading: authLoading } = useAuth();
     const [posts, setPosts] = useState<PostWithDetails[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
@@ -55,7 +57,12 @@ export function usePosts(options: UsePostsOptions = {}) {
 
                 if (error) {
                     console.error("Error fetching posts:", error);
-                    setPosts([]);
+                    // On auth errors, keep existing posts instead of showing empty feed
+                    const code = typeof error === "object" && "code" in error ? (error as { code: string }).code : "";
+                    const isAuthError = code === "401" || code === "403" || code === "PGRST301";
+                    if (!isAuthError) {
+                        setPosts([]);
+                    }
                     setIsLoading(false);
                     return;
                 }
@@ -240,10 +247,12 @@ export function usePosts(options: UsePostsOptions = {}) {
         []
     );
 
-    // Initial fetch
+    // Fetch posts only after auth is ready and user is available
     useEffect(() => {
-        fetchPosts();
-    }, [fetchPosts]);
+        if (!authLoading && user) {
+            fetchPosts();
+        }
+    }, [fetchPosts, authLoading, user]);
 
     return {
         posts,

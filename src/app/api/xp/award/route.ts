@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/insforge/server";
 import { awardSynapses } from "@/lib/xp";
-// import { updateStreak } from "@/lib/streaks";
 import { checkAndAwardBadges } from "@/lib/badges";
+import { SYNAPSE_REWARDS } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
+
+// Valid actions: keys from SYNAPSE_REWARDS + "ping"
+const VALID_ACTIONS = new Set([...Object.keys(SYNAPSE_REWARDS), "ping"]);
 
 /**
  * POST /api/xp/award
@@ -25,8 +28,13 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { action } = body;
 
-        if (!action) {
+        if (!action || typeof action !== "string") {
             return NextResponse.json({ error: "Missing action" }, { status: 400 });
+        }
+
+        // Validate action against allowlist
+        if (!VALID_ACTIONS.has(action)) {
+            return NextResponse.json({ error: "Invalid action" }, { status: 400 });
         }
 
         // 1. Update streak (Uptime) in Database via RPC
@@ -37,8 +45,7 @@ export async function POST(request: NextRequest) {
 
         // 2. Award action-specific Synapses if Action is not just a Ping
         if (action !== "ping") {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            xpResult = await awardSynapses(user.id, action as any);
+            xpResult = await awardSynapses(user.id, action as keyof typeof SYNAPSE_REWARDS);
         }
 
         // 3. Check and award new badges

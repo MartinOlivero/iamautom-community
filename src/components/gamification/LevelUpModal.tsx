@@ -17,15 +17,11 @@ type Props = {
 
 // Colores y configuración por nivel — deben coincidir con level_config en Insforge
 const LEVEL_CONFIG: Record<number, { color: string; gradient: string; icon: string; glow: string }> = {
-    1: { color: '#9CA3AF', gradient: 'from-gray-700 to-gray-900', icon: '🌱', glow: 'shadow-gray-500/30' },
-    2: { color: '#60A5FA', gradient: 'from-blue-700 to-blue-900', icon: '📚', glow: 'shadow-blue-500/40' },
-    3: { color: '#34D399', gradient: 'from-emerald-700 to-emerald-900', icon: '⚡', glow: 'shadow-emerald-500/40' },
-    4: { color: '#A78BFA', gradient: 'from-violet-700 to-violet-900', icon: '🔧', glow: 'shadow-violet-500/40' },
-    5: { color: '#F59E0B', gradient: 'from-amber-700 to-amber-900', icon: '🧠', glow: 'shadow-amber-500/40' },
-    6: { color: '#F97316', gradient: 'from-orange-700 to-orange-900', icon: '🏗️', glow: 'shadow-orange-500/40' },
-    7: { color: '#EF4444', gradient: 'from-red-700 to-red-900', icon: '🚀', glow: 'shadow-red-500/40' },
-    8: { color: '#EC4899', gradient: 'from-pink-700 to-pink-900', icon: '🎓', glow: 'shadow-pink-500/40' },
-    9: { color: '#8B5CF6', gradient: 'from-purple-700 to-purple-900', icon: '👑', glow: 'shadow-purple-500/50' },
+    1: { color: '#9CA3AF', gradient: 'from-gray-700 to-gray-900', icon: '🌱', glow: 'shadow-gray-500/30' },       // novato
+    2: { color: '#60A5FA', gradient: 'from-blue-700 to-blue-900', icon: '📚', glow: 'shadow-blue-500/40' },        // aprendiz
+    3: { color: '#34D399', gradient: 'from-emerald-700 to-emerald-900', icon: '⚡', glow: 'shadow-emerald-500/40' }, // automatizador
+    4: { color: '#A78BFA', gradient: 'from-violet-700 to-violet-900', icon: '🧠', glow: 'shadow-violet-500/40' },  // experto
+    5: { color: '#F59E0B', gradient: 'from-amber-700 to-amber-900', icon: '👑', glow: 'shadow-amber-500/40' },     // maestro_ia
 }
 
 export function LevelUpModal({ isOpen, levelData, onClose }: Props) {

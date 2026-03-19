@@ -50,6 +50,34 @@ export async function POST(request: Request) {
 
     const db = createAdminClient();
 
+    // Idempotency: check if this event was already processed
+    const { data: existing } = await db
+        .from("stripe_webhook_events")
+        .select("id")
+        .eq("event_id", event.id)
+        .single();
+
+    if (existing) {
+        return NextResponse.json({ received: true, deduplicated: true });
+    }
+
+    // Record event before processing to prevent concurrent duplicates
+    await db.from("stripe_webhook_events").insert({
+        event_id: event.id,
+        event_type: event.type,
+        processed_at: new Date().toISOString(),
+    });
+
+    /** Helper: update profile and throw on DB error */
+    async function updateProfile(filter: { id?: string; stripe_customer_id?: string }, data: Record<string, unknown>) {
+        const query = db.from("profiles").update({ ...data, updated_at: new Date().toISOString() });
+        if (filter.id) query.eq("id", filter.id);
+        if (filter.stripe_customer_id) query.eq("stripe_customer_id", filter.stripe_customer_id);
+        const { error, count } = await query.select("id", { count: "exact", head: true });
+        if (error) throw new Error(`DB update failed: ${error.message}`);
+        if (count === 0) console.warn(`Webhook ${event.type}: no profile matched`, filter);
+    }
+
     try {
         switch (event.type) {
             // ── Checkout completed ────────────────────────
@@ -63,22 +91,17 @@ export async function POST(request: Request) {
 
                 if (!userId || !subscriptionId) break;
 
-                // Get the subscription to find the price ID
                 const subscription =
                     await getStripe().subscriptions.retrieve(subscriptionId);
                 const priceId = subscription.items.data[0]?.price?.id ?? "";
                 const planType = getPlanTypeFromPriceId(priceId);
 
-                await db
-                    .from("profiles")
-                    .update({
-                        stripe_customer_id: session.customer as string,
-                        stripe_subscription_id: subscriptionId,
-                        plan_type: planType,
-                        subscription_status: "active",
-                        updated_at: new Date().toISOString(),
-                    })
-                    .eq("id", userId);
+                await updateProfile({ id: userId }, {
+                    stripe_customer_id: session.customer as string,
+                    stripe_subscription_id: subscriptionId,
+                    plan_type: planType,
+                    subscription_status: "active",
+                });
 
                 break;
             }
@@ -93,13 +116,9 @@ export async function POST(request: Request) {
 
                 if (!customerId) break;
 
-                await db
-                    .from("profiles")
-                    .update({
-                        subscription_status: "active",
-                        updated_at: new Date().toISOString(),
-                    })
-                    .eq("stripe_customer_id", customerId);
+                await updateProfile({ stripe_customer_id: customerId }, {
+                    subscription_status: "active",
+                });
 
                 break;
             }
@@ -114,13 +133,9 @@ export async function POST(request: Request) {
 
                 if (!customerId) break;
 
-                await db
-                    .from("profiles")
-                    .update({
-                        subscription_status: "past_due",
-                        updated_at: new Date().toISOString(),
-                    })
-                    .eq("stripe_customer_id", customerId);
+                await updateProfile({ stripe_customer_id: customerId }, {
+                    subscription_status: "past_due",
+                });
 
                 break;
             }
@@ -135,15 +150,11 @@ export async function POST(request: Request) {
 
                 if (!customerId) break;
 
-                await db
-                    .from("profiles")
-                    .update({
-                        subscription_status: "canceled",
-                        plan_type: "none",
-                        stripe_subscription_id: null,
-                        updated_at: new Date().toISOString(),
-                    })
-                    .eq("stripe_customer_id", customerId);
+                await updateProfile({ stripe_customer_id: customerId }, {
+                    subscription_status: "canceled",
+                    plan_type: "none",
+                    stripe_subscription_id: null,
+                });
 
                 break;
             }
@@ -162,25 +173,16 @@ export async function POST(request: Request) {
                 const planType = getPlanTypeFromPriceId(priceId);
                 const status = subscription.status;
 
-                const mappedStatus =
-                    status === "active"
-                        ? "active"
-                        : status === "past_due"
-                            ? "past_due"
-                            : status === "canceled"
-                                ? "canceled"
-                                : status === "trialing"
-                                    ? "trialing"
-                                    : "none";
+                const statusMap: Record<string, string> = {
+                    active: "active", past_due: "past_due",
+                    canceled: "canceled", trialing: "trialing",
+                };
+                const mappedStatus = statusMap[status] || "none";
 
-                await db
-                    .from("profiles")
-                    .update({
-                        plan_type: planType,
-                        subscription_status: mappedStatus,
-                        updated_at: new Date().toISOString(),
-                    })
-                    .eq("stripe_customer_id", customerId);
+                await updateProfile({ stripe_customer_id: customerId }, {
+                    plan_type: planType,
+                    subscription_status: mappedStatus,
+                });
 
                 break;
             }

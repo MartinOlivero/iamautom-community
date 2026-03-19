@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import DOMPurify from "dompurify";
 
 interface RichTextDisplayProps {
     content: string;
@@ -8,11 +9,17 @@ interface RichTextDisplayProps {
 }
 
 export default function RichTextDisplay({ content, className = "" }: RichTextDisplayProps) {
-    // Process content to highlight @mentions
+    // Sanitize then process content to highlight @mentions
     const processedContent = useMemo(() => {
         if (!content) return "";
+        // Sanitize HTML first to prevent XSS
+        const sanitized = DOMPurify.sanitize(content, {
+            ALLOWED_TAGS: ["p", "br", "strong", "em", "u", "s", "a", "ul", "ol", "li", "h1", "h2", "h3", "blockquote", "img", "iframe", "span", "code", "pre"],
+            ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "class", "width", "height", "allowfullscreen", "frameborder"],
+            ALLOW_DATA_ATTR: false,
+        });
         // Regex to find @username and wrap in a span
-        return content.replace(
+        return sanitized.replace(
             /(@[a-zA-Z0-9_]+)/g,
             '<span class="text-brand-accent font-bold cursor-pointer hover:underline">$1</span>'
         );

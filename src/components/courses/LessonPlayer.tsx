@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { createClient } from "@/lib/insforge/client";
 import { AnimatePresence } from "framer-motion";
+import DOMPurify from "dompurify";
 import Button from "@/components/ui/Button";
 import { YouTubePlayerWithTracking } from "@/components/lessons/YouTubePlayerWithTracking";
 import { LessonQuiz } from "@/components/lessons/LessonQuiz";
@@ -151,11 +152,15 @@ export default function LessonPlayer({ lesson, isCompleted, onComplete }: Lesson
                 )}
             </div>
 
-            {/* Description (Rich Text) */}
+            {/* Description (Rich Text) — sanitized to prevent XSS */}
             {lesson.description && (
                 <div
                     className="tiptap prose-content text-brand-text-secondary leading-relaxed overflow-hidden"
-                    dangerouslySetInnerHTML={{ __html: lesson.description }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(lesson.description, {
+                        ALLOWED_TAGS: ["p", "br", "strong", "em", "u", "s", "a", "ul", "ol", "li", "h1", "h2", "h3", "blockquote", "img", "iframe", "span", "code", "pre"],
+                        ALLOWED_ATTR: ["href", "target", "rel", "src", "alt", "class", "width", "height", "allowfullscreen", "frameborder"],
+                        ALLOW_DATA_ATTR: false,
+                    }) }}
                 />
             )}
 

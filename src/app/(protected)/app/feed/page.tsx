@@ -12,6 +12,7 @@ import MobileChannelNav from "@/components/feed/MobileChannelNav";
 import { usePosts, type PostWithDetails } from "@/hooks/usePosts";
 import { useCommunityStats } from "@/hooks/useCommunityStats";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useVisibilityRefresh } from "@/hooks/useVisibilityRefresh";
 
 export default function FeedPage({
     searchParams,
@@ -33,8 +34,12 @@ export default function FeedPage({
         toggleReaction,
         deletePost,
         updatePost,
-        togglePin
+        togglePin,
+        refresh
     } = usePosts({ channel, pageSize: 10 });
+
+    // Re-fetch posts when user returns to the tab after inactivity
+    useVisibilityRefresh(refresh);
 
     const {
         onlineMembers,

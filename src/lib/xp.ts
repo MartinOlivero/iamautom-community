@@ -5,6 +5,7 @@ type SynapseAction = keyof typeof SYNAPSE_REWARDS;
 
 /**
  * Awards Synapses to a user and logs the gamification event.
+ * Uses atomic RPC to prevent race conditions (concurrent requests losing XP).
  * User level is automatically calculated by a DB trigger upon xp_points update.
  * Uses admin client to bypass RLS.
  * Call from server actions or API routes only.
@@ -13,38 +14,32 @@ export async function awardSynapses(userId: string, action: SynapseAction, descr
     const db = createAdminClient();
     const xpAmount = SYNAPSE_REWARDS[action];
 
-    // Get current profile
-    const { data: profile } = await db
+    // Get current level before update (for level-up detection)
+    const { data: profileBefore } = await db
         .from("profiles")
-        .select("xp_points, level, coins")
+        .select("level")
         .eq("id", userId)
         .single();
 
-    if (!profile) {
+    if (!profileBefore) {
         throw new Error("Profile not found");
     }
 
-    const newXP = profile.xp_points + xpAmount;
-    const oldLevel = profile.level;
+    const oldLevel = profileBefore.level;
 
-    // Update profile: xp_points (total, for level) + coins (spendable balance)
-    // Database triggers handle level updates based on xp_points
-    const { data: updatedProfile, error: updateError } = await db
-        .from("profiles")
-        .update({
-            xp_points: newXP,
-            coins: (profile as Record<string, number>).coins + xpAmount,
-            updated_at: new Date().toISOString(),
-        })
-        .eq("id", userId)
-        .select("level")
-        .single();
+    // Atomic update: increment xp_points and coins in a single SQL operation
+    // This prevents race conditions where two concurrent requests read the same value
+    const { data: updatedProfile, error: updateError } = await db.rpc("award_synapses_atomic", {
+        p_user_id: userId,
+        p_xp_amount: xpAmount,
+    });
 
     if (updateError) {
         throw new Error("Failed to award synapses: " + updateError.message);
     }
 
-    const newLevel = updatedProfile?.level || oldLevel;
+    const newXP = updatedProfile?.new_xp ?? 0;
+    const newLevel = updatedProfile?.new_level ?? oldLevel;
     const leveledUp = newLevel !== oldLevel;
 
     // Insert Gamification Event
