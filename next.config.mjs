@@ -19,7 +19,7 @@ const nextConfig = {
                     },
                     {
                         key: "Content-Security-Policy",
-                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.insforge.app https://*.insforge.com https://api.stripe.com https://api.anthropic.com https://api.giphy.com wss://*.insforge.app; frame-src 'self' https://www.youtube.com https://js.stripe.com; object-src 'none'; base-uri 'self';",
+                        value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.insforge.app https://*.insforge.com https://api.stripe.com https://api.anthropic.com https://api.giphy.com https://www.loom.com wss://*.insforge.app; frame-src 'self' https://www.youtube.com https://js.stripe.com https://www.loom.com https://calendar.google.com; object-src 'none'; base-uri 'self';",
                     },
                 ],
             },
