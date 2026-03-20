@@ -2,6 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRefreshOnTabReturn } from "@/hooks/useVisibilityRefresh";
 import { createClient } from "@/lib/insforge/client";
 import Avatar from "@/components/ui/Avatar";
 import PlanBadge from "@/components/ui/Badge";
@@ -76,6 +77,8 @@ export default function LeaderboardPage() {
         setMembers(leaderboard);
         setIsLoading(false);
     }, [db]);
+
+    useRefreshOnTabReturn(fetchLeaderboard);
 
     useEffect(() => {
         fetchLeaderboard();

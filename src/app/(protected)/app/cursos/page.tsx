@@ -17,6 +17,7 @@ import {
     arrayMove,
 } from "@dnd-kit/sortable";
 import { useModules, type ModuleWithProgress } from "@/hooks/useModules";
+import { useRefreshOnTabReturn } from "@/hooks/useVisibilityRefresh";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { createClient } from "@/lib/insforge/client";
 import ModuleCard from "@/components/courses/ModuleCard";
@@ -29,6 +30,7 @@ import Spinner from "@/components/ui/Spinner";
  */
 export default function CursosPage() {
     const { modules, isLoading, isInTrialPeriod, trialEndsAt, refresh } = useModules();
+    useRefreshOnTabReturn(refresh);
     const { profile } = useAuth();
     const router = useRouter();
     const isAdmin = profile?.role === "admin";

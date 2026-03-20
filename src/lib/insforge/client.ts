@@ -11,6 +11,8 @@ export function createClient() {
     const rawClient = createInsforgeClient({
         baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL!,
         anonKey: process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY!,
+        autoRefreshToken: true,
+        persistSession: true,
     });
 
     // Attach Insforge-compatible methods to the instance to preserve prototype methods

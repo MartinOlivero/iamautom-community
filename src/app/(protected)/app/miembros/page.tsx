@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useState } from "react";
 import { useMembers } from "@/hooks/useMembers";
+import { useRefreshOnTabReturn } from "@/hooks/useVisibilityRefresh";
 import ProfileCard from "@/components/profile/ProfileCard";
 import Spinner from "@/components/ui/Spinner";
 
@@ -10,7 +11,8 @@ import Spinner from "@/components/ui/Spinner";
  * Members directory and XP leaderboard.
  */
 export default function MiembrosPage() {
-    const { members, isLoading } = useMembers();
+    const { members, isLoading, refresh } = useMembers();
+    useRefreshOnTabReturn(refresh);
     const [search, setSearch] = useState("");
 
     const filteredMembers = members.filter((m) =>

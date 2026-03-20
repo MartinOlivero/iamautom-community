@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/insforge/client'
 import { useAuth } from '@/components/auth/AuthProvider'
+import { useRefreshOnTabReturn } from '@/hooks/useVisibilityRefresh'
 import { ChallengeCard } from './ChallengeCard'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
@@ -19,33 +20,37 @@ export function ChallengesPage() {
     const [recommendation, setRecommendation] = useState<any>(null)
     const [loadingRec, setLoadingRec] = useState(false)
 
-    useEffect(() => {
+    const fetchChallenges = useCallback(async () => {
         if (!user?.id) return
 
-        async function fetchChallenges() {
-            const { data } = await db
-                .from('challenges')
-                .select(`
+        const { data } = await db
+            .from('challenges')
+            .select(`
             *,
             participant:challenge_participants(
               current_value, completed, joined_at
             )
           `)
-                .eq('is_active', true)
-                .lte('starts_at', new Date().toISOString())
-                .gte('ends_at', new Date().toISOString())
-                .eq('challenge_participants.user_id', user?.id)
-                .order('ends_at', { ascending: true });
+            .eq('is_active', true)
+            .lte('starts_at', new Date().toISOString())
+            .gte('ends_at', new Date().toISOString())
+            .eq('challenge_participants.user_id', user?.id)
+            .order('ends_at', { ascending: true });
 
-            if (data) {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                setChallenges(data.map((c: any) => ({
-                    ...c,
-                    participant: c.participant?.[0] || null
-                })))
-            }
-            setLoading(false)
+        if (data) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setChallenges(data.map((c: any) => ({
+                ...c,
+                participant: c.participant?.[0] || null
+            })))
         }
+        setLoading(false)
+    }, [user?.id, db])
+
+    useRefreshOnTabReturn(fetchChallenges);
+
+    useEffect(() => {
+        if (!user?.id) return
 
         async function fetchRecommendation() {
             if (!user?.id) return
@@ -82,7 +87,7 @@ export function ChallengesPage() {
 
         fetchChallenges()
         fetchRecommendation()
-    }, [user?.id, db])
+    }, [user?.id, db, fetchChallenges])
 
     const handleAcceptRecommendation = async () => {
         if (!user || !recommendation) return

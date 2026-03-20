@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/insforge/client";
+import { useRefreshOnTabReturn } from "@/hooks/useVisibilityRefresh";
 
 export interface CommunityMember {
     id: string;
@@ -81,6 +82,8 @@ export function useCommunityStats() {
             .update({ last_active_date: new Date().toISOString().split("T")[0] })
             .eq("id", userId);
     }, []);
+
+    useRefreshOnTabReturn(fetchStats);
 
     useEffect(() => {
         fetchStats();

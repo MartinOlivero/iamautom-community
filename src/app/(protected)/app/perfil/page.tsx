@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { useRefreshOnTabReturn } from "@/hooks/useVisibilityRefresh";
 import { createClient } from "@/lib/insforge/client";
 import Avatar from "@/components/ui/Avatar";
 import AvatarUpload from "@/components/profile/AvatarUpload";
@@ -18,6 +19,7 @@ import { GamificationTooltip } from "@/components/ui/GamificationTooltip";
 
 export default function PerfilPage() {
     const { user, profile, refreshProfile } = useAuth();
+    useRefreshOnTabReturn(refreshProfile);
     const db = createClient();
     const { theme, setTheme } = useTheme();
 
